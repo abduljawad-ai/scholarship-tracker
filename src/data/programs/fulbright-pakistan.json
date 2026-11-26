@@ -1,0 +1,109 @@
+{
+  "programId": "fulbright-pakistan",
+  "title": "Fulbright Program (Pakistan)",
+  "provider": "U.S. Educational Foundation in Pakistan (USEFP)",
+  "providerType": "org",
+  "country": "United States",
+  "officialUrl": "https://www.usefp.org/",
+  "fundedLevels": ["master", "phd"],
+  "applicantStages": ["bachelor", "master"],
+  "fields": ["All fields except clinical medicine"],
+  "eligibility": {
+    "nationalities": ["PK"],
+    "ageMax": null,
+    "minDegree": "bachelor",
+    "minMarks": "Minimum CGPA 3.0/4.0 or equivalent",
+    "englishTest": "TOEFL iBT or IELTS (USEFP administers the TOEFL for shortlisted candidates)",
+    "experienceYears": null,
+    "other": [
+      "Interview with the USEFP selection committee",
+      "Must return to Pakistan after the programme"
+    ]
+  },
+  "funding": {
+    "type": "fully-funded",
+    "tuitionCovered": true,
+    "monthlyStipend": 2500,
+    "currency": "USD",
+    "otherBenefits": [
+      "Return airfare",
+      "Health insurance",
+      "Book allowance",
+      "Settling-in allowance"
+    ]
+  },
+  "guide": {
+    "steps": [
+      "Check eligibility on the USEFP programme pages",
+      "Register on the USEFP online application system",
+      "Complete the application form and personal statements",
+      "Request official transcripts",
+      "Sit for the interview if shortlisted"
+    ],
+    "documents": [
+      "Passport copy",
+      "Six-year academic transcripts and degree certificates",
+      "Three references",
+      "GRE/GMAT score where required",
+      "Statement of purpose"
+    ],
+    "tips": [
+      "Tailor your study objectives to your return-to-Pakistan plan",
+      "Transcripts take time to request — start early",
+      "Interviews are competitive; prepare your research pitch"
+    ],
+    "timeline": [
+      "Applications open: February 2027",
+      "Application deadline: May 2027",
+      "Interviews: October 2027",
+      "Results: December 2027",
+      "Studies begin: August 2028"
+    ]
+  },
+  "cycles": [
+    {
+      "cycleId": "2028",
+      "label": "2028 intake",
+      "dates": {
+        "opens": "2027-02-15",
+        "deadline": "2027-05-12",
+        "resultsDate": "2027-12-15",
+        "studyStart": "2028-08-15"
+      },
+      "status": "open",
+      "apply": {
+        "url": "https://www.usefp.org/fulbright",
+        "portalName": "USEFP online application",
+        "fee": "No application fee"
+      },
+      "verification": {
+        "deadline": "provisional",
+        "applyUrl": "verified",
+        "funding": "verified",
+        "eligibility": "provisional"
+      },
+      "sources": [
+        {
+          "url": "https://www.usefp.org/fulbright",
+          "type": "official-page",
+          "lastVerified": "2026-11-25"
+        },
+        {
+          "url": "https://www.usefp.org/",
+          "type": "official-page",
+          "lastVerified": "2026-11-25"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "deadline",
+          "quote": "Sample (demo data): the 2028 intake deadline is shown as 12 May 2027 but has not been re-confirmed against the official page.",
+          "sourceUrl": "https://www.usefp.org/fulbright"
+        }
+      ],
+      "confidence": 0.7
+    }
+  ],
+  "firstSeen": "2026-11-18T09:30:00.000Z",
+  "lastUpdated": "2026-11-25T14:00:00.000Z"
+}

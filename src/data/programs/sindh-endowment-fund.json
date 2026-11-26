@@ -1,0 +1,101 @@
+{
+  "programId": "sindh-endowment-fund",
+  "title": "Sindh Endowment Fund Scholarship",
+  "provider": "Government of Sindh — Higher Education Department",
+  "providerType": "gov",
+  "country": "Pakistan",
+  "officialUrl": "https://www.sindh.gov.pk/",
+  "fundedLevels": ["bachelor", "master"],
+  "applicantStages": ["intermediate", "bachelor"],
+  "fields": ["All fields at approved institutions in Sindh"],
+  "eligibility": {
+    "nationalities": ["PK"],
+    "ageMax": 35,
+    "minDegree": "intermediate",
+    "minMarks": "Minimum 60% marks in the last qualifying examination",
+    "englishTest": null,
+    "experienceYears": null,
+    "other": [
+      "Domicile of Sindh province",
+      "Enrolled at an approved institution in Sindh"
+    ]
+  },
+  "funding": {
+    "type": "tuition",
+    "tuitionCovered": true,
+    "monthlyStipend": null,
+    "currency": null,
+    "otherBenefits": [
+      "Examination fee coverage",
+      "Book allowance"
+    ]
+  },
+  "guide": {
+    "steps": [
+      "Download the endowment fund application form from the department portal",
+      "Complete the form and get it endorsed by your institution",
+      "Attach domicile, academic records and the fee challan",
+      "Submit the form before the announced deadline",
+      "Track the merit list published by the department"
+    ],
+    "documents": [
+      "CNIC or B-Form",
+      "Domicile certificate",
+      "Intermediate or previous degree transcripts",
+      "Institution admission or enrolment letter",
+      "Income affidavit"
+    ],
+    "tips": [
+      "Apply through your institution — direct applications are not accepted",
+      "Keep photocopies of everything you submit",
+      "Check the portal regularly for the merit list"
+    ],
+    "timeline": [
+      "Applications open: March 2027",
+      "Deadline: May 2027",
+      "Merit list: September 2027",
+      "Award disbursement: October 2027"
+    ]
+  },
+  "cycles": [
+    {
+      "cycleId": "2027",
+      "label": "2027 intake",
+      "dates": {
+        "opens": "2027-03-01",
+        "deadline": "2027-05-31",
+        "resultsDate": "2027-09-30",
+        "studyStart": "2027-10-01"
+      },
+      "status": "open",
+      "apply": {
+        "url": "https://www.sindh.gov.pk/",
+        "portalName": "Sindh Endowment Fund application form",
+        "fee": "No application fee"
+      },
+      "verification": {
+        "deadline": "provisional",
+        "applyUrl": "unverified",
+        "funding": "provisional",
+        "eligibility": "provisional"
+      },
+      "sources": [
+        {
+          "url": "https://www.sindh.gov.pk/",
+          "type": "official-page",
+          "lastVerified": "2026-11-25"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "applyUrl",
+          "quote": "Sample (demo data): the application link is listed but has not been opened or re-confirmed, so it is marked unverified.",
+          "sourceUrl": "https://www.sindh.gov.pk/"
+        }
+      ],
+      "confidence": 0.6
+    }
+  ],
+  "firstSeen": "2026-11-20T00:00:00.000Z",
+  "lastUpdated": "2026-11-25T00:00:00.000Z"
+}

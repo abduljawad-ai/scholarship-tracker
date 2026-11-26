@@ -1,0 +1,154 @@
+{
+  "programId": "erasmus-mundus-joint-masters",
+  "title": "Erasmus Mundus Joint Masters",
+  "provider": "European Education and Culture Executive Agency (EACEA)",
+  "providerType": "gov",
+  "country": "European Union",
+  "officialUrl": "https://eacea.ec.europa.eu/",
+  "fundedLevels": ["master"],
+  "applicantStages": ["bachelor"],
+  "fields": [
+    "Engineering",
+    "Natural sciences",
+    "Social sciences and humanities"
+  ],
+  "eligibility": {
+    "nationalities": [],
+    "ageMax": null,
+    "minDegree": "bachelor",
+    "minMarks": "Programme-specific (typically CGPA 3.0/4.0 or equivalent)",
+    "englishTest": "Programme-specific (IELTS, TOEFL or equivalent)",
+    "experienceYears": null,
+    "other": [
+      "Open to all nationalities",
+      "Must hold a bachelor's degree before the programme starts",
+      "Programme-specific admission requirements apply"
+    ]
+  },
+  "funding": {
+    "type": "fully-funded",
+    "tuitionCovered": true,
+    "monthlyStipend": 1400,
+    "currency": "EUR",
+    "otherBenefits": [
+      "Monthly stipend",
+      "Travel and installation costs",
+      "Health insurance where applicable"
+    ]
+  },
+  "guide": {
+    "steps": [
+      "Browse the Erasmus Mundus Joint Masters catalogue",
+      "Check each programme's admission and language requirements",
+      "Apply directly to the consortium running your chosen programme",
+      "Submit transcripts and a motivation letter",
+      "Await the consortium's selection result"
+    ],
+    "documents": [
+      "Passport copy",
+      "Bachelor's degree certificate and transcripts",
+      "Motivation letter",
+      "Curriculum vitae",
+      "English language certificate"
+    ],
+    "tips": [
+      "Each consortium sets its own deadline — check every programme page",
+      "You can apply to more than one joint programme",
+      "Early applications are reviewed first in some consortia"
+    ],
+    "timeline": [
+      "Applications open: October 2027",
+      "Application deadline: January 2028",
+      "Consortium selection: March 2028",
+      "Studies begin: September 2028"
+    ]
+  },
+  "cycles": [
+    {
+      "cycleId": "2027",
+      "label": "2027 intake",
+      "dates": {
+        "opens": "2027-01-15",
+        "deadline": "2027-03-31",
+        "resultsDate": "2027-06-15",
+        "studyStart": "2027-09-01"
+      },
+      "status": "closed",
+      "apply": {
+        "url": "https://eacea.ec.europa.eu/scholarships/erasmus-mundus-catalogue_en",
+        "portalName": "Programme consortium application portal",
+        "fee": "No application fee"
+      },
+      "verification": {
+        "deadline": "verified",
+        "applyUrl": "verified",
+        "funding": "verified",
+        "eligibility": "verified"
+      },
+      "sources": [
+        {
+          "url": "https://eacea.ec.europa.eu/scholarships/erasmus-mundus-catalogue_en",
+          "type": "official-page",
+          "lastVerified": "2026-11-26"
+        },
+        {
+          "url": "https://eacea.ec.europa.eu/",
+          "type": "official-page",
+          "lastVerified": "2026-11-26"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "status",
+          "quote": "Sample (demo data): the 2027 intake is shown as closed after its March 2027 deadline.",
+          "sourceUrl": "https://eacea.ec.europa.eu/scholarships/erasmus-mundus-catalogue_en"
+        }
+      ],
+      "confidence": 0.88
+    },
+    {
+      "cycleId": "2028",
+      "label": "2028 intake",
+      "dates": {
+        "opens": "2027-10-15",
+        "deadline": "2028-01-15",
+        "resultsDate": "2028-03-31",
+        "studyStart": "2028-09-01"
+      },
+      "status": "open",
+      "apply": {
+        "url": "https://eacea.ec.europa.eu/scholarships/erasmus-mundus-catalogue_en",
+        "portalName": "Programme consortium application portal",
+        "fee": "No application fee"
+      },
+      "verification": {
+        "deadline": "verified",
+        "applyUrl": "verified",
+        "funding": "verified",
+        "eligibility": "verified"
+      },
+      "sources": [
+        {
+          "url": "https://eacea.ec.europa.eu/scholarships/erasmus-mundus-catalogue_en",
+          "type": "official-page",
+          "lastVerified": "2026-11-26"
+        },
+        {
+          "url": "https://eacea.ec.europa.eu/",
+          "type": "official-page",
+          "lastVerified": "2026-11-26"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "deadline",
+          "quote": "Sample (demo data): the 2028 intake is shown as open with a 15 January 2028 deadline.",
+          "sourceUrl": "https://eacea.ec.europa.eu/scholarships/erasmus-mundus-catalogue_en"
+        }
+      ],
+      "confidence": 0.88
+    }
+  ],
+  "firstSeen": "2026-11-20T00:00:00.000Z",
+  "lastUpdated": "2026-11-26T00:00:00.000Z"
+}

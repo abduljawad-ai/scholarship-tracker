@@ -1,0 +1,103 @@
+{
+  "programId": "commonwealth-pakistan-2025",
+  "title": "Commonwealth Scholarship (Pakistan)",
+  "provider": "Commonwealth Scholarship Commission in the United Kingdom",
+  "providerType": "gov",
+  "country": "United Kingdom",
+  "officialUrl": "https://cscuk.org.uk/",
+  "fundedLevels": ["master", "phd"],
+  "applicantStages": ["bachelor", "master"],
+  "fields": ["All fields"],
+  "eligibility": {
+    "nationalities": ["PK"],
+    "ageMax": null,
+    "minDegree": "bachelor",
+    "minMarks": "Minimum CGPA 3.0/4.0 or first-class honours equivalent",
+    "englishTest": "IELTS 6.5 or equivalent",
+    "experienceYears": null,
+    "other": [
+      "Pakistani citizen, normally resident in Pakistan",
+      "Nominated by the Higher Education Commission of Pakistan"
+    ]
+  },
+  "funding": {
+    "type": "fully-funded",
+    "tuitionCovered": true,
+    "monthlyStipend": 1200,
+    "currency": "GBP",
+    "otherBenefits": [
+      "Return airfare",
+      "Monthly stipend",
+      "Thesis grant",
+      "Study travel grant"
+    ]
+  },
+  "guide": {
+    "steps": [
+      "Check the HEC Commonwealth nomination window",
+      "Prepare the Commonwealth application form and study plan",
+      "Secure academic references",
+      "Submit the nomination through HEC",
+      "Shortlisted candidates complete the CSC application"
+    ],
+    "documents": [
+      "Passport copy",
+      "Degree certificates and transcripts",
+      "Study plan or research proposal",
+      "Two academic references",
+      "English language certificate"
+    ],
+    "tips": [
+      "HEC nomination comes first — direct CSC applications are not accepted",
+      "Match your study plan to Pakistan's development priorities",
+      "Transcripts and references take time; start well before the deadline"
+    ],
+    "timeline": [
+      "HEC nomination window: May 2027",
+      "Deadline: June 2027",
+      "CSC interviews and results: November 2027",
+      "Studies begin: September 2028"
+    ]
+  },
+  "cycles": [
+    {
+      "cycleId": "2027",
+      "label": "2027 intake",
+      "dates": {
+        "opens": "2027-05-04",
+        "deadline": "2027-06-30",
+        "resultsDate": "2027-11-15",
+        "studyStart": "2028-09-01"
+      },
+      "status": "closed",
+      "apply": {
+        "url": "https://cscuk.org.uk/",
+        "portalName": "Commonwealth Scholarships online application",
+        "fee": "No application fee"
+      },
+      "verification": {
+        "deadline": "verified",
+        "applyUrl": "verified",
+        "funding": "verified",
+        "eligibility": "verified"
+      },
+      "sources": [
+        {
+          "url": "https://cscuk.org.uk/",
+          "type": "official-page",
+          "lastVerified": "2026-11-21"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "status",
+          "quote": "Sample (demo data): the 2027 intake is shown as closed after its June 2027 deadline.",
+          "sourceUrl": "https://cscuk.org.uk/"
+        }
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "firstSeen": "2026-11-16T00:00:00.000Z",
+  "lastUpdated": "2026-11-21T00:00:00.000Z"
+}
