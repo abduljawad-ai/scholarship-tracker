@@ -371,7 +371,7 @@ Run: `npx vitest run tests/unit/data.test.ts` → PASS.
   - `EligibilityInput { currentLevel: StudyLevel; nationality: 'PK'; age?: number }`
   - `EligibilityResult { likelyEligible: boolean; reasons: string[] }`
   - `evaluateEligibility(program: Program, cycle: Cycle, input: EligibilityInput): EligibilityResult`
-- Rules: match if `applicantStages` includes the current level **or** any mapped next stage (the second check is a tolerance for data that lists the funded level; seed data uses the current/completed level); nationality passes when `nationalities` is empty, contains `PK`, or contains `any`; age passes when `ageMax` is null, age is undefined (add reason "Age limit not checked"), or `age <= ageMax`; cycle must be `open` or `upcoming`.
+- Rules: match only when `applicantStages` includes the current level. `stagesForCurrentLevel` is the UI mapping used to default the study-level filter (matric → intermediate programs, etc.); it is **not** an eligibility match. Do not add a "mapped next stage" tolerance: it would make an intermediate student eligible for Chevening and a matric student eligible for bachelor's programs, which is false. Nationality passes when `nationalities` is empty, contains `PK`, or contains `any`; age passes when `ageMax` is null, age is undefined (add reason "Age limit not checked"), or `age <= ageMax`; cycle must be `open` or `upcoming`.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -384,6 +384,8 @@ import { loadPrograms } from '../../src/lib/data'
 const programs = loadPrograms()
 const chevening = programs.find(p => p.programId === 'chevening-pakistan')!
 const cheveningCycle = chevening.cycles.find(c => c.status === 'open')!
+const turkiye = programs.find(p => p.programId === 'turkiye-burslari')!
+const turkiyeCycle = turkiye.cycles.find(c => c.status === 'upcoming')!
 
 test('matric students look at intermediate programs', () => {
   expect(stagesForCurrentLevel('matric')).toEqual(['intermediate'])
@@ -396,6 +398,21 @@ test('Pakistani bachelor student is likely eligible for Chevening', () => {
 
 test('a master student is not eligible for a master\'s scholarship', () => {
   const r = evaluateEligibility(chevening, cheveningCycle, { currentLevel: 'master', nationality: 'PK' })
+  expect(r.likelyEligible).toBe(false)
+})
+
+test('an intermediate student is not eligible for a master\'s scholarship', () => {
+  const r = evaluateEligibility(chevening, cheveningCycle, { currentLevel: 'intermediate', nationality: 'PK' })
+  expect(r.likelyEligible).toBe(false)
+})
+
+test('an intermediate student is eligible for a bachelor\'s scholarship', () => {
+  const r = evaluateEligibility(turkiye, turkiyeCycle, { currentLevel: 'intermediate', nationality: 'PK' })
+  expect(r.likelyEligible).toBe(true)
+})
+
+test('a matric student is not eligible for a bachelor\'s scholarship', () => {
+  const r = evaluateEligibility(turkiye, turkiyeCycle, { currentLevel: 'matric', nationality: 'PK' })
   expect(r.likelyEligible).toBe(false)
 })
 
@@ -425,7 +442,8 @@ Run: `npx vitest run tests/unit/eligibility.test.ts` → FAIL.
 
 - [ ] **Step 3: Implement**
 
-Implement the rules above. Keep reasons short, human-readable, and safe to show
+Implement the rules above. Match on `applicantStages` only; do not add a
+mapped-next-stage tolerance. Keep reasons short, human-readable, and safe to show
 under "Likely eligible — based on level, nationality and age." Never return the
 phrase "you qualify".
 
