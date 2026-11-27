@@ -1,0 +1,13 @@
+---
+import type { VerificationStatus } from '../lib/constants'
+
+interface Props {
+  label: string
+  status: VerificationStatus
+}
+
+const { label, status } = Astro.props
+const text = status.charAt(0).toUpperCase() + status.slice(1)
+---
+
+<span class="badge badge--verification" data-verification={status}>{label}: {text}</span>

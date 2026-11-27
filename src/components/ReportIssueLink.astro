@@ -1,0 +1,22 @@
+---
+import { PUBLIC_REPO_URL } from '../lib/constants'
+import type { Cycle, Program } from '../lib/schema'
+
+interface Props {
+  program: Program
+  cycle: Cycle
+}
+
+const { program, cycle } = Astro.props
+const title = `Problem with ${program.title}`
+const body = [
+  `Program: ${program.title}`,
+  `Program ID: ${program.programId}`,
+  `Cycle ID: ${cycle.cycleId}`,
+  '',
+  'Describe the problem and, if possible, link to the official page.',
+].join('\n')
+const href = `${PUBLIC_REPO_URL}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`
+---
+
+<a class="report-link" href={href} target="_blank" rel="noopener noreferrer">Report a problem</a>

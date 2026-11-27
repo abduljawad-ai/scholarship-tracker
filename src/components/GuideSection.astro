@@ -1,0 +1,67 @@
+---
+export interface TimelineItem {
+  label: string
+  value: string
+  dateTime?: string
+}
+
+interface Props {
+  panelId: string
+  steps: string[]
+  documents: string[]
+  timeline: TimelineItem[]
+  tips?: string[]
+}
+
+const { panelId, steps, documents, timeline, tips = [] } = Astro.props
+---
+
+<section class="detail-section guide-section" aria-labelledby={`${panelId}-guide-title`}>
+  <h2 id={`${panelId}-guide-title`}>How to apply</h2>
+
+  {steps.length > 0 ? (
+    <ol class="guide-steps">
+      {steps.map((step) => <li>{step}</li>)}
+    </ol>
+  ) : (
+    <p>No application steps are listed for this cycle — check the official page.</p>
+  )}
+
+  <h3>Documents needed</h3>
+  {documents.length > 0 ? (
+    <ul class="document-checklist">
+      {documents.map((document) => (
+        <li>
+          <label><input type="checkbox" /> {document}</label>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No document list is published for this cycle — check the official page.</p>
+  )}
+
+  <h3>Timeline</h3>
+  <dl class="timeline-list">
+    {timeline.map((item) => (
+      <div>
+        <dt>{item.label}</dt>
+        <dd>
+          {item.dateTime ? (
+            <time datetime={item.dateTime}>{item.value}</time>
+          ) : (
+            <span>{item.value}</span>
+          )}
+        </dd>
+      </div>
+    ))}
+  </dl>
+
+  {tips.length > 0 && (
+    <>
+      <h3>Tips from the guide</h3>
+      <ul class="detail-list">
+        {tips.map((tip) => <li>{tip}</li>)}
+      </ul>
+    </>
+  )}
+</section>

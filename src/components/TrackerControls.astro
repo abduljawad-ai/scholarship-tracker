@@ -1,0 +1,44 @@
+---
+import type { Cycle } from '../lib/schema'
+
+interface Props {
+  programId: string
+  cycle: Cycle
+  idPrefix: string
+}
+
+const { programId, cycle, idPrefix } = Astro.props
+const statusId = `${idPrefix}-tracker-status`
+const noteId = `${idPrefix}-tracker-note`
+const statuses = ['saved', 'applied', 'interview', 'offer', 'rejected'] as const
+---
+
+<div
+  class="tracker-controls"
+  data-tracker-controls
+  data-program-id={programId}
+  data-cycle-id={cycle.cycleId}
+>
+  <div data-tracker-start>
+    <button type="button" class="button--primary" data-tracker-save>
+      Save to My Applications
+    </button>
+  </div>
+
+  <div data-tracker-saved hidden>
+    <p class="tracker-confirmation" data-tracker-confirmation>Saved to My Applications</p>
+    <div class="field">
+      <label class="field-label" for={statusId}>Application status</label>
+      <select id={statusId} data-tracker-status>
+        {statuses.map((status) => (
+          <option value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+        ))}
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label" for={noteId}>Notes</label>
+      <textarea id={noteId} data-tracker-note rows="3"></textarea>
+    </div>
+    <button type="button" class="button--quiet" data-tracker-remove>Remove</button>
+  </div>
+</div>

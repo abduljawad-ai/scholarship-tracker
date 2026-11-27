@@ -1,0 +1,17 @@
+---
+import type { FundingType, VerificationStatus } from '../lib/constants'
+import { fundingLabel } from '../lib/format'
+import VerificationBadge from './VerificationBadge.astro'
+
+interface Props {
+  type: FundingType
+  status: VerificationStatus
+}
+
+const { type, status } = Astro.props
+---
+
+<div class="funding-badges">
+  <span class="badge badge--funding">{fundingLabel(type)}</span>
+  <VerificationBadge label="Funding" status={status} />
+</div>
