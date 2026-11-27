@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // Placeholder production URL. The owner replaces it at deploy; the sitemap,
 // canonical links and robots.txt must use the same origin.
-const site = 'https://scholarship-tracker.pages.dev'
+const site = 'https://a2cffc5e.scholarship-tracker-6wv.pages.dev'
 
 export default defineConfig({
   site,
