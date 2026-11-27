@@ -466,8 +466,8 @@ Run: `npx vitest run tests/unit/eligibility.test.ts` → PASS.
 - Produces:
   - `ProgramIndexEntry { programId; slug; title; provider; country; fundedLevels; applicantStages; nextDeadline: string|null; deadlineVerified: boolean; fundingType; fundingScore: number; status: 'active'|'archived'; firstSeen: string; likelyEligibleFor: StudyLevel[] }`
   - `toIndexEntry(program: Program): ProgramIndexEntry` — build-time; computes `likelyEligibleFor` for every `StudyLevel` from `nextCycle` + `evaluateEligibility` (nationality `PK`, no age), and `firstSeen` from the program.
-  - `FilterState { query; level: StudyLevel|'all'; currentLevel: StudyLevel; eligibleOnly; funding: 'all'|'fully'|'stipend'; deadlineWindow: 'all'|'30'|'90'; status: 'active'|'archived'|'all' }`
-  - `filterIndex(entries, filters, now: Date): ProgramIndexEntry[]` — client-safe (no `node:fs`); eligible-only uses `likelyEligibleFor`; a deadline window only matches `deadlineVerified` entries with a date.
+  - `FilterState { query; level: StudyLevel|'all'; currentLevel: StudyLevel; eligibleOnly; funding: 'all'|'fully'|'stipend'|'tuition'|'partial'; deadlineWindow: 'all'|'30'|'90'; status: 'active'|'archived'|'all'; country?: string|'all' }` — `country` is optional for backward compatibility and defaults to `'all'`.
+  - `filterIndex(entries, filters, now: Date): ProgramIndexEntry[]` — client-safe (no `node:fs`); eligible-only uses `likelyEligibleFor`; a deadline window only matches `deadlineVerified` entries with a date; `country` matches `entry.country` exactly when set; `funding` maps `fully` to `fully-funded` and passes through `stipend`, `tuition`, and `partial`.
   - `sortIndex(entries, sort: 'newest'|'best-funded'|'deadline'): ProgramIndexEntry[]` — `newest` sorts by `firstSeen` descending; `best-funded` by `fundingScore` descending; `deadline` ascending with null deadlines always last; all stable.
   - `matchesQuery(entry, query): boolean` — case-insensitive across title, provider, country, funded levels.
 
@@ -674,13 +674,21 @@ previews). Commit: `feat: add researched design system and site layout`.
 
 **Files:**
 - Create: `src/pages/index.astro` (real page), `src/scripts/home.ts`, `src/components/FilterBar.astro`, `src/components/ListingCard.astro`, `src/components/EmptyState.astro`, `src/components/Pagination.astro`, `src/components/FreshnessBanner.astro` (stub; implemented in Task 13), `tests/e2e/home.spec.ts`
+- Modify: `src/lib/filters.ts`, `tests/unit/filters.test.ts`, `src/lib/format.ts`, `tests/unit/format.test.ts`
 
 **Interfaces:**
-- Produces: home embeds `<script type="application/json" id="program-index">` containing `ProgramIndexEntry[]`; `home.ts` reads it, applies `filterIndex`/`sortIndex`, renders 24 cards per page, syncs filters to the URL, persists the chosen current level in `localStorage` key `scholarship-level`, and shows the "Likely eligible" note when the eligible toggle is on.
+- Produces: home embeds `<script type="application/json" id="program-index">` containing `ProgramIndexEntry[]`; `home.ts` reads it, applies `filterIndex`/`sortIndex`, renders 24 cards per page, syncs filters to the URL, persists the chosen current level in `localStorage` key `scholarship-level`, and shows the "Likely eligible" note when the eligible toggle is on. The note carries `data-testid="eligible-note"`; cards may also show a "Likely eligible" pill when the current level is in `likelyEligibleFor`.
+- Filters: search, Study level, I'm currently in, Country, Funding, Deadline window, Eligible only, and Sort. Home defaults to `status: 'active'`, `level: 'all'`, `country: 'all'`, `funding: 'all'`, `deadlineWindow: 'all'`, `sort: 'newest'`, and `currentLevel: 'bachelor'` when no URL/localStorage value exists; the archive page uses `status: 'archived'`.
 - Labels and defaults: the funded-level select is labelled **"Study level"**; the
   "I'm currently in" selector is labelled **"I'm currently in"** (no "level" in
-  its label, so tests stay unambiguous). Home defaults to `status: 'active'` and
-  `level: 'all'`; the archive page uses `status: 'archived'`.
+  its label, so tests stay unambiguous). On a user change of "I'm currently in",
+  set the Study level select to `stagesForCurrentLevel(newLevel)[0]` (the next
+  stage); initial load still defaults `level: 'all'`.
+- Add `studyLevelLabel(level: StudyLevel): string` to `src/lib/format.ts` with
+  readable labels (`Matric`, `Intermediate`, `Bachelor's`, `Master's`, `PhD`)
+  and a unit test. Extend `FilterState`/`filterIndex` with the optional country
+  filter and the `tuition`/`partial` funding values; add unit tests, including
+  the HEC `partial` case and the Germany country case.
 
 - [ ] **Step 1: Write the failing E2E tests**
 
@@ -700,13 +708,27 @@ test('lists seed programs and filters by study level', async ({ page }) => {
 test('eligible toggle shows the honest note and only active items', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel(/eligible only/i).check()
-  await expect(page.getByText(/Likely eligible/i)).toBeVisible()
+  await expect(page.getByTestId('eligible-note')).toBeVisible()
+  await expect(page.getByTestId('eligible-note')).toContainText(/Likely eligible/i)
 })
 
 test('search with no matches shows the empty state', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel(/search/i).fill('zzzz-no-match')
   await expect(page.getByTestId('empty-state')).toBeVisible()
+})
+
+test('filters by country', async ({ page }) => {
+  await page.goto('/')
+  await page.getByLabel(/country/i).selectOption('Germany')
+  await expect(page.getByTestId('listing-card')).toHaveCount(1)
+  await expect(page.getByTestId('card-daad-epos')).toBeVisible()
+})
+
+test('current level maps the study-level filter to the next stage', async ({ page }) => {
+  await page.goto('/')
+  await page.getByLabel(/i'm currently in/i).selectOption('matric')
+  await expect(page.getByLabel(/study level/i)).toHaveValue('intermediate')
 })
 
 test('unverified deadlines are never rendered as dates', async ({ page }) => {
@@ -722,11 +744,19 @@ Run: `npx playwright test tests/e2e/home.spec.ts` → FAIL.
 
 - [ ] **Step 3: Implement**
 
-Render cards with title, provider, country, levels, funding badge, deadline via
-`formatDeadline`, and a "Likely eligible" pill when applicable. Add filter bar
-(search, level, eligible toggle, funding, deadline window), sort select, result
-count, pagination, and empty state. Use `data-testid="listing-card"` and
-`data-testid="card-<programId>"`.
+Render cards with title, provider, country, levels via `studyLevelLabel`,
+funding badge, deadline via `formatDeadline` (verified date only; provisional
+and unverified show the not-confirmed copy), and a "Likely eligible" pill when
+applicable. Server-render all active cards inside the grid so the page works
+without JavaScript; `home.ts` reads the JSON, maps the server-rendered cards by
+`programId`, and re-appends the filtered/sorted page (24 per page). Add filter
+bar (search, study level, current level, country, eligible toggle, funding,
+deadline window), sort select, result count, pagination, and empty state. Use
+`data-testid="listing-card"`, `data-testid="card-<programId>"`, and
+`data-testid="eligible-note"` on the note. Sync filters to the URL with
+`history.replaceState` and persist the current level in `localStorage`. Use
+`stagesForCurrentLevel` only for the UI study-level mapping, never for
+eligibility.
 
 - [ ] **Step 4: Verify**
 
