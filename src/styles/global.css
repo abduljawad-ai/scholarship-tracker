@@ -184,6 +184,9 @@ a:hover {
   top: var(--space-2);
   left: var(--space-2);
   z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-medium);
@@ -227,6 +230,7 @@ a:hover {
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
+  min-height: 2.75rem;
   color: var(--color-text);
   font-family: var(--font-heading);
   font-size: var(--type-lg);
@@ -256,6 +260,10 @@ a:hover {
 }
 
 .site-nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: var(--space-1);
   color: var(--color-text);
   font-size: var(--type-sm);
   font-weight: 500;
@@ -273,13 +281,31 @@ a:hover {
   text-decoration: underline;
 }
 
+/* On phones, put the brand and theme toggle on one row and the nav on the next.
+   This keeps the header to two rows and gives every link a 44px target. */
+@media (max-width: 40rem) {
+  .site-brand {
+    order: 1;
+  }
+
+  .theme-toggle {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .site-nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+}
+
 .theme-toggle {
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   padding: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-medium);
@@ -345,6 +371,9 @@ a:hover {
 }
 
 .site-footer__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   flex: none;
   white-space: normal;
 }
@@ -557,6 +586,11 @@ a:hover {
   overflow-wrap: anywhere;
 }
 
+.listing-card__title a {
+  display: inline-block;
+  padding-block: var(--space-2);
+}
+
 .listing-card__provider {
   margin: 0;
   color: var(--color-text-muted);
@@ -623,7 +657,9 @@ a:hover {
 }
 
 .listing-card__official {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   margin-top: var(--space-3);
   font-size: var(--type-sm);
   line-height: var(--leading-sm);
@@ -715,6 +751,12 @@ a:hover {
 .detail-backlink {
   margin-bottom: var(--space-5);
   font-size: var(--type-sm);
+}
+
+.detail-backlink a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
 }
 
 .detail-header {
@@ -1248,6 +1290,10 @@ a:hover {
 }
 
 .freshness-banner__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: var(--space-1);
   color: var(--color-accent-strong);
   font-weight: 600;
   white-space: nowrap;

@@ -89,6 +89,18 @@ persistence, metadata/sitemap, the demo banner, axe accessibility checks, and
 375 px overflow. Unit tests cover schema validation, selectors, eligibility,
 filters, formatting, the tracker, freshness, and the 2,000-listing index budget.
 
+## Design workflow
+
+The repo uses a small design system adapted from the opencode Design OS:
+
+- [AGENTS.md](AGENTS.md) — project rules, including the trust and accessibility rules.
+- [docs/design-brief.md](docs/design-brief.md) — the job, audience, one action per page, and proof.
+- [docs/design-review.md](docs/design-review.md) — the 18-check rubric and automatic fails.
+- `npm run design:shots` — full-page screenshots at 360, 768, and 1440 px in `test-results/design-review/`.
+
+In opencode, `/brief` writes the brief, `/review` scores the site, and `/polish`
+does the final pass. The reviewer is read-only; it files fixes for the build agent.
+
 ## Deploy
 
 The site is designed for Cloudflare Pages on the free plan:
@@ -113,4 +125,6 @@ public before launch if you want visitors to be able to file issues.
 - [Design blueprint](docs/superpowers/specs/2026-11-26-scholarship-tracker-design.md)
 - [Plan 1 — public site foundation](docs/superpowers/plans/2026-11-27-foundation-public-site.md)
 - [Design direction](docs/design-direction.md)
+- [Design brief](docs/design-brief.md)
+- [Design review rubric](docs/design-review.md)
 - [Deployment runbook](docs/runbook.md)
