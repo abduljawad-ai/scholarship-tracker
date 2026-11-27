@@ -142,10 +142,12 @@ function initTracker(): void {
 }
 
 function initShareLink(): void {
-  const share = document.querySelector<HTMLAnchorElement>('[data-share-link]')
-  if (!share) return
-  const title = share.dataset.shareTitle ?? document.title
-  share.href = `https://wa.me/?text=${encodeURIComponent(`${title} — ${window.location.href}`)}`
+  const shares = document.querySelectorAll<HTMLAnchorElement>('[data-share-link]')
+  if (shares.length === 0) return
+  shares.forEach((share) => {
+    const title = share.dataset.shareTitle ?? document.title
+    share.href = `https://wa.me/?text=${encodeURIComponent(`${title} — ${window.location.href}`)}`
+  })
 }
 
 function init(): void {
