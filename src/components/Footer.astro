@@ -1,0 +1,17 @@
+---
+import { APP_NAME, PUBLIC_REPO_URL } from '../lib/constants'
+
+const reportURL = `${PUBLIC_REPO_URL}/issues`
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <p class="site-footer__note">
+      {APP_NAME} is independent and not affiliated with scholarship providers. Details can change —
+      always verify eligibility and deadlines on the official source before applying.
+    </p>
+    <a class="site-footer__link" href={reportURL} rel="noopener noreferrer">
+      Report an issue or correction
+    </a>
+  </div>
+</footer>
