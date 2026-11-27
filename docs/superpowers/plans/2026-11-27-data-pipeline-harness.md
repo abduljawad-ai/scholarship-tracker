@@ -118,7 +118,7 @@ pipeline/
   `deriveCycleStatus(dates: { opens: string | null; deadline: string | null }, today: string): 'open' | 'upcoming' | 'closed' | null`.
   The pipeline imports both in Task 7.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // tests/unit/cycle-status.test.ts
@@ -148,19 +148,19 @@ test('todayInPakistan crosses midnight in UTC', () => {
 })
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run: `npx vitest run tests/unit/cycle-status.test.ts`
 Expected: FAIL — module `src/lib/cycle-status.ts` not found.
 
-- [ ] **Step 3: Implement the module**
+- [x] **Step 3: Implement the module**
 
 Use `Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi', year: 'numeric',
 month: '2-digit', day: '2-digit' })` for `todayInPakistan` (returns
 `YYYY-MM-DD`). Rules, in order: `deadline < today` → closed; `opens > today` →
 upcoming; `opens !== null` → open; `deadline !== null` → open; otherwise null.
 
-- [ ] **Step 4: Normalize the seed data**
+- [x] **Step 4: Normalize the seed data**
 
 - `commonwealth-pakistan-2025`, cycle `2027`: opens `2026-05-04`, deadline
   `2026-06-30`, resultsDate `2026-11-15`, studyStart `2027-09-01`, status
@@ -174,7 +174,7 @@ upcoming; `opens !== null` → open; `deadline !== null` → open; otherwise nul
 - Set `lastUpdated` to `2026-11-27T00:00:00.000Z` on every program whose status
   or dates changed. Keep `firstSeen` unchanged.
 
-- [ ] **Step 5: Update dependent tests**
+- [x] **Step 5: Update dependent tests**
 
 - `tests/unit/data.test.ts`: expect Erasmus `nextCycle(program)!.status` to be
   `'upcoming'`. Add a test that every cycle's status equals
@@ -183,12 +183,12 @@ upcoming; `opens !== null` → open; `deadline !== null` → open; otherwise nul
   `nextCycle(chevening)!` instead of `find(c => c.status === 'open')`. The
   "closed" test keeps cloning the cycle with `status: 'closed'`.
 
-- [ ] **Step 6: Run the full unit suite and typecheck**
+- [x] **Step 6: Run the full unit suite and typecheck**
 
 Run: `npm test && npm run typecheck`
 Expected: all tests pass; 0 errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/lib/cycle-status.ts src/data/programs tests/unit
@@ -226,7 +226,7 @@ git commit -m "fix: derive cycle status from dates and normalize seed data"
   `callsOn(state, day): number`;
   `loadProgramsFrom(dir): Program[]`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `pipeline-sources.test.ts`:
 - a valid registry loads one source;
@@ -252,12 +252,12 @@ git commit -m "fix: derive cycle status from dates and normalize seed data"
 - defaults are `dailyCallLimit: 180`, `maxAttempts: 3`,
   `requestTimeoutMs: 60000`.
 
-- [ ] **Step 2: Run the tests and verify they fail**
+- [x] **Step 2: Run the tests and verify they fail**
 
 Run: `npx vitest run tests/unit/pipeline-sources.test.ts tests/unit/pipeline-state.test.ts tests/unit/pipeline-config.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Add dependencies and implement the modules**
+- [x] **Step 3: Add dependencies and implement the modules**
 
 Run: `npm install -D tsx`. The `pipeline` npm script lands in Task 8, when
 `main.ts` exists.
@@ -355,7 +355,7 @@ with `mkdirSync(dirname, { recursive: true })`, `writeFileSync(tmp)`,
 `src/lib/data.ts`: extract the body of `loadPrograms()` into
 `loadProgramsFrom(dir: string)`; `loadPrograms()` calls it with `PROGRAMS_DIR`.
 
-- [ ] **Step 4: Seed `pipeline/sources.json`**
+- [x] **Step 4: Seed `pipeline/sources.json`**
 
 One entry per seed program. Use these official URLs and hosts; `discovery` is
 true for programs whose pages link to scholarship sub-pages:
@@ -376,12 +376,12 @@ Set `indexUrls` equal to `pageUrls` for discovery sources. Set
 `archived: true` for `commonwealth`, `discovery: false` for it, and
 `programId: null` nowhere yet (discovery-only sources can be added later).
 
-- [ ] **Step 5: Run the tests and typecheck**
+- [x] **Step 5: Run the tests and typecheck**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/pipeline pipeline/sources.json src/lib/data.ts package.json package-lock.json tsconfig.json tests/unit
@@ -408,7 +408,7 @@ git commit -m "feat: add pipeline config, source registry, and checkpoint state"
 
 `PageSnapshot` is `{ url, finalUrl, status, contentType, hash, text }`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `pipeline-fetch.test.ts`:
 - a 200 response returns text, final URL, content type, and a stable SHA-256
@@ -430,12 +430,12 @@ git commit -m "feat: add pipeline config, source registry, and checkpoint state"
 - `pdfToText` calls the `unpdf` extractor with merged pages (mock `unpdf` with
   `vi.mock`).
 
-- [ ] **Step 2: Run the tests and verify they fail**
+- [x] **Step 2: Run the tests and verify they fail**
 
 Run: `npx vitest run tests/unit/pipeline-fetch.test.ts tests/unit/pipeline-content.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Run: `npm install -D node-html-parser unpdf`.
 
@@ -461,12 +461,12 @@ fragments, dedupe.
 `extractText(bytes, { mergePages: true })`; return the text. Keep the import
 inside the function so HTML-only runs do not load the PDF bundle.
 
-- [ ] **Step 4: Run the tests and typecheck**
+- [x] **Step 4: Run the tests and typecheck**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/pipeline/fetch.ts scripts/pipeline/html.ts scripts/pipeline/pdf.ts package.json package-lock.json tests/unit
@@ -497,7 +497,7 @@ git commit -m "feat: add fetching, robots checks, HTML text, and PDF extraction"
   orchestrator so item checkpoints and provider usage cannot clobber each
   other.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `pipeline-providers.test.ts`:
 - Groq posts to `https://api.groq.com/openai/v1/chat/completions` with
@@ -518,12 +518,12 @@ git commit -m "feat: add fetching, robots checks, HTML text, and PDF extraction"
 - all providers cooling down throws `ProvidersExhaustedError`;
 - a successful call increments the day's count and persists once.
 
-- [ ] **Step 2: Run the tests and verify they fail**
+- [x] **Step 2: Run the tests and verify they fail**
 
 Run: `npx vitest run tests/unit/pipeline-providers.test.ts tests/unit/pipeline-router.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Implement the providers**
+- [x] **Step 3: Implement the providers**
 
 Each provider takes `(request, signal)` and returns the text. Use a shared
 `postJson(url, body, headers, signal)` helper in `router.ts` or a private
@@ -536,7 +536,7 @@ Default models: Gemini `gemini-2.5-flash`; Groq `openai/gpt-oss-120b`.
 Cloudflare and OpenRouter require an explicit model in env; do not guess a
 model ID.
 
-- [ ] **Step 4: Implement the router**
+- [x] **Step 4: Implement the router**
 
 `createRouter({ config, store, fetchImpl, now })` builds only the
 configured providers. `complete` walks `config.routing[request.task]`, skips
@@ -545,12 +545,12 @@ and persists), and returns the first success. On success,
 `store.set(recordProviderCall(store.get(), id, todayInPakistan(now())))`.
 `available(task, exclude)` returns the ready provider IDs without calling.
 
-- [ ] **Step 5: Run the tests and typecheck**
+- [x] **Step 5: Run the tests and typecheck**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/pipeline/providers scripts/pipeline/router.ts tests/unit
@@ -576,7 +576,7 @@ git commit -m "feat: add free-model providers and the quota-aware router"
   `parseExtraction(text): Extraction`;
   `validateExtraction(extraction, snapshot, source): string[]`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 - `renderPrompt` replaces every `{{var}}` and throws on a missing variable;
 - `normalizeText` folds curly quotes and dashes to ASCII and collapses
@@ -596,12 +596,12 @@ git commit -m "feat: add free-model providers and the quota-aware router"
 - it rejects a guide item with no matching `guide.steps`/`documents`/`tips`/
   `timeline` evidence.
 
-- [ ] **Step 2: Run the tests and verify they fail**
+- [x] **Step 2: Run the tests and verify they fail**
 
 Run: `npx vitest run tests/unit/pipeline-extract.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Write `extract.md`**
+- [x] **Step 3: Write `extract.md`**
 
 Rules: return JSON only; never infer; `null` when the page does not state a
 value; ISO dates; quote the exact sentence for every non-null fact; use field
@@ -610,7 +610,7 @@ names `opens`, `deadline`, `resultsDate`, `studyStart`, `applyUrl`,
 intake; `pageKind` is `program`, `index`, or `unknown`. Include the JSON shape
 and a worked example. No marketing language.
 
-- [ ] **Step 4: Implement the schema and validation**
+- [x] **Step 4: Implement the schema and validation**
 
 `ExtractionSchema` is a strict zod object matching `Extraction`. `parseExtraction`
 finds the first `{` and last `}` after stripping fences.
@@ -627,12 +627,12 @@ finds the first `{` and last `}` after stripping fences.
 
 Return an array of human-readable errors; empty means valid.
 
-- [ ] **Step 5: Run the tests and typecheck**
+- [x] **Step 5: Run the tests and typecheck**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add pipeline/prompts/extract.md scripts/pipeline/prompts.ts scripts/pipeline/text.ts scripts/pipeline/extract.ts tests/unit
@@ -662,7 +662,7 @@ git commit -m "feat: add versioned extraction prompt, schema, and validation"
   `verifyFact(router, fact, snapshot, primaryProviderId, promptsDir, options?): Promise<{ status: 'verified' | 'provisional'; reason: string }>`;
   `options` is `{ officialHosts?: string[]; today?: string; fetchImpl?: FetchLike }`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Dates:
 - `3 November 2027`, `3 Nov 2027`, `November 3, 2027`, `2027-11-03` all support
@@ -688,12 +688,12 @@ Verification:
 - disagreement is provisional;
 - the verifier is called with `exclude: [primaryProviderId]`.
 
-- [ ] **Step 2: Run the tests and verify they fail**
+- [x] **Step 2: Run the tests and verify they fail**
 
 Run: `npx vitest run tests/unit/pipeline-verify.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Implement dates and URLs**
+- [x] **Step 3: Implement dates and URLs**
 
 `normalizeText`: lowercase, replace curly quotes/dashes with ASCII, collapse
 whitespace, strip punctuation except digits/letters/`/`/`-`/`.`.
@@ -714,7 +714,7 @@ reject if the final host is not allowed. Return a reason string for the report.
 `today <= date <= today + 3 years`; false otherwise. The orchestrator also
 rejects a deadline earlier than the extracted `opens` date.
 
-- [ ] **Step 4: Implement verification**
+- [x] **Step 4: Implement verification**
 
 `verify.md` asks: "Does the source support this exact value? Return
 `{"agreed":true|false,"quote":"...","reason":"..."}`. Quote the sentence. Do not
@@ -726,12 +726,12 @@ call `router.complete` with `exclude` → require `agreed` and a verifier quote
 that appears in the source and supports the value. On any failure return
 `provisional` with the reason; never throw for a single bad fact.
 
-- [ ] **Step 5: Run the tests and typecheck**
+- [x] **Step 5: Run the tests and typecheck**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/pipeline/dates.ts scripts/pipeline/urls.ts scripts/pipeline/verify.ts pipeline/prompts/verify.md tests/unit
@@ -757,7 +757,7 @@ git commit -m "feat: add deterministic fact checks and two-model verification"
   guideVerified: boolean }`; field names are `deadline`, `opens`,
   `resultsDate`, `studyStart`, and `applyUrl`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 - a new cycle is appended, existing cycles are untouched, and `firstSeen` stays;
 - a cycle with the same `cycleId` is updated, not duplicated (extension case);
@@ -781,12 +781,12 @@ git commit -m "feat: add deterministic fact checks and two-model verification"
 - `writeProgramFile` writes valid JSON and leaves no `.tmp`;
 - `setRunStatusLive` writes `mode: 'live'` and an ISO timestamp.
 
-- [ ] **Step 2: Run the tests and verify they fail**
+- [x] **Step 2: Run the tests and verify they fail**
 
 Run: `npx vitest run tests/unit/pipeline-publish.test.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement the merge**
+- [x] **Step 3: Implement the merge**
 
 `mergeExtraction` clones the program, finds or appends each extracted cycle by
 `cycleId`, and applies the rules above. `opens`, `resultsDate`, and `studyStart`
@@ -806,12 +806,12 @@ null.
 Validate with `ProgramSchema.parse` before writing. Write with two-space JSON and
 a trailing newline, temp file + rename.
 
-- [ ] **Step 4: Run the tests and typecheck**
+- [x] **Step 4: Run the tests and typecheck**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/pipeline/publish.ts tests/unit
@@ -841,7 +841,7 @@ git commit -m "feat: merge verified facts and publish program data atomically"
   unhealthy: string[], candidates: number, checked: number }`. `runPipeline`
   writes the report itself unless `dryRun`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Use a temp root with `pipeline/sources.json`, one copied Chevening program, and
 `src/data/run-status.json`. Use a fake `fetch` returning fixture HTML and a fake
@@ -875,12 +875,12 @@ Use a temp root with `pipeline/sources.json`, one copied Chevening program, and
 - `--max-items 5`, `--source chevening`, `--dry-run`, `--live` parse;
 - an unknown flag throws.
 
-- [ ] **Step 2: Run the tests and verify they fail**
+- [x] **Step 2: Run the tests and verify they fail**
 
 Run: `npx vitest run tests/unit/pipeline-run.test.ts tests/unit/pipeline-report.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Implement the orchestrator**
+- [x] **Step 3: Implement the orchestrator**
 
 `runPipeline`:
 1. Load config paths, registry, state, programs, run-status.
@@ -943,12 +943,12 @@ writing. Build one `StateStore` and pass it to both the router and the
 orchestrator; run; print the summary; append to `GITHUB_STEP_SUMMARY` when set;
 exit 0 for complete/paused/skipped, 1 for failed.
 
-- [ ] **Step 4: Run the tests and typecheck**
+- [x] **Step 4: Run the tests and typecheck**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/pipeline/run.ts scripts/pipeline/report.ts scripts/pipeline/main.ts package.json tests/unit
@@ -1011,7 +1011,7 @@ calls/run; 10 accepted candidates/run; 50 pending total; 35-minute soft stop,
 Discovery never writes `src/data/programs/`, never changes a published program,
 and a discovery error is reported without failing the run.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `pipeline-discover.test.ts`:
 - `extractSitemapLinks` reads `<loc>`, follows one sitemap index level, resolves
@@ -1032,12 +1032,12 @@ and a discovery error is reported without failing the run.
 - no function writes to `src/data/programs/` (assert the directory is
   unchanged).
 
-- [ ] **Step 2: Run the tests and verify they fail**
+- [x] **Step 2: Run the tests and verify they fail**
 
 Run: `npx vitest run tests/unit/pipeline-discover.test.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement discovery**
+- [x] **Step 3: Implement discovery**
 
 `discover.md` asks for `{ pages: [{ url, isScholarship, title, provider,
 country, deadline, applyUrl, evidence }] }` with the same quote rules as
@@ -1055,7 +1055,7 @@ normalized title. A missing deadline stays `null`.
 `Candidate` gains optional `foundByQuery`, `discoveredVia`, `firstSeenAt`, and
 `discoveryScore`. `candidates.json` is `{ "version": 1, "candidates": [] }`.
 
-- [ ] **Step 4: Wire discovery into the orchestrator**
+- [x] **Step 4: Wire discovery into the orchestrator**
 
 After the known-program queue is exhausted, if the run is not paused and not a
 dry run, run discovery for sources with `discovery: true`. Discovery has its own
@@ -1064,12 +1064,12 @@ after each batch. Add `candidates` and a `discovery` block to the report. A
 discovery failure is reported but does not fail the run. Dry runs skip
 discovery so they spend no model calls and write no queue.
 
-- [ ] **Step 5: Run the tests and typecheck**
+- [x] **Step 5: Run the tests and typecheck**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/pipeline/discover.ts scripts/pipeline/types.ts scripts/pipeline/state.ts scripts/pipeline/run.ts scripts/pipeline/report.ts pipeline/prompts/discover.md pipeline/prompts/discover-gaps.md pipeline/candidates.json tests/unit
@@ -1095,7 +1095,7 @@ git commit -m "feat: discover official scholarship pages into a review queue"
   `mergeExtraction`, `parseCandidates`.
 - Produces: `runEval(root?): Promise<{ passed: number; failed: string[] }>`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `pipeline-eval.test.ts`:
 - `runEval()` returns zero failures for the committed fixtures;
@@ -1103,12 +1103,12 @@ git commit -m "feat: discover official scholarship pages into a review queue"
   copy in a temp dir);
 - a case with an invalid extraction JSON is reported as a failure.
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run: `npx vitest run tests/unit/pipeline-eval.test.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Create the fixtures**
+- [x] **Step 3: Create the fixtures**
 
 `chevening.html` includes a deadline sentence (`3 November 2027`), an apply
 link on `chevening.org`, and a short guide. `chevening.extraction.json` is a
@@ -1120,7 +1120,7 @@ page; `index.discover.json` is the recorded discovery output.
 `cases.json` maps each HTML file to its recorded output, the target
 `programId`, and the expected cycle count/status.
 
-- [ ] **Step 4: Implement `runEval` and the CLI**
+- [x] **Step 4: Implement `runEval` and the CLI**
 
 For each case: `htmlToText`, `parseExtraction`, `validateExtraction`, merge into
 a copy of the program named by `programId`, and assert the expected cycle count
@@ -1128,16 +1128,16 @@ and status. For discovery, `parseCandidates` and assert the queued count. Print
 `PASS`/`FAIL` per case; exit 1 on any failure. `npm run eval` runs
 `tsx scripts/pipeline/eval.ts`.
 
-- [ ] **Step 5: Add the CI step**
+- [x] **Step 5: Add the CI step**
 
 In `.github/workflows/ci.yml`, after `npm test`, add `- run: npm run eval`.
 
-- [ ] **Step 6: Run the eval, tests, and typecheck**
+- [x] **Step 6: Run the eval, tests, and typecheck**
 
 Run: `npm run eval && npm test && npm run typecheck`
 Expected: all cases pass; all tests pass.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add pipeline/fixtures scripts/pipeline/eval.ts package.json package-lock.json .github/workflows/ci.yml tests/unit
@@ -1157,7 +1157,7 @@ git commit -m "test: add golden fixtures and the pipeline eval"
 - Consumes: `npm run pipeline -- --live --max-items 20`.
 - Produces: a scheduled workflow that commits data, state, and reports.
 
-- [ ] **Step 1: Write the workflow**
+- [x] **Step 1: Write the workflow**
 
 ```yaml
 name: Data pipeline
@@ -1220,12 +1220,12 @@ jobs:
           if-no-files-found: ignore
 ```
 
-- [ ] **Step 2: Add `.env.example`**
+- [x] **Step 2: Add `.env.example`**
 
 List the five optional provider keys and the two model overrides. Never include
 real keys.
 
-- [ ] **Step 3: Update the runbook**
+- [x] **Step 3: Update the runbook**
 
 Add: how to add provider secrets; how to trigger a manual run; what each state
 value means; how to resume after a pause; how to inspect `pipeline/runs/`; how
@@ -1237,7 +1237,7 @@ Note that GitHub emails the repository owner when a scheduled workflow fails, so
 no extra alert service is needed. Note that a manual dispatch always checks out
 `main`, so a feature branch cannot publish data.
 
-- [ ] **Step 4: Verify the YAML and the dry-run CLI**
+- [x] **Step 4: Verify the YAML and the dry-run CLI**
 
 Run: `npm run pipeline -- --dry-run`
 Expected: `No AI providers configured — pipeline skipped.` and exit 0, with no
@@ -1246,7 +1246,7 @@ changes to `src/data/` or `pipeline/`.
 Run: `git status --short`
 Expected: only the files added in this task.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add .github/workflows/pipeline.yml .env.example docs/runbook.md AGENTS.md
@@ -1262,7 +1262,7 @@ git commit -m "ci: add the daily pipeline workflow and operations guide"
   boxes)
 - Test: full suite (no new test file)
 
-- [ ] **Step 1: Run every check**
+- [x] **Step 1: Run every check**
 
 ```bash
 npm run typecheck
@@ -1275,7 +1275,7 @@ npm run test:e2e
 Expected: 0 type errors; all unit tests pass; all eval cases pass; the build
 succeeds; all e2e tests pass.
 
-- [ ] **Step 2: Confirm the trust invariants**
+- [x] **Step 2: Confirm the trust invariants**
 
 - `src/data/run-status.json` is still `{"mode":"sample","lastSuccessfulRun":null}`.
 - `npm run pipeline -- --dry-run` makes no file changes.
@@ -1283,21 +1283,21 @@ succeeds; all e2e tests pass.
 - Every seed cycle's status matches `deriveCycleStatus` at `2026-11-27`.
 - No program file gained a new `programId` or lost a cycle.
 
-- [ ] **Step 3: Review the diff against the spec**
+- [x] **Step 3: Review the diff against the spec**
 
 Check each spec requirement in sections 7–9b against a task: fetch, hash, skip
 unchanged, extract with quotes, deterministic checks, two-model verify, dedupe,
 checkpoint/resume, per-source isolation, report, provider cooldowns, daily cap,
 discovery queue, and no autonomous new-program publishing.
 
-- [ ] **Step 4: Mark the plan complete and commit**
+- [x] **Step 4: Mark the plan complete and commit**
 
 ```bash
 git add docs/superpowers/plans/2026-11-27-data-pipeline-harness.md
 git commit -m "docs: record the pipeline rehearsal and trust audit"
 ```
 
-- [ ] **Step 5: Open the PR and wait for CI**
+- [x] **Step 5: Open the PR and wait for CI**
 
 ```bash
 git push -u origin plan-2-pipeline
@@ -1307,3 +1307,36 @@ gh pr checks --watch
 
 Merge only when CI is green. Do not merge if `run-status.json` changed to
 `live` in the PR.
+
+---
+
+## Rehearsal record (2026-11-27)
+
+All twelve tasks are implemented and verified offline. No AI key was used and no
+network data was published.
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck` | 0 errors, 0 warnings, 0 hints (97 files) |
+| `npm test` | 25 files, 211 tests passed |
+| `npm run eval` | 4 golden cases passed, 0 failed |
+| `npm run build` | 14 pages, `sitemap-index.xml` created |
+| `npm run test:e2e` | 64 Playwright tests passed |
+| `src/data/run-status.json` | still `{"mode":"sample","lastSuccessfulRun":null}` |
+| `npm run pipeline -- --dry-run` | exit 0, no file changes |
+| Secret scan | no matches outside this plan document |
+| Seed cycle statuses | all coherent with `deriveCycleStatus` at 2026-11-27 |
+| Program identity | every `programId` unchanged; no cycle lost |
+
+Spec coverage: fetch with timeout and robots, content hashing and skip-unchanged,
+quote-validated extraction, deterministic date and apply-URL checks, two-model
+verification, dedupe, per-item checkpoint and resume, per-source isolation and
+retirement after five failures, run report and step summary, provider cooldowns
+and the 180-call daily cap, the discovery review queue, and no autonomous
+new-program publishing.
+
+Remaining before the site leaves demo mode (owner actions, not code):
+
+1. Add provider secrets in GitHub.
+2. Set Actions workflow permissions to Read and write.
+3. Run the workflow once by hand and confirm it commits.
