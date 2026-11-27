@@ -25,6 +25,23 @@ function report(): RunReport {
       fulbright: { fetched: 1, published: 0, failed: 1 },
     },
     providers: { groq: { calls: 4, errors: 0, cooldowns: 0 } },
+    discovery: {
+      rounds: [
+        {
+          round: 1,
+          queries: ['Example Foundation scholarship'],
+          fetched: 2,
+          accepted: 1,
+          gaps: [],
+          stopReason: 'round-cap',
+        },
+      ],
+      fetched: 2,
+      accepted: 1,
+      queries: ['Example Foundation scholarship'],
+      stopReason: 'round-cap',
+      errors: ['https://example.org/sitemap.xml: HTTP 404'],
+    },
   }
 }
 
@@ -53,4 +70,7 @@ test('renderSummary reports counts and lists the outcomes', () => {
   expect(markdown).toContain('- fulbright::https://www.usefp.org/: HTTP 500')
   expect(markdown).toContain('### Unhealthy sources')
   expect(markdown).toContain('- daad')
+  expect(markdown).toContain('Discovery: 2 fetched, 1 accepted (round-cap)')
+  expect(markdown).toContain('### Discovery errors')
+  expect(markdown).toContain('- https://example.org/sitemap.xml: HTTP 404')
 })

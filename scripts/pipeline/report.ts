@@ -29,6 +29,12 @@ export function renderSummary(report: RunReport): string {
     `- Unhealthy sources: ${report.unhealthy.length}`,
   ]
 
+  if (report.discovery) {
+    lines.push(
+      `- Discovery: ${report.discovery.fetched} fetched, ${report.discovery.accepted} accepted (${report.discovery.stopReason})`,
+    )
+  }
+
   if (report.published.length > 0) {
     lines.push("", "### Published", ...report.published.map((item) => `- ${item}`))
   }
@@ -47,6 +53,13 @@ export function renderSummary(report: RunReport): string {
       "",
       "### Unhealthy sources",
       ...report.unhealthy.map((item) => `- ${item}`),
+    )
+  }
+  if (report.discovery && report.discovery.errors.length > 0) {
+    lines.push(
+      "",
+      "### Discovery errors",
+      ...report.discovery.errors.map((item) => `- ${item}`),
     )
   }
 

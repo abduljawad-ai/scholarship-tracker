@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "
 import path from "node:path"
 import { z } from "zod"
 import type {
+  DiscoveryState,
   ItemCheckpoint,
   PipelineState,
   ProviderId,
@@ -73,6 +74,40 @@ const ProviderUsageSchema = z
   })
   .strict()
 
+const DiscoveryQuerySchema = z
+  .object({
+    id: z.string().min(1),
+    text: z.string().min(1),
+    round: z.number().int().min(1),
+    origin: z.enum(["seed", "gap"]),
+    createdAt: z.string(),
+  })
+  .strict()
+
+const DiscoverySeenUrlSchema = z
+  .object({
+    firstSeenAt: z.string(),
+    status: z.number().int().nullable(),
+    contentHash: z.string().optional(),
+  })
+  .strict()
+
+const DiscoveryHostHealthSchema = z
+  .object({
+    lastFetchedAt: z.string().nullable(),
+    failures: z.number().int().min(0),
+    nextEligibleAt: z.string().nullable(),
+  })
+  .strict()
+
+const DiscoveryStateSchema = z
+  .object({
+    seenUrls: z.record(z.string(), DiscoverySeenUrlSchema),
+    queries: z.array(DiscoveryQuerySchema),
+    hostHealth: z.record(z.string(), DiscoveryHostHealthSchema),
+  })
+  .strict()
+
 const PipelineStateSchema = z
   .object({
     version: z.literal(1),
@@ -80,9 +115,15 @@ const PipelineStateSchema = z
     pages: z.record(z.string(), PageHealthSchema),
     sources: z.record(z.string(), SourceHealthSchema),
     providers: z.record(z.string(), ProviderUsageSchema),
+    // Optional so state written before discovery existed still loads.
+    discovery: DiscoveryStateSchema.optional(),
     lastSuccessfulRun: z.string().nullable(),
   })
   .strict()
+
+export function emptyDiscovery(): DiscoveryState {
+  return { seenUrls: {}, queries: [], hostHealth: {} }
+}
 
 export function emptyState(): PipelineState {
   return {
@@ -91,6 +132,7 @@ export function emptyState(): PipelineState {
     pages: {},
     sources: {},
     providers: {},
+    discovery: emptyDiscovery(),
     lastSuccessfulRun: null,
   }
 }
@@ -141,7 +183,7 @@ export function loadState(file: string): PipelineState {
   if (!parsed.success) {
     throw new StateError(`Invalid pipeline state at ${file}: ${parsed.error.message}`)
   }
-  return parsed.data
+  return { ...parsed.data, discovery: parsed.data.discovery ?? emptyDiscovery() }
 }
 
 /** Atomic write: a crash never leaves a half-written checkpoint. */

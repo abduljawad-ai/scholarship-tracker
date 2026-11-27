@@ -78,30 +78,29 @@ export function htmlToText(html: string): string {
     .join("\n")
 }
 
-/** Absolute http(s) links in document order, fragments stripped, deduped. */
+const NON_WEB_PROTOCOLS = /^(mailto:|tel:|javascript:|data:)/i
+
+/**
+ * Absolute, unique links from one HTML page. Fragments are dropped and only
+ * http(s) URLs survive; callers decide which hosts and paths are allowed.
+ */
 export function extractLinks(html: string, baseUrl: string): string[] {
-  const root = parse(html)
-  const links: string[] = []
-  const seen = new Set<string>()
+  const root = parse(html, { comment: false })
+  const links = new Set<string>()
 
   for (const anchor of root.querySelectorAll("a[href]")) {
     const href = anchor.getAttribute("href")?.trim()
-    if (!href || href.startsWith("#")) continue
+    if (!href || href.startsWith("#") || NON_WEB_PROTOCOLS.test(href)) continue
 
-    let url: URL
     try {
-      url = new URL(href, baseUrl)
+      const url = new URL(href, baseUrl)
+      if (url.protocol !== "https:" && url.protocol !== "http:") continue
+      url.hash = ""
+      links.add(url.toString())
     } catch {
-      continue
+      // A malformed href is a dead end, not a reason to fail the page.
     }
-    if (url.protocol !== "http:" && url.protocol !== "https:") continue
-
-    url.hash = ""
-    const value = url.toString()
-    if (seen.has(value)) continue
-    seen.add(value)
-    links.push(value)
   }
 
-  return links
+  return [...links]
 }

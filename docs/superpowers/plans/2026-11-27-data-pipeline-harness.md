@@ -957,33 +957,78 @@ git commit -m "feat: add the resumable pipeline orchestrator, reports, and CLI"
 
 ---
 
-### Task 9: Discovery queue for new scholarships
+### Task 9: Agentic discovery queue for new scholarships
 
 **Files:**
 - Create: `scripts/pipeline/discover.ts`, `pipeline/prompts/discover.md`,
-  `pipeline/candidates.json`
+  `pipeline/prompts/discover-gaps.md`, `pipeline/candidates.json`
 - Test: `tests/unit/pipeline-discover.test.ts`
+- Modify: `scripts/pipeline/types.ts`, `scripts/pipeline/state.ts`,
+  `scripts/pipeline/run.ts`, `scripts/pipeline/report.ts`
 
 **Interfaces:**
-- Consumes: `Router`, `SourceConfig`, `PageSnapshot`, `EvidenceFact`.
-- Produces: `CandidateSchema`;
-  `discoverFromIndex(router, source, snapshot, existing, now, promptsDir): Promise<Candidate[]>`;
-  `extractSitemapLinks(xml, baseUrl): string[]`;
-  `parseCandidates(text): Candidate[]`;
-  `loadCandidates(path): Candidate[]`; `saveCandidates(path, candidates): void`.
+- Consumes: `Router`, `SourceConfig`, `PageSnapshot`, `EvidenceFact`,
+  `StateStore`.
+- Produces:
+  - `CandidateSchema` (zod); `parseCandidates(text): Candidate[]`;
+  - `normalizeUrl(url): string`;
+  - `extractSitemapLinks(xml, baseUrl, allowedHosts?): string[]`;
+  - `extractFeedLinks(xml, baseUrl): string[]`;
+  - `scoreFrontier(item): number`;
+  - `mergeCandidates(existing, incoming, maxPending): Candidate[]`;
+  - `loadCandidates(path): Candidate[]`; `saveCandidates(path, candidates): void`;
+  - `runDiscovery(options): Promise<DiscoveryResult>`.
+- State: `PipelineState.discovery` holds `{ seenUrls, queries, hostHealth }` so a
+  run resumes without re-fetching or re-asking.
+
+**Budgets (defaults):** 3 rounds; 6 queries/round and 18/run; 8 URLs per query;
+40 page fetches/run; 10 pages per classification call and 30 calls/run; 2 gap
+calls/run; 10 accepted candidates/run; 50 pending total; 35-minute soft stop,
+40-minute hard stop; 15-second fetch timeout with 3 attempts.
+
+**Loop:**
+1. Seed queries deterministically from discovery sources (`provider +
+   " scholarship"`, host + " scholarships").
+2. Each round, collect URLs from publisher-declared surfaces only: the source's
+   `indexUrls` (links), RSS/Atom alternates, and `/sitemap.xml` (sitemap indexes
+   followed one level). Cache per source inside the run.
+3. Score the frontier deterministically: official host, scholarship path
+   vocabulary, `lastmod`, query-term match, index vs sitemap, and penalties for
+   news/blog/login/media paths. Drop off-host, non-http, media, and already-seen
+   URLs before any model call.
+4. Fetch the top slice with per-host politeness and backoff. Reject pages under
+   400 characters. Persist `seenUrls` and host health.
+5. Classify pages in batches of 10 with task `discover`. Accept only
+   `isScholarship`, a title, a provider, an official URL, and at least one
+   evidence quote that appears in the page. An unsupported deadline or apply URL
+   becomes `null`, never a guess.
+6. Queue `pending-review` candidates, deduped by normalized URL and normalized
+   title, capped at 10 per run and 50 pending. Save after each batch.
+7. After each round except the last, one `discover-gaps` call proposes up to 4
+   new query phrases from accepted and rejected titles. Stop on any cap, the
+   deadline, no new URLs, or no signal.
+
+Discovery never writes `src/data/programs/`, never changes a published program,
+and a discovery error is reported without failing the run.
 
 - [ ] **Step 1: Write the failing tests**
 
-- links on the official host matching scholarship keywords are considered;
-- off-host links, PDFs, and non-scholarship paths are skipped;
-- a page classified as a scholarship with a valid title, provider, official URL,
-  and a supported deadline becomes a `pending-review` candidate;
-- a page classified as not a scholarship is skipped;
-- a candidate with an unsupported quote or a disallowed apply URL is skipped;
+`pipeline-discover.test.ts`:
+- `extractSitemapLinks` reads `<loc>`, follows one sitemap index level, resolves
+  relative URLs, and keeps only allowed hosts;
+- `extractFeedLinks` reads RSS `<link>` and Atom `<link href>`;
+- `scoreFrontier` prefers an official scholarship path over an off-topic news
+  path and penalises media files;
+- `normalizeUrl` drops fragments, default ports, and trailing slashes;
+- off-host, media, and already-seen URLs never reach the fetcher;
+- a batch response is mapped back to pages by URL, and a page classified as not
+  a scholarship is skipped;
+- a candidate with an unsupported quote is skipped; an unsupported deadline or
+  apply URL becomes `null`;
 - an existing candidate URL or normalized title is not duplicated;
-- `extractSitemapLinks` reads `<loc>` entries, resolves relative URLs, and keeps
-  only allowed hosts;
-- `saveCandidates` writes valid JSON atomically;
+- `saveCandidates` writes valid JSON atomically and `loadCandidates` rejects a
+  malformed file;
+- the loop stops at the round cap and the fetch cap;
 - no function writes to `src/data/programs/` (assert the directory is
   unchanged).
 
@@ -994,28 +1039,30 @@ Expected: FAIL — module not found.
 
 - [ ] **Step 3: Implement discovery**
 
-`discover.md` asks for `{ isScholarship, title, provider, country, deadline,
-applyUrl, evidence }` with the same quote rules. `discoverFromIndex` filters
-links by allowed host and `/(scholarship|scholarships|funding|bursary|award|grant)/i`,
-caps at 10 new links, fetches each, calls the router with task `discover`, and
-validates the result. Also fetch `${origin}/sitemap.xml` once per discovery
-source, run it through `extractSitemapLinks`, and merge those candidates with
-the index links (dedupe by URL) before the cap. Queue only when
-`isScholarship` is true and title, provider, official URL, and at least one
-evidence quote are present. A missing deadline is allowed. Never publish.
+`discover.md` asks for `{ pages: [{ url, isScholarship, title, provider,
+country, deadline, applyUrl, evidence }] }` with the same quote rules as
+`extract.md`. `discover-gaps.md` asks for `{ queries: string[] }` — up to four
+short phrases, no URLs. Both return JSON only.
 
-`Candidate` shape: `{ candidateId, title, provider, country, officialUrl,
-deadline, applyUrl, evidence, sourceId, discoveredAt, status: 'pending-review' }`.
-`candidateId` is a slug of title + deadline year, unique against existing
-candidates. Dedupe against existing candidates by `normalizeUrl(officialUrl)`
-and by normalized title.
+`runDiscovery` builds seed queries, collects and scores the frontier, fetches
+with `fetchText` (robots and retries already enforced), classifies in batches,
+validates quotes against each page, and merges candidates. It keeps `seenUrls`,
+query history, and per-host health in the shared state so a later run does not
+repeat work. `candidateId` is a slug of title + deadline year, made unique
+against existing candidates. Dedupe by `normalizeUrl(officialUrl)` and by
+normalized title. A missing deadline stays `null`.
+
+`Candidate` gains optional `foundByQuery`, `discoveredVia`, `firstSeenAt`, and
+`discoveryScore`. `candidates.json` is `{ "version": 1, "candidates": [] }`.
 
 - [ ] **Step 4: Wire discovery into the orchestrator**
 
-After the known-program queue is exhausted, if the run is not paused, process
-discovery indexes for sources with `discovery: true`. Respect `maxItems` and the
-daily cap. Save candidates after each accepted item. A discovery failure is
-reported but does not fail the run.
+After the known-program queue is exhausted, if the run is not paused and not a
+dry run, run discovery for sources with `discovery: true`. Discovery has its own
+fetch and call budgets; the router still enforces the daily cap. Save candidates
+after each batch. Add `candidates` and a `discovery` block to the report. A
+discovery failure is reported but does not fail the run. Dry runs skip
+discovery so they spend no model calls and write no queue.
 
 - [ ] **Step 5: Run the tests and typecheck**
 
@@ -1025,7 +1072,7 @@ Expected: all pass.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add scripts/pipeline/discover.ts pipeline/prompts/discover.md pipeline/candidates.json scripts/pipeline/run.ts tests/unit
+git add scripts/pipeline/discover.ts scripts/pipeline/types.ts scripts/pipeline/state.ts scripts/pipeline/run.ts scripts/pipeline/report.ts pipeline/prompts/discover.md pipeline/prompts/discover-gaps.md pipeline/candidates.json tests/unit
 git commit -m "feat: discover official scholarship pages into a review queue"
 ```
 

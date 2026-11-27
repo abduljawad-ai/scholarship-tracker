@@ -38,12 +38,16 @@ const RETRY_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504])
 const ALLOWED_TEXT_TYPES = new Set([
   "text/html",
   "text/plain",
+  "text/xml",
+  "application/xml",
+  "application/rss+xml",
+  "application/atom+xml",
   "application/xhtml+xml",
   "application/pdf",
 ])
 
 const ACCEPT =
-  "text/html, application/xhtml+xml, application/pdf, text/plain;q=0.9, */*;q=0.1"
+  "text/html, application/xhtml+xml, application/xml, text/xml, application/rss+xml, application/atom+xml, application/pdf, text/plain;q=0.9, */*;q=0.1"
 
 const defaultSleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms))
@@ -133,12 +137,20 @@ export async function fetchText(
   }
 
   const raw = await response.text()
-  const text =
-    contentType === "text/html" || contentType === "application/xhtml+xml"
-      ? htmlToText(raw)
-      : raw.trim()
+  const isHtml = contentType === "text/html" || contentType === "application/xhtml+xml"
+  const text = isHtml ? htmlToText(raw) : raw.trim()
 
-  return { url, finalUrl, status: response.status, contentType, hash: hashText(text), text }
+  const snapshot: PageSnapshot = {
+    url,
+    finalUrl,
+    status: response.status,
+    contentType,
+    hash: hashText(text),
+    text,
+  }
+  // Discovery needs the links, not just the words. Kept off PDFs and plain text.
+  if (isHtml) snapshot.html = raw
+  return snapshot
 }
 
 /** Fetch raw bytes (used when a caller wants the file itself). */

@@ -11,6 +11,7 @@ import { buildExtractRequest, parseExtraction, validateExtraction } from "./extr
 import { clearRobotsCache, fetchText, robotsAllows, type FetchLike } from "./fetch"
 import { mergeExtraction, setRunStatusLive, writeProgramFile } from "./publish"
 import { ProvidersExhaustedError } from "./router"
+import { runDiscovery, type DiscoveryResult } from "./discover"
 import { loadSources } from "./sources"
 import {
   createFileStore,
@@ -22,6 +23,7 @@ import {
 } from "./state"
 import { quoteAppearsIn } from "./text"
 import type {
+  DiscoveryRunReport,
   Extraction,
   PageSnapshot,
   PipelineConfig,
@@ -362,6 +364,8 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
   let checked = 0
   let processed = 0
   let status: RunStatus = "running"
+  let discoveryResult: DiscoveryResult | null = null
+  const discoveryErrors: string[] = []
 
   const commit = (next: ReturnType<StateStore["get"]>): void => {
     state = next
@@ -569,6 +573,31 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
       }
     }
   } finally {
+    // Discovery is a review queue, never a publication. It runs after the
+    // known-program queue, is skipped by dry runs, and its failures are
+    // reported without failing the run.
+    if (
+      status !== "paused" &&
+      !dryRun &&
+      !(checked === 0 && failed.length > 0)
+    ) {
+      try {
+        discoveryResult = await runDiscovery({
+          config,
+          router,
+          store,
+          sources: activeSources,
+          now,
+          fetchImpl,
+          sleep: options.sleep,
+          random: options.random,
+        })
+      } catch (err) {
+        discoveryErrors.push(err instanceof Error ? err.message : String(err))
+      }
+      state = store.get()
+    }
+
     if (status !== "paused") {
       status = checked === 0 && failed.length > 0 ? "failed" : "complete"
     }
@@ -593,10 +622,28 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
     }
   }
 
+  const discoveryQuiet =
+    discoveryResult === null ||
+    (discoveryResult.stopReason === "none" &&
+      discoveryResult.fetched === 0 &&
+      discoveryResult.accepted.length === 0 &&
+      discoveryResult.errors.length === 0)
+  const discoveryReport: DiscoveryRunReport | null =
+    discoveryQuiet && discoveryErrors.length === 0
+      ? null
+      : {
+          rounds: discoveryResult?.rounds ?? [],
+          fetched: discoveryResult?.fetched ?? 0,
+          accepted: discoveryResult?.accepted.length ?? 0,
+          queries: discoveryResult?.queries ?? [],
+          stopReason: discoveryResult?.stopReason ?? "none",
+          errors: [...(discoveryResult?.errors ?? []), ...discoveryErrors],
+        }
+
   const report: RunReport = {
     runId: currentRunId,
     startedAt,
-    finishedAt: startedAt,
+    finishedAt: new Date().toISOString(),
     status,
     published,
     unchanged,
@@ -604,10 +651,11 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
     failed,
     paused,
     unhealthy: [...unhealthy],
-    candidates: 0,
+    candidates: discoveryResult?.accepted.length ?? 0,
     checked,
     sources: sourceStats,
     providers: providerStats(state, today, now),
+    discovery: discoveryReport,
   }
 
   if (!dryRun) writeReport(config, report)
@@ -621,7 +669,7 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
       failed: failed.map((item) => item.item),
       paused,
       unhealthy: [...unhealthy],
-      candidates: 0,
+      candidates: discoveryResult?.accepted.length ?? 0,
       checked,
     },
     report,

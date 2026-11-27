@@ -29,6 +29,8 @@ const PAGE_URL = 'https://example.org/scholarships/'
 const APPLY_URL = 'https://example.org/apply/'
 const DEADLINE = '2027-12-01'
 const KEY = itemKey('example', PAGE_URL)
+const DISCOVERY_INDEX_URL = 'https://example.org/discover/'
+const DISCOVERY_PAGE_URL = 'https://example.org/scholarships/new-program/'
 
 const LONG_BODY = 'The scholarship covers tuition, a monthly stipend, and travel. '.repeat(12)
 const PAGE_HTML = `<!doctype html><html><body>
@@ -167,7 +169,7 @@ function fixture(
     writeFileSync(path.join(dataDir, `${program.programId}.json`), JSON.stringify(program, null, 2))
   }
   writeFileSync(path.join(root, 'pipeline/sources.json'), JSON.stringify(sources, null, 2))
-  for (const prompt of ['extract.md', 'verify.md']) {
+  for (const prompt of ['extract.md', 'verify.md', 'discover.md', 'discover-gaps.md']) {
     copyFileSync(path.resolve('pipeline/prompts', prompt), path.join(promptsDir, prompt))
   }
 
@@ -212,14 +214,51 @@ function fakeRouter(
     extraction?: Extraction
     fail?: Error
     verify?: 'verified' | 'provisional'
+    discoveryPageUrl?: string
   } = {},
 ): FakeRouter {
   const extraction = options.extraction ?? extractionFixture()
+  const discoveryPageUrl = options.discoveryPageUrl ?? PAGE_URL
 
   const complete = vi.fn(async (request: AiRequest) => {
     if (request.task === 'extract' || request.task === 'extract-long') {
       if (options.fail) throw options.fail
       return { text: JSON.stringify(extraction), providerId: 'groq', model: 'test-model' }
+    }
+
+    if (request.task === 'discover') {
+      if (request.system.includes('propose')) {
+        return {
+          text: JSON.stringify({ queries: [] }),
+          providerId: 'groq',
+          model: 'test-model',
+        }
+      }
+
+      const urls = [...request.user.matchAll(/^URL: (.+)$/gm)].map((match) => match[1]!.trim())
+      const pages = urls.map((url) => ({
+        url,
+        isScholarship: url === discoveryPageUrl,
+        title: url === discoveryPageUrl ? 'Example Scholarship 2027' : null,
+        provider: url === discoveryPageUrl ? 'Example Provider' : null,
+        country: url === discoveryPageUrl ? 'Pakistan' : null,
+        deadline: url === discoveryPageUrl ? DEADLINE : null,
+        applyUrl: url === discoveryPageUrl ? APPLY_URL : null,
+        evidence:
+          url === discoveryPageUrl
+            ? [
+                { field: 'title', quote: 'Example Scholarship 2027', sourceUrl: url },
+                { field: 'deadline', quote: 'close on 1 December 2027', sourceUrl: url },
+                { field: 'applyUrl', quote: 'Apply at https://example.org/apply/', sourceUrl: url },
+              ]
+            : [],
+      }))
+
+      return {
+        text: JSON.stringify({ pages }),
+        providerId: 'groq',
+        model: 'test-model',
+      }
     }
 
     if (options.verify === 'provisional') {
@@ -529,6 +568,71 @@ test('the report is written and the summary counts both outcomes', async () => {
   const markdown = renderSummary(result.report)
   expect(markdown).toContain('Published: 1')
   expect(markdown).toContain('Failed: 1')
+})
+
+test('discovery queues a candidate without touching published programs', async () => {
+  const discoverySource = source({
+    sourceId: 'discovery',
+    programId: null,
+    pageUrls: [DISCOVERY_INDEX_URL],
+    indexUrls: [DISCOVERY_INDEX_URL],
+    discovery: true,
+  })
+  const f = fixture([discoverySource], [programJson('example-program')])
+  const programBefore = readFileSync(path.join(f.dataDir, 'example-program.json'), 'utf8')
+
+  const fetchImpl = vi.fn<FetchLike>(async (url) => {
+    if (url.endsWith('/robots.txt')) {
+      return new Response('User-agent: *\nAllow: /\n', {
+        status: 200,
+        headers: { 'content-type': 'text/plain' },
+      })
+    }
+    if (url === 'https://example.org/sitemap.xml') {
+      return new Response(`<urlset><url><loc>${DISCOVERY_PAGE_URL}</loc></url></urlset>`, {
+        status: 200,
+        headers: { 'content-type': 'application/xml' },
+      })
+    }
+    if (url === DISCOVERY_INDEX_URL) {
+      return new Response(
+        `<html><body><a href="${DISCOVERY_PAGE_URL}">New program</a></body></html>`,
+        {
+          status: 200,
+          headers: { 'content-type': 'text/html' },
+        },
+      )
+    }
+    if (url === DISCOVERY_PAGE_URL) {
+      return new Response(PAGE_HTML, {
+        status: 200,
+        headers: { 'content-type': 'text/html' },
+      })
+    }
+    return new Response('not found', {
+      status: 404,
+      headers: { 'content-type': 'text/plain' },
+    })
+  })
+
+  const result = await run(f, {
+    fetchImpl,
+    router: fakeRouter({ discoveryPageUrl: DISCOVERY_PAGE_URL }).router,
+  })
+
+  expect(result.summary.status).toBe('complete')
+  expect(result.summary.candidates).toBe(1)
+  expect(result.report.candidates).toBe(1)
+  expect(result.report.discovery?.accepted).toBe(1)
+  expect(result.report.discovery?.stopReason).toBe('no-signal')
+
+  const queue = JSON.parse(readFileSync(f.config.candidatesPath, 'utf8')) as {
+    candidates: Array<{ officialUrl: string; status: string }>
+  }
+  expect(queue.candidates).toHaveLength(1)
+  expect(queue.candidates[0]?.officialUrl).toBe(DISCOVERY_PAGE_URL)
+  expect(queue.candidates[0]?.status).toBe('pending-review')
+  expect(readFileSync(path.join(f.dataDir, 'example-program.json'), 'utf8')).toBe(programBefore)
 })
 
 test('parseArgs reads defaults and flags and rejects unknown options', () => {

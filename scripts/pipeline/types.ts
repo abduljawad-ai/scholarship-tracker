@@ -34,6 +34,8 @@ export interface PageSnapshot {
   contentType: string
   hash: string
   text: string
+  /** Raw HTML for discovery link extraction; absent for PDFs and plain text. */
+  html?: string
 }
 
 export interface EvidenceFact {
@@ -153,12 +155,47 @@ export interface ProviderUsage {
   lastError: string | null
 }
 
+export type DiscoveredVia =
+  | 'sitemap'
+  | 'rss'
+  | 'index'
+  | 'wayback-cdx'
+  | 'commoncrawl-cdx'
+  | 'search'
+
+export interface DiscoveryQuery {
+  id: string
+  text: string
+  round: number
+  origin: 'seed' | 'gap'
+  createdAt: string
+}
+
+export interface DiscoverySeenUrl {
+  firstSeenAt: string
+  status: number | null
+  contentHash?: string
+}
+
+export interface DiscoveryHostHealth {
+  lastFetchedAt: string | null
+  failures: number
+  nextEligibleAt: string | null
+}
+
+export interface DiscoveryState {
+  seenUrls: Record<string, DiscoverySeenUrl>
+  queries: DiscoveryQuery[]
+  hostHealth: Record<string, DiscoveryHostHealth>
+}
+
 export interface PipelineState {
   version: 1
   run: RunCheckpoint | null
   pages: Record<string, PageHealth>
   sources: Record<string, SourceHealth>
   providers: Record<string, ProviderUsage>
+  discovery: DiscoveryState
   lastSuccessfulRun: string | null
 }
 
@@ -174,6 +211,26 @@ export interface Candidate {
   sourceId: string
   discoveredAt: string
   status: 'pending-review'
+  foundByQuery?: string | null
+  discoveredVia?: DiscoveredVia
+  firstSeenAt?: string
+  discoveryScore?: number
+}
+
+export interface DiscoveryRunReport {
+  rounds: Array<{
+    round: number
+    queries: string[]
+    fetched: number
+    accepted: number
+    gaps: string[]
+    stopReason: string | null
+  }>
+  fetched: number
+  accepted: number
+  queries: string[]
+  stopReason: string
+  errors: string[]
 }
 
 export interface RunReport {
@@ -191,6 +248,7 @@ export interface RunReport {
   checked: number
   sources: Record<string, { fetched: number; published: number; failed: number }>
   providers: Record<string, { calls: number; errors: number; cooldowns: number }>
+  discovery: DiscoveryRunReport | null
 }
 
 export interface RunSummary {
