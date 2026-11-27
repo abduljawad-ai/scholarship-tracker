@@ -37,16 +37,16 @@ app: Cloudflare Pages serves the files produced by `npm run build` from `dist/`.
 The production URL is:
 
 ```text
-https://scholarship-tracker-6wv.pages.dev
+https://scholarships-pk.pages.dev
 ```
 
 | File | Value |
 | --- | --- |
-| `astro.config.mjs` | `site: 'https://scholarship-tracker-6wv.pages.dev'` |
-| `public/robots.txt` | `Sitemap: https://scholarship-tracker-6wv.pages.dev/sitemap-index.xml` |
+| `astro.config.mjs` | `site: 'https://scholarships-pk.pages.dev'` |
+| `public/robots.txt` | `Sitemap: https://scholarships-pk.pages.dev/sitemap-index.xml` |
 
 Both must use the stable production alias. Never use a per-deployment hash URL
-(such as `a2cffc5e.scholarship-tracker-6wv.pages.dev`): the hash changes on every
+(such as `e4930463.scholarships-pk.pages.dev`): the hash changes on every
 deploy, so canonical links and the sitemap would point at an old frozen build.
 The sitemap and canonical URLs depend on this value. The report-issue links
 point at the project repository. Keep that repository public before launch, or
@@ -173,7 +173,7 @@ The banner is dismissible per browser session and appears on every page.
 | Symptom | Check |
 | --- | --- |
 | Build fails with “Invalid program file” | The message names the JSON file; fix it against `src/lib/schema.ts`. |
-| Sitemap or canonical URLs use the wrong domain | Update `site` in `astro.config.mjs` and the `Sitemap:` line in `public/robots.txt`. Use the stable `scholarship-tracker-6wv.pages.dev` alias, never a deployment hash URL. |
+| Sitemap or canonical URLs use the wrong domain | Update `site` in `astro.config.mjs` and the `Sitemap:` line in `public/robots.txt`. Use the stable `scholarships-pk.pages.dev` alias, never a deployment hash URL. |
 | “This project is disconnected from your Git account” | Reconnect GitHub in **Settings → Builds & deployments → Git repository**; see “Reconnect Git” above. |
 | “Report an issue” points at `OWNER/REPO` | Update `PUBLIC_REPO_URL` in `src/lib/constants.ts`. |
 | e2e fails because port 4322 is busy | Stop the stale preview; the Playwright config always builds fresh and refuses to reuse a server. |

@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 // Stable production URL (Cloudflare Pages alias). Use the alias, never a
 // per-deployment hash URL: canonical links, the sitemap and robots.txt must
 // keep one origin across deployments.
-const site = 'https://scholarship-tracker-6wv.pages.dev'
+const site = 'https://scholarships-pk.pages.dev'
 
 export default defineConfig({
   site,
