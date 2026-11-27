@@ -59,18 +59,30 @@ function init(): void {
   const pagination = document.querySelector<HTMLElement>('[data-testid="pagination"]')
   const pageStatus = document.querySelector<HTMLElement>('[data-testid="page-status"]')
   const clear = document.querySelector<HTMLButtonElement>('[data-testid="clear-filters"]')
-  if (!grid || !form || !count || !note || !empty || !pagination || !pageStatus || !clear) return
+  if (!grid || !form || !count || !empty || !pagination || !pageStatus || !clear) return
 
   const search = required<HTMLInputElement>(form, '[data-filter="q"]')
   const level = required<HTMLSelectElement>(form, '[data-filter="level"]')
-  const current = required<HTMLSelectElement>(form, '[data-filter="current"]')
+  const current = form.querySelector<HTMLSelectElement>('[data-filter="current"]')
   const country = required<HTMLSelectElement>(form, '[data-filter="country"]')
   const funding = required<HTMLSelectElement>(form, '[data-filter="funding"]')
-  const deadline = required<HTMLSelectElement>(form, '[data-filter="deadline"]')
-  const eligible = required<HTMLInputElement>(form, '[data-filter="eligible"]')
+  const deadline = form.querySelector<HTMLSelectElement>('[data-filter="deadline"]')
+  const eligible = form.querySelector<HTMLInputElement>('[data-filter="eligible"]')
   const sort = required<HTMLSelectElement>(document, '[data-filter="sort"]')
   const prev = required<HTMLButtonElement>(pagination, '[data-testid="prev-page"]')
   const next = required<HTMLButtonElement>(pagination, '[data-testid="next-page"]')
+
+  const listStatus: FilterState['status'] =
+    grid.dataset.listStatus === 'archived' ? 'archived' : 'active'
+  const sortOptions = [...sort.options].map((option) => option.value)
+
+  function sortFrom(value: string | null): Sort {
+    return (
+      SORT_VALUES.find(
+        (candidate) => value !== null && candidate === value && sortOptions.includes(value),
+      ) ?? 'newest'
+    )
+  }
 
   const entries = readEntries()
   const knownCountries = new Set(entries.map((entry) => entry.country))
@@ -110,10 +122,11 @@ function init(): void {
           ? countryParam
           : 'all',
       funding: isOneOf(fundingParam, FUNDING_VALUES) ? fundingParam : 'all',
-      deadlineWindow: isOneOf(deadlineParam, DEADLINE_VALUES) ? deadlineParam : 'all',
-      sort: isOneOf(sortParam, SORT_VALUES) ? sortParam : 'newest',
-      eligibleOnly: params.get('eligible') === '1',
-      status: 'active',
+      deadlineWindow:
+        listStatus === 'active' && isOneOf(deadlineParam, DEADLINE_VALUES) ? deadlineParam : 'all',
+      sort: sortFrom(sortParam),
+      eligibleOnly: listStatus === 'archived' ? false : params.get('eligible') === '1',
+      status: listStatus,
       page: Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1,
     }
   }
@@ -123,24 +136,24 @@ function init(): void {
   function syncControls(): void {
     search.value = state.query
     level.value = state.level
-    current.value = state.currentLevel
+    if (current) current.value = state.currentLevel
     country.value = state.country ?? 'all'
     funding.value = state.funding
-    deadline.value = state.deadlineWindow
+    if (deadline) deadline.value = state.deadlineWindow
     sort.value = state.sort
-    eligible.checked = state.eligibleOnly
+    if (eligible) eligible.checked = state.eligibleOnly
   }
 
   function syncUrl(): void {
     const params = new URLSearchParams()
     if (state.query.trim() !== '') params.set('q', state.query.trim())
     if (state.level !== 'all') params.set('level', state.level)
-    if (state.currentLevel !== 'bachelor') params.set('current', state.currentLevel)
+    if (current && state.currentLevel !== 'bachelor') params.set('current', state.currentLevel)
     if (state.country && state.country !== 'all') params.set('country', state.country)
     if (state.funding !== 'all') params.set('funding', state.funding)
-    if (state.deadlineWindow !== 'all') params.set('deadline', state.deadlineWindow)
+    if (deadline && state.deadlineWindow !== 'all') params.set('deadline', state.deadlineWindow)
     if (state.sort !== 'newest') params.set('sort', state.sort)
-    if (state.eligibleOnly) params.set('eligible', '1')
+    if (eligible && state.eligibleOnly) params.set('eligible', '1')
     if (state.page !== 1) params.set('page', String(state.page))
 
     const url = new URL(window.location.href)
@@ -171,7 +184,7 @@ function init(): void {
     updatePills(visible)
 
     count!.textContent = `${filtered.length} ${filtered.length === 1 ? 'scholarship' : 'scholarships'}`
-    note!.hidden = !state.eligibleOnly
+    if (note) note.hidden = !state.eligibleOnly
     empty!.hidden = filtered.length !== 0
     pagination!.hidden = totalPages <= 1
     prev!.disabled = state.page <= 1
@@ -194,7 +207,7 @@ function init(): void {
     state.level = isStudyLevel(level.value) ? level.value : 'all'
     changed()
   })
-  current.addEventListener('change', () => {
+  current?.addEventListener('change', () => {
     if (!isStudyLevel(current.value)) return
     state.currentLevel = current.value
     // UI next-stage mapping only; eligibility is precomputed from applicant stages.
@@ -215,15 +228,15 @@ function init(): void {
     state.funding = isOneOf(funding.value, FUNDING_VALUES) ? funding.value : 'all'
     changed()
   })
-  deadline.addEventListener('change', () => {
+  deadline?.addEventListener('change', () => {
     state.deadlineWindow = isOneOf(deadline.value, DEADLINE_VALUES) ? deadline.value : 'all'
     changed()
   })
   sort.addEventListener('change', () => {
-    state.sort = isOneOf(sort.value, SORT_VALUES) ? sort.value : 'newest'
+    state.sort = sortFrom(sort.value)
     changed()
   })
-  eligible.addEventListener('change', () => {
+  eligible?.addEventListener('change', () => {
     state.eligibleOnly = eligible.checked
     changed()
   })
@@ -238,6 +251,7 @@ function init(): void {
   clear.addEventListener('click', () => {
     state.query = ''
     state.level = 'all'
+    if (current) state.currentLevel = 'bachelor'
     state.country = 'all'
     state.funding = 'all'
     state.deadlineWindow = 'all'

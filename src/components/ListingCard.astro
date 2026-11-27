@@ -4,9 +4,10 @@ import { formatDeadline, fundingLabel, studyLevelLabel } from '../lib/format'
 
 interface Props {
   entry: ProgramIndexEntry
+  officialUrl?: string
 }
 
-const { entry } = Astro.props
+const { entry, officialUrl } = Astro.props
 const deadline = formatDeadline(
   entry.nextDeadline,
   entry.deadlineVerified ? 'verified' : 'unverified',
@@ -23,6 +24,9 @@ const verifiedDeadline = entry.deadlineVerified && entry.nextDeadline !== null
       <span class="badge badge--eligible" data-eligible-pill hidden={!entry.likelyEligibleFor.includes('bachelor')}>
         Likely eligible
       </span>
+      {entry.status === 'archived' && (
+        <span class="badge badge--closed" data-testid="closed-badge">Closed</span>
+      )}
     </div>
 
     <p class="listing-card__provider">{entry.provider}</p>
@@ -53,5 +57,11 @@ const verifiedDeadline = entry.deadlineVerified && entry.nextDeadline !== null
         </dd>
       </div>
     </dl>
+
+    {entry.status === 'archived' && officialUrl && (
+      <a class="listing-card__official" href={officialUrl} rel="noopener noreferrer">
+        View official page (closed cycle)
+      </a>
+    )}
   </div>
 </article>

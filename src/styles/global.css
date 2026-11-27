@@ -593,6 +593,12 @@ a:hover {
   white-space: normal;
 }
 
+.badge--closed {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+}
+
 .listing-card__facts {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -614,6 +620,13 @@ a:hover {
 .listing-card__facts dd {
   margin: var(--space-1) 0 0;
   overflow-wrap: anywhere;
+}
+
+.listing-card__official {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-size: var(--type-sm);
+  line-height: var(--leading-sm);
 }
 
 .empty-state {

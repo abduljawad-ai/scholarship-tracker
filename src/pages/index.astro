@@ -63,7 +63,7 @@ const json = JSON.stringify(entries).replace(/</g, '\\u003c')
     </p>
 
     <!-- No-JS fallback: every active card is rendered on the server. -->
-    <div id="listing-grid" class="listing-grid">
+    <div id="listing-grid" class="listing-grid" data-list-status="active">
       {entries.map((entry) => <ListingCard entry={entry} />)}
     </div>
 

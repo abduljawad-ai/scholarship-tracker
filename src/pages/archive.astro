@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import EmptyState from '../components/EmptyState.astro'
+import FilterBar from '../components/FilterBar.astro'
+import FreshnessBanner from '../components/FreshnessBanner.astro'
+import ListingCard from '../components/ListingCard.astro'
+import Pagination from '../components/Pagination.astro'
+import { APP_NAME } from '../lib/constants'
+import { archivedPrograms, loadPrograms } from '../lib/data'
+import { sortIndex, toIndexEntry } from '../lib/filters'
+
+// Build-time only: the client reads the embedded index below, never data.ts.
+const programs = archivedPrograms(loadPrograms())
+const entries = sortIndex(
+  programs.map(toIndexEntry),
+  'newest',
+)
+const officialUrls = new Map(
+  programs.map((program) => [program.programId, program.officialUrl]),
+)
+const countries = [...new Set(entries.map((entry) => entry.country))].sort((a, b) =>
+  a.localeCompare(b),
+)
+// Prevent a title from closing the JSON script element.
+const json = JSON.stringify(entries).replace(/</g, '\\u003c')
+---
+
+<BaseLayout
+  title={`Scholarship archive | ${APP_NAME}`}
+  description="Browse closed scholarship cycles and past listing details for reference."
+  canonicalPath="/archive/"
+>
+  <section class="hero" aria-labelledby="archive-title">
+    <p class="eyebrow">Past opportunities</p>
+    <h1 id="archive-title">Scholarship archive</h1>
+    <p class="lede">
+      Scholarships whose application cycles have closed are kept here for reference. Check the
+      official page for any future intake.
+    </p>
+  </section>
+
+  <FreshnessBanner />
+
+  <section class="listing-section" aria-labelledby="listing-heading">
+    <h2 id="listing-heading" class="sr-only">Archived scholarship listings</h2>
+
+    <FilterBar countries={countries} mode="archived" />
+
+    <div class="listing-toolbar">
+      <p class="results-count" data-testid="results-count" aria-live="polite" aria-atomic="true">
+        {entries.length} {entries.length === 1 ? 'scholarship' : 'scholarships'}
+      </p>
+      <div class="field field--sort">
+        <label class="field-label" for="sort">Sort by</label>
+        <select id="sort" data-filter="sort">
+          <option value="newest">Newest first</option>
+          <option value="best-funded">Best funded</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- No-JS fallback: every archived card is rendered on the server. -->
+    <div id="listing-grid" class="listing-grid" data-list-status="archived">
+      {entries.map((entry) => (
+        <ListingCard entry={entry} officialUrl={officialUrls.get(entry.programId)} />
+      ))}
+    </div>
+
+    <EmptyState
+      title="No past scholarships match these filters"
+      body="Try a different search, or clear the filters to see every past listing."
+    />
+    <Pagination />
+  </section>
+
+  <script type="application/json" id="program-index" is:inline set:html={json}></script>
+
+  <script>
+    import '../scripts/home'
+  </script>
+</BaseLayout>

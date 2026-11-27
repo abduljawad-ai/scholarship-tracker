@@ -4,9 +4,10 @@ import { studyLevelLabel } from '../lib/format'
 
 interface Props {
   countries: string[]
+  mode?: 'active' | 'archived'
 }
 
-const { countries } = Astro.props
+const { countries, mode = 'active' } = Astro.props
 ---
 
 <form class="filter-form" data-filter-form aria-label="Filter scholarships">
@@ -32,14 +33,16 @@ const { countries } = Astro.props
       </select>
     </div>
 
-    <div class="field">
-      <label class="field-label" for="current-level">I'm currently in</label>
-      <select id="current-level" data-filter="current">
-        {STUDY_LEVELS.map((level) => (
-          <option value={level} selected={level === 'bachelor'}>{studyLevelLabel(level)}</option>
-        ))}
-      </select>
-    </div>
+    {mode === 'active' && (
+      <div class="field">
+        <label class="field-label" for="current-level">I'm currently in</label>
+        <select id="current-level" data-filter="current">
+          {STUDY_LEVELS.map((level) => (
+            <option value={level} selected={level === 'bachelor'}>{studyLevelLabel(level)}</option>
+          ))}
+        </select>
+      </div>
+    )}
 
     <div class="field">
       <label class="field-label" for="country">Country</label>
@@ -62,20 +65,24 @@ const { countries } = Astro.props
       </select>
     </div>
 
-    <div class="field">
-      <label class="field-label" for="deadline">Deadline</label>
-      <select id="deadline" data-filter="deadline">
-        <option value="all">Any deadline</option>
-        <option value="30">Next 30 days</option>
-        <option value="90">Next 90 days</option>
-      </select>
-    </div>
+    {mode === 'active' && (
+      <>
+        <div class="field">
+          <label class="field-label" for="deadline">Deadline</label>
+          <select id="deadline" data-filter="deadline">
+            <option value="all">Any deadline</option>
+            <option value="30">Next 30 days</option>
+            <option value="90">Next 90 days</option>
+          </select>
+        </div>
 
-    <div class="field field--checkbox">
-      <label class="checkbox-label" for="eligible-only">
-        <input id="eligible-only" type="checkbox" data-filter="eligible" aria-describedby="eligible-note" />
-        <span>Eligible only</span>
-      </label>
-    </div>
+        <div class="field field--checkbox">
+          <label class="checkbox-label" for="eligible-only">
+            <input id="eligible-only" type="checkbox" data-filter="eligible" aria-describedby="eligible-note" />
+            <span>Eligible only</span>
+          </label>
+        </div>
+      </>
+    )}
   </div>
 </form>
