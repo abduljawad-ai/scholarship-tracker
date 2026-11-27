@@ -10,7 +10,11 @@ const NEXT_LEVEL: Record<StudyLevel, StudyLevel[]> = {
   phd: ["phd"],
 }
 
-/** The study stages a student at `current` should look at next. */
+/**
+ * The study stages a student at `current` should look at next.
+ * UI mapping only — eligibility does NOT use this (a stage match must be an
+ * exact `applicantStages` hit on the current level).
+ */
 export function stagesForCurrentLevel(current: StudyLevel): StudyLevel[] {
   return NEXT_LEVEL[current]
 }
@@ -39,10 +43,7 @@ export function evaluateEligibility(
   const reasons: string[] = []
   let eligible = true
 
-  const stages = program.applicantStages
-  const levelMatches =
-    stages.includes(input.currentLevel) ||
-    stagesForCurrentLevel(input.currentLevel).some((stage) => stages.includes(stage))
+  const levelMatches = program.applicantStages.includes(input.currentLevel)
   if (!levelMatches) {
     eligible = false
     reasons.push("Your study level does not match this program")
