@@ -2,9 +2,12 @@
 // and content hashing. No dependency on the site build.
 import { createHash } from "node:crypto"
 import { USER_AGENT } from "./config"
+import { parseRetryAfter, type FetchLike } from "./http"
 import { htmlToText } from "./html"
 import { pdfToText } from "./pdf"
 import type { PageSnapshot } from "./types"
+
+export type { FetchLike } from "./http"
 
 export class FetchError extends Error {
   readonly status: number | null
@@ -17,8 +20,6 @@ export class FetchError extends Error {
     this.url = url
   }
 }
-
-export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>
 
 export interface FetchOptions {
   fetchImpl?: FetchLike
@@ -57,18 +58,6 @@ function normalizeContentType(value: string | null): string {
 
 function hashText(text: string): string {
   return createHash("sha256").update(text).digest("hex")
-}
-
-/** Retry-After as milliseconds; accepts delta-seconds or an HTTP date. */
-export function parseRetryAfter(value: string | null, now: number = Date.now()): number | null {
-  if (!value) return null
-
-  const seconds = Number(value)
-  if (Number.isFinite(seconds) && seconds >= 0) return Math.round(seconds * 1000)
-
-  const date = Date.parse(value)
-  if (Number.isNaN(date)) return null
-  return Math.max(0, date - now)
 }
 
 async function request(url: string, options: FetchOptions): Promise<Response> {

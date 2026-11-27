@@ -90,6 +90,12 @@ export interface Router {
   available(task: AiTask, exclude?: ProviderId[]): ProviderId[]
 }
 
+export interface Provider {
+  id: ProviderId
+  model: string
+  complete(request: AiRequest, signal: AbortSignal): Promise<string>
+}
+
 export interface ProviderSettings {
   apiKey: string
   model: string
