@@ -1,0 +1,109 @@
+{
+  "programId": "turkiye-burslari",
+  "title": "Türkiye Bursları (Türkiye Scholarships)",
+  "provider": "Presidency for Turks Abroad and Related Communities (YTB)",
+  "providerType": "gov",
+  "country": "Türkiye",
+  "officialUrl": "https://www.turkiyeburslari.gov.tr/en",
+  "fundedLevels": ["bachelor"],
+  "applicantStages": ["intermediate"],
+  "fields": ["Undergraduate programmes in all fields"],
+  "eligibility": {
+    "nationalities": ["PK"],
+    "ageMax": 21,
+    "minDegree": "intermediate",
+    "minMarks": "At least 70% marks in intermediate (varies by year)",
+    "englishTest": null,
+    "experienceYears": null,
+    "other": [
+      "Twelve years of education completed",
+      "Placement test or interview may be required depending on the programme"
+    ]
+  },
+  "funding": {
+    "type": "fully-funded",
+    "tuitionCovered": true,
+    "monthlyStipend": 4500,
+    "currency": "TRY",
+    "otherBenefits": [
+      "Accommodation",
+      "Health insurance",
+      "Turkish language course",
+      "Return flight for international students"
+    ]
+  },
+  "guide": {
+    "steps": [
+      "Create an account on the Türkiye Bursları application system",
+      "Choose up to twelve university and programme preferences",
+      "Upload academic and identity documents",
+      "Complete the short essay questions",
+      "Attend the interview stage if shortlisted"
+    ],
+    "documents": [
+      "Passport or national ID",
+      "Intermediate diploma and transcripts",
+      "Passport-size photograph",
+      "Language certificate if available",
+      "Any certificates of achievement"
+    ],
+    "tips": [
+      "Order your programme preferences carefully — they matter at placement",
+      "Apply as soon as the window opens; the portal gets busy near the deadline",
+      "Keep scanned documents under the size limits"
+    ],
+    "timeline": [
+      "Applications open: January 2028",
+      "Application deadline: February 2028",
+      "Interviews: April to May 2028",
+      "Results: May 2028",
+      "Studies begin: September 2028"
+    ]
+  },
+  "cycles": [
+    {
+      "cycleId": "2028",
+      "label": "2028 intake",
+      "dates": {
+        "opens": "2028-01-10",
+        "deadline": "2028-02-20",
+        "resultsDate": "2028-05-30",
+        "studyStart": "2028-09-15"
+      },
+      "status": "upcoming",
+      "apply": {
+        "url": "https://www.turkiyeburslari.gov.tr/en/application",
+        "portalName": "Türkiye Bursları application system",
+        "fee": "No application fee"
+      },
+      "verification": {
+        "deadline": "provisional",
+        "applyUrl": "verified",
+        "funding": "verified",
+        "eligibility": "provisional"
+      },
+      "sources": [
+        {
+          "url": "https://www.turkiyeburslari.gov.tr/en",
+          "type": "official-page",
+          "lastVerified": "2026-11-23"
+        },
+        {
+          "url": "https://www.turkiyeburslari.gov.tr/",
+          "type": "official-page",
+          "lastVerified": "2026-11-23"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "fundedLevels",
+          "quote": "Sample (demo data): the 2028 intake is listed as a fully funded undergraduate scholarship.",
+          "sourceUrl": "https://www.turkiyeburslari.gov.tr/en"
+        }
+      ],
+      "confidence": 0.72
+    }
+  ],
+  "firstSeen": "2026-11-19T00:00:00.000Z",
+  "lastUpdated": "2026-11-23T00:00:00.000Z"
+}

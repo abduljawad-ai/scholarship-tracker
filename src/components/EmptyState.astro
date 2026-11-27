@@ -1,0 +1,17 @@
+---
+interface Props {
+  title?: string
+  body?: string
+}
+
+const {
+  title = 'No scholarships match these filters',
+  body = 'Try a different search, or clear the filters to see every current listing.',
+} = Astro.props
+---
+
+<div class="empty-state" data-testid="empty-state" hidden>
+  <h3>{title}</h3>
+  <p>{body}</p>
+  <button type="button" class="button--primary" data-testid="clear-filters">Clear filters</button>
+</div>

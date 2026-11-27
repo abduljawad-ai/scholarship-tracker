@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { APP_NAME } from '../lib/constants'
+---
+
+<BaseLayout
+  title={`Page not found | ${APP_NAME}`}
+  description="This page does not exist. Browse current scholarships or the archive of closed cycles."
+  noindex
+>
+  <section class="hero" aria-labelledby="not-found-title">
+    <p class="eyebrow">404</p>
+    <h1 id="not-found-title">Page not found</h1>
+    <p class="lede">
+      That page does not exist. It may have moved, or the scholarship may have closed and joined
+      the archive.
+    </p>
+  </section>
+
+  <section class="detail-section" aria-labelledby="not-found-links">
+    <h2 id="not-found-links">Where to go next</h2>
+    <ul class="detail-list">
+      <li><a href="/">Browse scholarships</a> &mdash; current and upcoming opportunities.</li>
+      <li><a href="/archive/">Browse the archive</a> &mdash; closed cycles kept for reference.</li>
+      <li><a href="/my-applications/">My Applications</a> &mdash; the listings saved on this device.</li>
+    </ul>
+  </section>
+</BaseLayout>

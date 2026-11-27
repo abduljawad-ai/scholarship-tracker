@@ -1,0 +1,17 @@
+---
+interface Props {
+  title: string
+}
+
+const { title } = Astro.props
+---
+
+<a
+  class="button--quiet"
+  href="https://wa.me/"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Share on WhatsApp"
+  data-share-link
+  data-share-title={title}
+>Share on WhatsApp</a>

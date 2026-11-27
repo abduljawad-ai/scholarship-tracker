@@ -1,0 +1,80 @@
+---
+import runStatus from '../data/run-status.json'
+import { freshnessMessage, freshnessState, type RunStatus } from '../lib/freshness'
+
+const status = runStatus as RunStatus
+const now = new Date()
+const state = freshnessState(status, now)
+const message = freshnessMessage(state, status, now)
+const fingerprint = `${status.mode}:${status.lastSuccessfulRun ?? 'none'}`
+---
+
+<aside
+  class="freshness-banner"
+  data-freshness-banner
+  data-mode={status.mode}
+  data-last-successful-run={status.lastSuccessfulRun ?? ''}
+  data-fingerprint={fingerprint}
+  data-state={state}
+  data-testid="freshness-banner"
+  aria-label="Data status"
+  hidden={state === 'fresh'}
+>
+  <p class="freshness-banner__message" data-freshness-message>{message}</p>
+  <a class="freshness-banner__link" href="/about/">How we verify</a>
+  <button
+    type="button"
+    class="freshness-banner__dismiss"
+    data-freshness-dismiss
+    aria-label="Dismiss data status notice"
+  >
+    Dismiss
+  </button>
+</aside>
+
+<script>
+  import { freshnessMessage, freshnessState, type RunStatus } from '../lib/freshness'
+
+  const STORAGE_KEY = 'freshness-banner-dismissed:v1'
+
+  function init(): void {
+    const banner = document.querySelector<HTMLElement>('[data-freshness-banner]')
+    if (!banner) return
+
+    const messageNode = banner.querySelector<HTMLElement>('[data-freshness-message]')
+    const dismiss = banner.querySelector<HTMLButtonElement>('[data-freshness-dismiss]')
+    const mode = banner.dataset.mode === 'live' ? 'live' : 'sample'
+    const lastSuccessfulRun = banner.dataset.lastSuccessfulRun || null
+    const fingerprint = banner.dataset.fingerprint ?? `${mode}:${lastSuccessfulRun ?? 'none'}`
+    const status: RunStatus = { mode, lastSuccessfulRun }
+
+    let dismissed = false
+    try {
+      dismissed = sessionStorage.getItem(STORAGE_KEY) === fingerprint
+    } catch {
+      // Storage can be blocked; the banner still works for this page view.
+    }
+
+    function render(): void {
+      const now = new Date()
+      const state = freshnessState(status, now)
+      if (messageNode) messageNode.textContent = freshnessMessage(state, status, now)
+      banner!.dataset.state = state
+      banner!.hidden = state === 'fresh' || dismissed
+    }
+
+    dismiss?.addEventListener('click', () => {
+      dismissed = true
+      try {
+        sessionStorage.setItem(STORAGE_KEY, fingerprint)
+      } catch {
+        // Ignore blocked storage; the dismissal still applies to this page.
+      }
+      banner!.hidden = true
+    })
+
+    render()
+  }
+
+  init()
+</script>

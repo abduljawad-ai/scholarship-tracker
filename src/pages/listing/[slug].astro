@@ -1,0 +1,361 @@
+---
+import EligibilityNote from '../../components/EligibilityNote.astro'
+import FundingBadge from '../../components/FundingBadge.astro'
+import GuideSection from '../../components/GuideSection.astro'
+import ReportIssueLink from '../../components/ReportIssueLink.astro'
+import ShareButton from '../../components/ShareButton.astro'
+import TrackerControls from '../../components/TrackerControls.astro'
+import VerificationBadge from '../../components/VerificationBadge.astro'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { APP_NAME } from '../../lib/constants'
+import { loadPrograms } from '../../lib/data'
+import {
+  formatDate,
+  formatDeadline,
+  formatMoney,
+  studyLevelLabel,
+} from '../../lib/format'
+import type { Cycle, Program } from '../../lib/schema'
+import { nextCycle } from '../../lib/selectors'
+
+interface TimelineItem {
+  label: string
+  value: string
+  dateTime?: string
+}
+
+interface Props {
+  program: Program
+}
+
+// Build-time only. Each seeded program gets one static page at /listing/<id>/.
+export function getStaticPaths() {
+  return loadPrograms().map((program) => ({
+    params: { slug: program.programId },
+    props: { program },
+  }))
+}
+
+const { program } = Astro.props
+const defaultCycle = nextCycle(program) ?? program.cycles[0]
+const updatedDate = formatDate(program.lastUpdated.slice(0, 10))
+
+function capitalize(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1)
+}
+
+function dateOrNot(date: string | null): string {
+  return date === null ? 'Not listed' : formatDate(date)
+}
+
+// Trust threshold: show "Check official page" unless confidence >= 0.8 AND
+// every per-fact verification is "verified". Below either bar the summary is
+// not presented as confirmed, and an unverified deadline never shows a date.
+function needsCheck(cycle: Cycle): boolean {
+  return (
+    cycle.confidence < 0.8 ||
+    Object.values(cycle.verification).some((status) => status !== 'verified')
+  )
+}
+
+function canApply(cycle: Cycle): boolean {
+  return (
+    (cycle.status === 'open' || cycle.status === 'upcoming') &&
+    cycle.verification.applyUrl === 'verified' &&
+    cycle.apply.url !== null
+  )
+}
+
+function applyReason(cycle: Cycle): string {
+  if (cycle.status === 'closed' || cycle.status === 'archived') {
+    return 'Applications are closed for this cycle.'
+  }
+  if (cycle.verification.applyUrl !== 'verified') {
+    return 'Apply link not verified — check official page.'
+  }
+  if (cycle.apply.url === null) {
+    return 'No application link listed — check official page.'
+  }
+  return ''
+}
+
+const nationalities =
+  program.eligibility.nationalities.length === 0
+    ? 'Open to all nationalities'
+    : program.eligibility.nationalities.join(', ')
+const maxAge =
+  program.eligibility.ageMax === null
+    ? 'Not specified'
+    : `${program.eligibility.ageMax} or under`
+const minDegree =
+  program.eligibility.minDegree === null
+    ? 'Not specified'
+    : studyLevelLabel(program.eligibility.minDegree)
+const experience =
+  program.eligibility.experienceYears === null
+    ? 'Not listed'
+    : `${program.eligibility.experienceYears} years`
+const stipend =
+  program.funding.monthlyStipend !== null && program.funding.currency !== null
+    ? formatMoney(program.funding.monthlyStipend, program.funding.currency)
+    : null
+const description = `${program.title} at ${program.provider} in ${program.country}. Read the verified application guide, funding, eligibility and official sources.`
+---
+
+<BaseLayout
+  title={`${program.title} — ${APP_NAME}`}
+  description={description}
+  canonicalPath={`/listing/${program.programId}/`}
+>
+  <nav class="detail-backlink" aria-label="Breadcrumb">
+    <a href="/">← Back to all scholarships</a>
+  </nav>
+
+  <header class="detail-header">
+    <p class="eyebrow">{capitalize(program.providerType)} provider · {program.country}</p>
+    <h1>{program.title}</h1>
+    <p class="lede">{program.provider}</p>
+
+    <ul class="badge-list" aria-label="Cycle status">
+      <li class="badge" data-status={defaultCycle.status}>
+        {capitalize(defaultCycle.status)} · {defaultCycle.label}
+      </li>
+      {needsCheck(defaultCycle) && (
+        <li class="badge badge--warning">Check official page</li>
+      )}
+    </ul>
+
+    <dl class="detail-facts detail-header__facts">
+      <div>
+        <dt>Last updated</dt>
+        <dd><time datetime={program.lastUpdated.slice(0, 10)}>{updatedDate}</time></dd>
+      </div>
+      <div>
+        <dt>Official page</dt>
+        <dd><a href={program.officialUrl} rel="noopener noreferrer">Visit official page</a></dd>
+      </div>
+      <div>
+        <dt>Funded levels</dt>
+        <dd>{program.fundedLevels.map((level) => studyLevelLabel(level)).join(', ')}</dd>
+      </div>
+    </dl>
+
+    <p class="trust-label">
+      Summarized from official sources on {updatedDate}; always confirm on the official page.
+    </p>
+  </header>
+
+  {program.cycles.length > 1 && (
+    <div class="cycle-tabs" role="tablist" aria-label="Application cycles">
+      {program.cycles.map((cycle) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${program.programId}-${cycle.cycleId}`}
+          aria-controls={`panel-${program.programId}-${cycle.cycleId}`}
+          aria-selected={cycle.cycleId === defaultCycle.cycleId}
+          tabindex={cycle.cycleId === defaultCycle.cycleId ? 0 : -1}
+          data-cycle-tab
+          data-cycle-id={cycle.cycleId}
+        >
+          {cycle.label}
+        </button>
+      ))}
+    </div>
+  )}
+
+  {program.cycles.map((cycle) => {
+    const panelId = `panel-${program.programId}-${cycle.cycleId}`
+    const tabId = `tab-${program.programId}-${cycle.cycleId}`
+    const isDefault = cycle.cycleId === defaultCycle.cycleId
+    const hasTabs = program.cycles.length > 1
+    const deadlineValue = formatDeadline(cycle.dates.deadline, cycle.verification.deadline)
+    const verifiedDeadline =
+      cycle.dates.deadline !== null && cycle.verification.deadline === 'verified'
+    const applyUrl = canApply(cycle) ? cycle.apply.url : null
+
+    const timeline: TimelineItem[] = [
+      {
+        label: 'Opens',
+        value: dateOrNot(cycle.dates.opens),
+        dateTime: cycle.dates.opens ?? undefined,
+      },
+      {
+        label: 'Deadline',
+        value: deadlineValue,
+        dateTime: verifiedDeadline ? (cycle.dates.deadline ?? undefined) : undefined,
+      },
+      {
+        label: 'Results',
+        value: dateOrNot(cycle.dates.resultsDate),
+        dateTime: cycle.dates.resultsDate ?? undefined,
+      },
+      {
+        label: 'Study start',
+        value: dateOrNot(cycle.dates.studyStart),
+        dateTime: cycle.dates.studyStart ?? undefined,
+      },
+    ]
+
+    return (
+      <section
+        class="cycle-panel"
+        id={panelId}
+        role="tabpanel"
+        aria-labelledby={hasTabs ? tabId : undefined}
+        data-cycle-panel
+        data-cycle-id={cycle.cycleId}
+        hidden={!isDefault}
+      >
+        <div class="cycle-panel__head">
+          <h2>{cycle.label}</h2>
+          <ul class="badge-list" aria-label="Cycle verification">
+            <li class="badge" data-status={cycle.status}>{capitalize(cycle.status)}</li>
+            {needsCheck(cycle) && <li class="badge badge--warning">Check official page</li>}
+          </ul>
+        </div>
+
+        <GuideSection
+          panelId={panelId}
+          steps={program.guide.steps}
+          documents={program.guide.documents}
+          timeline={timeline}
+          tips={program.guide.tips}
+        />
+
+        <section class="detail-section" aria-labelledby={`${panelId}-apply-title`}>
+          <h2 id={`${panelId}-apply-title`}>Where to apply</h2>
+          {applyUrl !== null ? (
+            <div class="apply-callout">
+              <a class="button--primary" href={applyUrl}>
+                Apply for {cycle.label} on the official portal
+              </a>
+              {cycle.apply.portalName && <p>Via {cycle.apply.portalName}</p>}
+              {cycle.apply.fee && <p>{cycle.apply.fee}</p>}
+            </div>
+          ) : (
+            <p class="apply-reason">{applyReason(cycle)}</p>
+          )}
+          <p>
+            <a href={program.officialUrl} rel="noopener noreferrer">Visit official page</a>
+          </p>
+        </section>
+
+        <section class="detail-section" aria-labelledby={`${panelId}-funding-title`}>
+          <h2 id={`${panelId}-funding-title`}>Funding</h2>
+          <FundingBadge type={program.funding.type} status={cycle.verification.funding} />
+          <dl class="detail-facts">
+            <div>
+              <dt>Tuition</dt>
+              <dd>
+                {program.funding.tuitionCovered
+                  ? 'Tuition fees covered'
+                  : 'Tuition fees not covered'}
+              </dd>
+            </div>
+            <div>
+              <dt>Monthly stipend</dt>
+              <dd>{stipend ?? 'Not listed'}</dd>
+            </div>
+          </dl>
+          {program.funding.otherBenefits.length > 0 && (
+            <>
+              <h3>Other benefits</h3>
+              <ul class="detail-list">
+                {program.funding.otherBenefits.map((benefit) => <li>{benefit}</li>)}
+              </ul>
+            </>
+          )}
+        </section>
+
+        <section class="detail-section" aria-labelledby={`${panelId}-eligibility-title`}>
+          <h2 id={`${panelId}-eligibility-title`}>Eligibility</h2>
+          <VerificationBadge label="Eligibility" status={cycle.verification.eligibility} />
+          <dl class="detail-facts">
+            <div>
+              <dt>Nationalities</dt>
+              <dd>{nationalities}</dd>
+            </div>
+            <div>
+              <dt>Maximum age</dt>
+              <dd>{maxAge}</dd>
+            </div>
+            <div>
+              <dt>Minimum degree</dt>
+              <dd>{minDegree}</dd>
+            </div>
+            <div>
+              <dt>Minimum marks</dt>
+              <dd>{program.eligibility.minMarks ?? 'Not listed'}</dd>
+            </div>
+            <div>
+              <dt>English test</dt>
+              <dd>{program.eligibility.englishTest ?? 'Not listed'}</dd>
+            </div>
+            <div>
+              <dt>Experience</dt>
+              <dd>{experience}</dd>
+            </div>
+          </dl>
+          {program.eligibility.other.length > 0 && (
+            <ul class="detail-list">
+              {program.eligibility.other.map((rule) => <li>{rule}</li>)}
+            </ul>
+          )}
+          <EligibilityNote />
+        </section>
+
+        <section class="detail-section" aria-labelledby={`${panelId}-sources-title`}>
+          <h2 id={`${panelId}-sources-title`}>Official sources</h2>
+          <ul class="sources-list">
+            {cycle.sources.map((source) => (
+              <li>
+                <a href={source.url} rel="noopener noreferrer">{source.url}</a>
+                <p class="source-meta">
+                  {source.type} · Last verified:{' '}
+                  <time datetime={source.lastVerified}>{formatDate(source.lastVerified)}</time>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section class="detail-section" aria-labelledby={`${panelId}-evidence-title`}>
+          <h2 id={`${panelId}-evidence-title`}>Evidence from official sources</h2>
+          {cycle.evidence.length > 0 ? (
+            <ul class="evidence-list">
+              {cycle.evidence.map((item) => (
+                <li>
+                  <p class="evidence-field">Field: {item.field}</p>
+                  <blockquote>{item.quote}</blockquote>
+                  <a href={item.sourceUrl} rel="noopener noreferrer">View source</a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No evidence quotes are stored for this cycle.</p>
+          )}
+        </section>
+
+        <section class="detail-section" aria-labelledby={`${panelId}-tracker-title`}>
+          <h2 id={`${panelId}-tracker-title`}>Track this application</h2>
+          <p>Keep a note of your progress on this device — no account needed.</p>
+          <TrackerControls
+            programId={program.programId}
+            cycle={cycle}
+            idPrefix={`${program.programId}-${cycle.cycleId}`}
+          />
+        </section>
+
+        <div class="detail-actions">
+          <ShareButton title={program.title} />
+          <ReportIssueLink program={program} cycle={cycle} />
+        </div>
+      </section>
+    )
+  })}
+
+  <script>
+    import '../../scripts/listing'
+  </script>
+</BaseLayout>

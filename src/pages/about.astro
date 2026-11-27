@@ -1,0 +1,121 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { APP_NAME, PUBLIC_REPO_URL } from '../lib/constants'
+
+const reportHref = `${PUBLIC_REPO_URL}/issues/new?title=${encodeURIComponent('Correction or problem')}`
+---
+
+<BaseLayout
+  title={`How it works | ${APP_NAME}`}
+  description="How Scholarship Tracker sources, checks and labels scholarship information for Pakistani students — and how your data stays on your device."
+  canonicalPath="/about/"
+>
+  <article>
+    <header class="hero">
+      <p class="eyebrow">About</p>
+      <h1>How Scholarship Tracker works</h1>
+      <p class="lede">
+        A free, independent directory of scholarships for Pakistani students. Every listing is
+        built from official pages and documents, with the evidence and the date it was last
+        checked.
+      </p>
+    </header>
+
+    <section class="detail-section" aria-labelledby="what-you-get">
+      <h2 id="what-you-get">What every listing shows</h2>
+      <ul class="detail-list">
+        <li>Who can apply, and the study levels a scholarship accepts</li>
+        <li>The documents you need and the steps to apply</li>
+        <li>The application timeline and funding on offer</li>
+        <li>The official page, a direct apply link when it is verified, and the date we last checked</li>
+      </ul>
+      <p>
+        &ldquo;Likely eligible&rdquo; is a conservative guide based on the study levels a
+        scholarship accepts. It is not the provider&rsquo;s decision, and it never replaces their
+        rules.
+      </p>
+    </section>
+
+    <section class="detail-section" aria-labelledby="sourcing">
+      <h2 id="sourcing">Where the information comes from</h2>
+      <p>
+        Every listing links to the official sources used &mdash; the provider&rsquo;s own page,
+        prospectus or application PDF. We store the evidence quote behind each important fact, so
+        you can check it yourself.
+      </p>
+      <p>
+        News articles and scholarship aggregators are never treated as facts. They can help us
+        discover a programme, but a published detail must be confirmed on the provider&rsquo;s own
+        material. A daily automated check revisits each source, records what it finds, and updates
+        the last-verified date. When a source cannot be read, the listing is marked provisional
+        instead of guessed.
+      </p>
+    </section>
+
+    <section class="detail-section" aria-labelledby="labels">
+      <h2 id="labels">What the labels mean</h2>
+      <dl class="detail-facts">
+        <div>
+          <dt>Verified</dt>
+          <dd>
+            The detail was read on an official page or document, and the supporting quote is kept
+            with the listing.
+          </dd>
+        </div>
+        <div>
+          <dt>Provisional</dt>
+          <dd>
+            An official source exists but could not be fully checked &mdash; for example, the page
+            blocks automated access, or the deadline appears only in an image or a Facebook post.
+            Treat it as a lead, not a fact.
+          </dd>
+        </div>
+        <div>
+          <dt>Unverified</dt>
+          <dd>
+            We could not confirm the detail. An unverified deadline is never shown as a date, and
+            an Apply button appears only for a verified, open cycle.
+          </dd>
+        </div>
+      </dl>
+      <p>
+        When something is not confirmed, the listing says so plainly and sends you to the official
+        page rather than filling the gap.
+      </p>
+    </section>
+
+    <section class="detail-section" aria-labelledby="privacy">
+      <h2 id="privacy">Your applications stay on your device</h2>
+      <p>
+        My Applications uses your browser&rsquo;s local storage. There is no account, no email
+        address, and no copy on a server. Export a backup code before clearing site data or moving
+        to another device, and keep that code private because it contains your notes.
+      </p>
+      <p>
+        There are no advertising trackers. If you use the AI assistant when it becomes available,
+        never share personal details &mdash; CNIC or passport numbers, phone numbers, email
+        addresses, your address or documents. It does not need them, and it will never ask.
+      </p>
+    </section>
+
+    <section class="detail-section" aria-labelledby="limits">
+      <h2 id="limits">Independence and limits</h2>
+      <p>
+        {APP_NAME} is independent and not affiliated with any scholarship provider. We do not
+        charge for listings and we do not process applications. Scholarship details can change at
+        any time, so always confirm eligibility, documents and deadlines on the provider&rsquo;s
+        official page before you apply or pay anything.
+      </p>
+      <p>
+        This is an early public build. The listings currently shown are a small seed set used to
+        test the system; coverage and verification will grow as the daily checker runs. If
+        something looks wrong or out of date, please tell us.
+      </p>
+      <p>
+        <a class="report-link" href={reportHref} target="_blank" rel="noopener noreferrer">
+          Report an issue or correction
+        </a>
+      </p>
+    </section>
+  </article>
+</BaseLayout>

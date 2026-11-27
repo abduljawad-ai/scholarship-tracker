@@ -1,0 +1,11 @@
+---
+interface Props {
+  note?: string
+}
+
+const {
+  note = 'Likely eligible — based on level, nationality and age. Check the marks and English requirements below.',
+} = Astro.props
+---
+
+<p class="eligible-note">{note}</p>

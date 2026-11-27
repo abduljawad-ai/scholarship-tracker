@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import EmptyState from '../components/EmptyState.astro'
+import FilterBar from '../components/FilterBar.astro'
+import ListingCard from '../components/ListingCard.astro'
+import Pagination from '../components/Pagination.astro'
+import { APP_NAME } from '../lib/constants'
+import { loadPrograms } from '../lib/data'
+import { sortIndex, toIndexEntry } from '../lib/filters'
+
+// Build-time only: the client reads the embedded index below, never data.ts.
+const entries = sortIndex(
+  loadPrograms()
+    .map(toIndexEntry)
+    .filter((entry) => entry.status === 'active'),
+  'newest',
+)
+const countries = [...new Set(entries.map((entry) => entry.country))].sort((a, b) =>
+  a.localeCompare(b),
+)
+// Prevent a title from closing the JSON script element.
+const json = JSON.stringify(entries).replace(/</g, '\\u003c')
+---
+
+<BaseLayout
+  title={APP_NAME}
+  description="Compare current scholarships by study level, country, funding and deadline."
+  canonicalPath="/"
+>
+  <section class="hero home-hero" aria-labelledby="hero-title">
+    <p class="eyebrow">Independent scholarship guidance</p>
+    <h1 id="hero-title">Find scholarships with confidence</h1>
+    <p class="lede">
+      Compare current opportunities and check each listing's official source before you apply.
+    </p>
+  </section>
+
+  <section class="listing-section" aria-labelledby="listing-heading">
+    <h2 id="listing-heading" class="sr-only">Scholarship listings</h2>
+
+    <FilterBar countries={countries} />
+
+    <div class="listing-toolbar">
+      <p class="results-count" data-testid="results-count" aria-live="polite" aria-atomic="true">
+        {entries.length} {entries.length === 1 ? 'scholarship' : 'scholarships'}
+      </p>
+      <div class="field field--sort">
+        <label class="field-label" for="sort">Sort by</label>
+        <select id="sort" data-filter="sort">
+          <option value="newest">Newest first</option>
+          <option value="best-funded">Best funded</option>
+          <option value="deadline">Soonest deadline</option>
+        </select>
+      </div>
+    </div>
+
+    <p class="eligible-note" id="eligible-note" data-testid="eligible-note" hidden>
+      Eligible only shows listings marked <strong>Likely eligible</strong> for your current stage.
+      Confirm the details on each official page before applying.
+    </p>
+
+    <!-- No-JS fallback: every active card is rendered on the server. -->
+    <div id="listing-grid" class="listing-grid" data-list-status="active">
+      {entries.map((entry) => <ListingCard entry={entry} />)}
+    </div>
+
+    <EmptyState />
+    <Pagination />
+  </section>
+
+  <script type="application/json" id="program-index" is:inline set:html={json}></script>
+
+  <script>
+    import '../scripts/home'
+  </script>
+</BaseLayout>

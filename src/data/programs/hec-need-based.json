@@ -1,0 +1,106 @@
+{
+  "programId": "hec-need-based",
+  "title": "HEC Need-Based Scholarship",
+  "provider": "Higher Education Commission of Pakistan",
+  "providerType": "gov",
+  "country": "Pakistan",
+  "officialUrl": "https://www.hec.gov.pk/",
+  "fundedLevels": ["bachelor", "master"],
+  "applicantStages": ["intermediate", "bachelor"],
+  "fields": [
+    "Engineering and technology",
+    "Business and administrative sciences",
+    "Natural sciences"
+  ],
+  "eligibility": {
+    "nationalities": ["PK"],
+    "ageMax": null,
+    "minDegree": "intermediate",
+    "minMarks": "Minimum 60% marks in the last qualifying examination",
+    "englishTest": null,
+    "experienceYears": null,
+    "other": [
+      "Enrolled in or admitted to a participating public sector university",
+      "Financial need assessed under HEC need-based criteria"
+    ]
+  },
+  "funding": {
+    "type": "partial",
+    "tuitionCovered": true,
+    "monthlyStipend": 40000,
+    "currency": "PKR",
+    "otherBenefits": [
+      "Monthly stipend",
+      "Book allowance",
+      "Transport allowance"
+    ]
+  },
+  "guide": {
+    "steps": [
+      "Confirm your university participates in the need-based programme",
+      "Collect the HEC scholarship form from the university's financial aid office",
+      "Submit income and asset declarations for the need assessment",
+      "Attach academic records and the admission letter",
+      "Attend the district/provincial screening if shortlisted"
+    ],
+    "documents": [
+      "CNIC or B-Form",
+      "Intermediate and previous degree transcripts",
+      "University admission letter",
+      "Family income affidavit",
+      "Domicile certificate"
+    ],
+    "tips": [
+      "Apply through the university — HEC does not take direct applications",
+      "Keep the income affidavit notarised",
+      "Deadlines vary by university; confirm with your financial aid office"
+    ],
+    "timeline": [
+      "University applications open: June 2027",
+      "Deadline at universities: July 2027",
+      "Shortlisting and interviews: September 2027",
+      "Award announcements: October 2027"
+    ]
+  },
+  "cycles": [
+    {
+      "cycleId": "2027",
+      "label": "2027 intake",
+      "dates": {
+        "opens": "2027-06-01",
+        "deadline": "2027-07-31",
+        "resultsDate": "2027-09-15",
+        "studyStart": "2027-10-01"
+      },
+      "status": "upcoming",
+      "apply": {
+        "url": null,
+        "portalName": "Via the participating university's financial aid office",
+        "fee": "No application fee"
+      },
+      "verification": {
+        "deadline": "provisional",
+        "applyUrl": "unverified",
+        "funding": "provisional",
+        "eligibility": "provisional"
+      },
+      "sources": [
+        {
+          "url": "https://www.hec.gov.pk/",
+          "type": "official-page",
+          "lastVerified": "2026-11-22"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "funding",
+          "quote": "Sample (demo data): the need-based award is shown as partial funding with tuition covered and a monthly stipend.",
+          "sourceUrl": "https://www.hec.gov.pk/"
+        }
+      ],
+      "confidence": 0.65
+    }
+  ],
+  "firstSeen": "2026-11-17T00:00:00.000Z",
+  "lastUpdated": "2026-11-22T00:00:00.000Z"
+}

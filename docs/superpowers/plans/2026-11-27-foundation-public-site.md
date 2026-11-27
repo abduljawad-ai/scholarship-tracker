@@ -53,7 +53,7 @@
    results. Tested in Task 4.
 4. **Corrupted or absent localStorage / bad import code.** Expected: page still
    works, tracker falls back to empty, invalid import is rejected with a message.
-   Tested in Task 11.
+   Tested in Tasks 9 (library) and 11 (page).
 5. **Empty results and missing dates in filters/sorts.** Expected: clear empty
    state, no crashes, null deadlines sorted last. Tested in Tasks 5, 8.
 
@@ -68,7 +68,8 @@ src/
   lib/
     constants.ts      # levels, statuses, app name, limits
     schema.ts         # zod schemas + inferred types (server/build only)
-    data.ts           # build-time JSON loader + selectors (server/build only)
+    selectors.ts      # pure cycle selectors (client-safe, no node:fs)
+    data.ts           # build-time JSON loader (server/build only)
     eligibility.ts    # level mapping + conservative eligibility
     filters.ts        # pure filter/sort/index-entry functions
     format.ts         # dates, deadlines, money, labels
@@ -140,7 +141,8 @@ Run: `npm test` → PASS. Run: `npm run build` → succeeds, `dist/` produced.
 - [ ] **Step 5: Add CI and commit**
 
 `.github/workflows/ci.yml`: on push/PR — setup Node, `npm ci`, `npm run typecheck`,
-`npm test`, `npm run build`, install Playwright chromium, `npm run test:e2e`.
+`npm test`, `npm run build`. (The Playwright e2e step is added in Task 7, when the
+first e2e test exists; running it now would fail with "no tests found".)
 Commit: `chore: scaffold Astro site with tests and CI`.
 
 ---
@@ -152,8 +154,61 @@ Commit: `chore: scaffold Astro site with tests and CI`.
 - Modify: `src/lib/constants.ts`
 
 **Interfaces:**
-- Produces in `constants.ts`: `STUDY_LEVELS = ['matric','intermediate','bachelor','master','phd'] as const`, `type StudyLevel`, `VERIFICATION_STATUSES = ['verified','provisional','unverified'] as const`, `type VerificationStatus`, `CYCLE_STATUSES = ['open','upcoming','closed','archived'] as const`.
+- Produces in `constants.ts`: `STUDY_LEVELS = ['matric','intermediate','bachelor','master','phd'] as const`, `type StudyLevel`, `VERIFICATION_STATUSES = ['verified','provisional','unverified'] as const`, `type VerificationStatus`, `CYCLE_STATUSES = ['open','upcoming','closed','archived'] as const`, `type CycleStatus`, `PROVIDER_TYPES = ['gov','university','foundation','org'] as const`, `type ProviderType`, `FUNDING_TYPES = ['fully-funded','stipend','tuition','partial'] as const`, `type FundingType`, `SOURCE_TYPES = ['official-page','official-pdf','official-facebook','aggregator'] as const`, `type SourceType`.
 - Produces in `schema.ts`: `CycleSchema`, `ProgramSchema`, `type Cycle`, `type Program`, `parseProgram(input: unknown): Program`.
+
+**Exact schema shape (all objects `.strict()`):**
+
+```ts
+Program {
+  programId: string          // /^[a-z0-9-]+$/, stable, never contains a deadline
+  title: string
+  provider: string
+  providerType: ProviderType
+  country: string
+  officialUrl: string        // https URL
+  fundedLevels: StudyLevel[] // min 1 — what the scholarship pays for
+  applicantStages: StudyLevel[] // min 1 — the applicant's current/completed level
+  fields: string[]
+  eligibility: {
+    nationalities: string[]  // empty = open to all; 'PK' = Pakistan
+    ageMax: number | null
+    minDegree: StudyLevel | null
+    minMarks: string | null
+    englishTest: string | null
+    experienceYears: number | null
+    other: string[]
+  }
+  funding: {
+    type: FundingType
+    tuitionCovered: boolean
+    monthlyStipend: number | null
+    currency: string | null
+    otherBenefits: string[]
+  }
+  guide: { steps: string[]; documents: string[]; tips: string[]; timeline: string[] }
+  cycles: Cycle[]            // min 1
+  firstSeen: string          // ISO datetime
+  lastUpdated: string        // ISO datetime
+}
+
+Cycle {
+  cycleId: string
+  label: string
+  dates: { opens: string|null; deadline: string|null; resultsDate: string|null; studyStart: string|null } // YYYY-MM-DD
+  status: CycleStatus
+  apply: { url: string|null; portalName: string|null; fee: string|null }
+  verification: { deadline: VerificationStatus; applyUrl: VerificationStatus; funding: VerificationStatus; eligibility: VerificationStatus }
+  sources: { url: string; type: SourceType; lastVerified: string }[] // min 1
+  evidence: { field: string; quote: string; sourceUrl: string }[]
+  confidence: number         // 0..1
+}
+```
+
+`applicantStages` is the level the applicant is currently in or has completed
+(e.g. Chevening: `['bachelor']` because bachelor's graduates apply; its
+`fundedLevels` is `['master']`). Do not put the funded level in
+`applicantStages`.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -209,6 +264,15 @@ matric-level program, and one archived-only program (Commonwealth 2025) so the
 archive has content. Use fixed 2027–2028 dates and explicit cycle `status` values.
 All seed files are demo data (the banner in Task 13 says so).
 
+Seed specifics: Chevening has `fundedLevels: ['master']` and
+`applicantStages: ['bachelor']` (bachelor's graduates apply) with a verified
+deadline and apply URL; Fulbright is `open` with a dated deadline whose
+`verification.deadline` is `provisional`; Sindh Endowment Fund is `open`, has a
+non-null `apply.url`, but `verification.applyUrl` is `unverified` (proves the
+Apply button is suppressed); Erasmus has one `closed` cycle and one `open` cycle;
+Commonwealth has only a `closed` cycle; every program has non-null `firstSeen`
+and `lastUpdated` ISO datetimes.
+
 Exact filenames: `chevening-pakistan.json`, `fulbright-pakistan.json`,
 `daad-epos.json`, `turkiye-burslari.json`, `erasmus-mundus-joint-masters.json`,
 `hec-need-based.json`, `sindh-endowment-fund.json`, `sindh-matric-scholarship.json`,
@@ -227,15 +291,17 @@ Run: `npx vitest run tests/unit/schema.test.ts` → PASS.
 ### Task 3: Data loader and selectors
 
 **Files:**
-- Create: `src/lib/data.ts`, `tests/unit/data.test.ts`
+- Create: `src/lib/selectors.ts`, `src/lib/data.ts`, `tests/unit/data.test.ts`
 
 **Interfaces:**
-- Produces:
+- Produces in `selectors.ts` (pure; **no `node:fs`**, safe to import from client scripts):
+  - `isActive(program: Program): boolean` — any cycle `status` in `open|upcoming`.
+  - `nextCycle(program: Program): Cycle | undefined` — earliest non-null deadline among `open|upcoming`; null-deadline cycles after dated ones; ties keep array order; if all are null, the first `open|upcoming` cycle.
+  - `activePrograms(programs: Program[]): Program[]`, `archivedPrograms(programs: Program[]): Program[]` — sorted by title.
+- Produces in `data.ts` (build-time only):
   - `loadPrograms(): Program[]` — reads every `src/data/programs/*.json`, validates, throws on duplicate `programId` or invalid file (message includes filename).
   - `getProgram(programs: Program[], slug: string): Program | undefined`
-  - `isActive(program: Program): boolean` — any cycle `status` in `open|upcoming`.
-  - `nextCycle(program: Program): Cycle | undefined` — earliest deadline among `open|upcoming`; ties/nulls ordered after dated cycles.
-  - `activePrograms(programs: Program[]): Program[]`, `archivedPrograms(programs: Program[]): Program[]` — sorted by title.
+  - Re-exports the `selectors.ts` functions so existing imports keep working.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -278,9 +344,11 @@ Run: `npx vitest run tests/unit/data.test.ts` → FAIL (module missing).
 
 - [ ] **Step 3: Implement**
 
-Use `node:fs`/`node:path` (build-time only; never import this from client scripts).
-Collect parse errors with the filename. Duplicate IDs throw. Implement the
-selectors with injected-free logic (status-driven, no wall clock).
+Use `node:fs`/`node:path` in `data.ts` only (build-time; never import `data.ts`
+from client scripts). Put the pure selectors in `selectors.ts` so `filters.ts`
+and client scripts can import them without pulling in `node:fs`. Collect parse
+errors with the filename. Duplicate IDs throw. Selectors are status-driven with
+no wall clock.
 
 - [ ] **Step 4: Verify**
 
@@ -303,7 +371,7 @@ Run: `npx vitest run tests/unit/data.test.ts` → PASS.
   - `EligibilityInput { currentLevel: StudyLevel; nationality: 'PK'; age?: number }`
   - `EligibilityResult { likelyEligible: boolean; reasons: string[] }`
   - `evaluateEligibility(program: Program, cycle: Cycle, input: EligibilityInput): EligibilityResult`
-- Rules: match if `applicantStages` includes the current level **or** any mapped next stage; nationality passes when `nationalities` is empty, contains `PK`, or contains `any`; age passes when `ageMax` is null, age is undefined (add reason "Age limit not checked"), or `age <= ageMax`; cycle must be `open` or `upcoming`.
+- Rules: match only when `applicantStages` includes the current level. `stagesForCurrentLevel` is the UI mapping used to default the study-level filter (matric → intermediate programs, etc.); it is **not** an eligibility match. Do not add a "mapped next stage" tolerance: it would make an intermediate student eligible for Chevening and a matric student eligible for bachelor's programs, which is false. Nationality passes when `nationalities` is empty, contains `PK`, or contains `any`; age passes when `ageMax` is null, age is undefined (add reason "Age limit not checked"), or `age <= ageMax`; cycle must be `open` or `upcoming`.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -316,33 +384,55 @@ import { loadPrograms } from '../../src/lib/data'
 const programs = loadPrograms()
 const chevening = programs.find(p => p.programId === 'chevening-pakistan')!
 const cheveningCycle = chevening.cycles.find(c => c.status === 'open')!
+const turkiye = programs.find(p => p.programId === 'turkiye-burslari')!
+const turkiyeCycle = turkiye.cycles.find(c => c.status === 'upcoming')!
 
 test('matric students look at intermediate programs', () => {
   expect(stagesForCurrentLevel('matric')).toEqual(['intermediate'])
 })
 
-test('Pakistani master student is likely eligible for Chevening', () => {
-  const r = evaluateEligibility(chevening, cheveningCycle, { currentLevel: 'master', nationality: 'PK' })
+test('Pakistani bachelor student is likely eligible for Chevening', () => {
+  const r = evaluateEligibility(chevening, cheveningCycle, { currentLevel: 'bachelor', nationality: 'PK' })
   expect(r.likelyEligible).toBe(true)
+})
+
+test('a master student is not eligible for a master\'s scholarship', () => {
+  const r = evaluateEligibility(chevening, cheveningCycle, { currentLevel: 'master', nationality: 'PK' })
+  expect(r.likelyEligible).toBe(false)
+})
+
+test('an intermediate student is not eligible for a master\'s scholarship', () => {
+  const r = evaluateEligibility(chevening, cheveningCycle, { currentLevel: 'intermediate', nationality: 'PK' })
+  expect(r.likelyEligible).toBe(false)
+})
+
+test('an intermediate student is eligible for a bachelor\'s scholarship', () => {
+  const r = evaluateEligibility(turkiye, turkiyeCycle, { currentLevel: 'intermediate', nationality: 'PK' })
+  expect(r.likelyEligible).toBe(true)
+})
+
+test('a matric student is not eligible for a bachelor\'s scholarship', () => {
+  const r = evaluateEligibility(turkiye, turkiyeCycle, { currentLevel: 'matric', nationality: 'PK' })
+  expect(r.likelyEligible).toBe(false)
 })
 
 test('a program restricted to another nationality is rejected', () => {
   const restricted = { ...chevening, eligibility: { ...chevening.eligibility, nationalities: ['US'] } }
-  const r = evaluateEligibility(restricted, cheveningCycle, { currentLevel: 'master', nationality: 'PK' })
+  const r = evaluateEligibility(restricted, cheveningCycle, { currentLevel: 'bachelor', nationality: 'PK' })
   expect(r.likelyEligible).toBe(false)
   expect(r.reasons.join(' ')).toContain('nationality')
 })
 
 test('age over the limit is rejected with a reason', () => {
   const p = { ...chevening, eligibility: { ...chevening.eligibility, ageMax: 25 } }
-  const r = evaluateEligibility(p, cheveningCycle, { currentLevel: 'master', nationality: 'PK', age: 30 })
+  const r = evaluateEligibility(p, cheveningCycle, { currentLevel: 'bachelor', nationality: 'PK', age: 30 })
   expect(r.likelyEligible).toBe(false)
   expect(r.reasons.join(' ')).toContain('age')
 })
 
 test('closed cycle is not eligible', () => {
   const closed = { ...cheveningCycle, status: 'closed' as const }
-  expect(evaluateEligibility(chevening, closed, { currentLevel: 'master', nationality: 'PK' }).likelyEligible).toBe(false)
+  expect(evaluateEligibility(chevening, closed, { currentLevel: 'bachelor', nationality: 'PK' }).likelyEligible).toBe(false)
 })
 ```
 
@@ -352,7 +442,8 @@ Run: `npx vitest run tests/unit/eligibility.test.ts` → FAIL.
 
 - [ ] **Step 3: Implement**
 
-Implement the rules above. Keep reasons short, human-readable, and safe to show
+Implement the rules above. Match on `applicantStages` only; do not add a
+mapped-next-stage tolerance. Keep reasons short, human-readable, and safe to show
 under "Likely eligible — based on level, nationality and age." Never return the
 phrase "you qualify".
 
@@ -373,11 +464,11 @@ Run: `npx vitest run tests/unit/eligibility.test.ts` → PASS.
 
 **Interfaces:**
 - Produces:
-  - `ProgramIndexEntry { programId; slug; title; provider; country; fundedLevels; applicantStages; nextDeadline: string|null; deadlineVerified: boolean; fundingType; fundingScore: number; status: 'active'|'archived' }`
-  - `toIndexEntry(program: Program): ProgramIndexEntry`
-  - `FilterState { query; level: StudyLevel|'all'; currentLevel: StudyLevel; eligibleOnly; funding: 'all'|'fully'|'stipend'; deadlineWindow: 'all'|'30'|'90'; status: 'active'|'archived'|'all' }`
-  - `filterIndex(entries, filters, now: Date, resolveProgram: (programId: string) => Program | undefined): ProgramIndexEntry[]`
-  - `sortIndex(entries, sort: 'newest'|'best-funded'|'deadline'): ProgramIndexEntry[]` — null deadlines always last; stable.
+  - `ProgramIndexEntry { programId; slug; title; provider; country; fundedLevels; applicantStages; nextDeadline: string|null; deadlineVerified: boolean; fundingType; fundingScore: number; status: 'active'|'archived'; firstSeen: string; likelyEligibleFor: StudyLevel[] }`
+  - `toIndexEntry(program: Program): ProgramIndexEntry` — build-time; computes `likelyEligibleFor` for every `StudyLevel` from `nextCycle` + `evaluateEligibility` (nationality `PK`, no age), and `firstSeen` from the program.
+  - `FilterState { query; level: StudyLevel|'all'; currentLevel: StudyLevel; eligibleOnly; funding: 'all'|'fully'|'stipend'|'tuition'|'partial'; deadlineWindow: 'all'|'30'|'90'; status: 'active'|'archived'|'all'; country?: string|'all' }` — `country` is optional for backward compatibility and defaults to `'all'`.
+  - `filterIndex(entries, filters, now: Date): ProgramIndexEntry[]` — client-safe (no `node:fs`); eligible-only uses `likelyEligibleFor`; a deadline window only matches `deadlineVerified` entries with a date; `country` matches `entry.country` exactly when set; `funding` maps `fully` to `fully-funded` and passes through `stipend`, `tuition`, and `partial`.
+  - `sortIndex(entries, sort: 'newest'|'best-funded'|'deadline'): ProgramIndexEntry[]` — `newest` sorts by `firstSeen` descending; `best-funded` by `fundingScore` descending; `deadline` ascending with null deadlines always last; all stable.
   - `matchesQuery(entry, query): boolean` — case-insensitive across title, provider, country, funded levels.
 
 - [ ] **Step 1: Write the failing tests**
@@ -389,23 +480,26 @@ import { filterIndex, sortIndex, toIndexEntry } from '../../src/lib/filters'
 import { loadPrograms } from '../../src/lib/data'
 
 const entries = loadPrograms().map(toIndexEntry)
-const byId = new Map(loadPrograms().map(p => [p.programId, p]))
-const resolve = (id: string) => byId.get(id)
 const now = new Date('2026-11-27T00:00:00Z')
 
 test('level filter keeps matching programs', () => {
-  const out = filterIndex(entries, { query: '', level: 'master', currentLevel: 'master', eligibleOnly: false, funding: 'all', deadlineWindow: 'all', status: 'all' }, now, resolve)
+  const out = filterIndex(entries, { query: '', level: 'master', currentLevel: 'master', eligibleOnly: false, funding: 'all', deadlineWindow: 'all', status: 'all' }, now)
   expect(out.length).toBeGreaterThan(0)
   expect(out.every(e => e.fundedLevels.includes('master'))).toBe(true)
 })
 
 test('eligible-only never returns archived entries', () => {
-  const out = filterIndex(entries, { query: '', level: 'all', currentLevel: 'master', eligibleOnly: true, funding: 'all', deadlineWindow: 'all', status: 'all' }, now, resolve)
+  const out = filterIndex(entries, { query: '', level: 'all', currentLevel: 'master', eligibleOnly: true, funding: 'all', deadlineWindow: 'all', status: 'all' }, now)
   expect(out.every(e => e.status === 'active')).toBe(true)
 })
 
+test('eligible-only uses the precomputed likelyEligibleFor list', () => {
+  const out = filterIndex(entries, { query: '', level: 'all', currentLevel: 'bachelor', eligibleOnly: true, funding: 'all', deadlineWindow: 'all', status: 'all' }, now)
+  expect(out.every(e => e.likelyEligibleFor.includes('bachelor'))).toBe(true)
+})
+
 test('search is case-insensitive across title and provider', () => {
-  const out = filterIndex(entries, { query: 'CHEVENING', level: 'all', currentLevel: 'master', eligibleOnly: false, funding: 'all', deadlineWindow: 'all', status: 'all' }, now, resolve)
+  const out = filterIndex(entries, { query: 'CHEVENING', level: 'all', currentLevel: 'master', eligibleOnly: false, funding: 'all', deadlineWindow: 'all', status: 'all' }, now)
   expect(out.some(e => e.programId === 'chevening-pakistan')).toBe(true)
 })
 
@@ -417,8 +511,20 @@ test('deadline sort puts nulls last', () => {
   }
 })
 
+test('newest sort orders by firstSeen descending', () => {
+  const out = sortIndex(entries, 'newest')
+  for (let i = 1; i < out.length; i++) {
+    expect(out[i - 1].firstSeen >= out[i].firstSeen).toBe(true)
+  }
+})
+
+test('deadline window only matches verified deadlines', () => {
+  const out = filterIndex(entries, { query: '', level: 'all', currentLevel: 'master', eligibleOnly: false, funding: 'all', deadlineWindow: '90', status: 'all' }, now)
+  expect(out.every(e => e.deadlineVerified && e.nextDeadline !== null)).toBe(true)
+})
+
 test('empty filters return an empty list, not a crash', () => {
-  const out = filterIndex(entries, { query: 'zzzz-no-match', level: 'all', currentLevel: 'master', eligibleOnly: false, funding: 'all', deadlineWindow: 'all', status: 'all' }, now, resolve)
+  const out = filterIndex(entries, { query: 'zzzz-no-match', level: 'all', currentLevel: 'master', eligibleOnly: false, funding: 'all', deadlineWindow: 'all', status: 'all' }, now)
   expect(out).toEqual([])
 })
 ```
@@ -429,12 +535,15 @@ Run: `npx vitest run tests/unit/filters.test.ts` → FAIL.
 
 - [ ] **Step 3: Implement**
 
-`toIndexEntry` uses `nextCycle`; `deadlineVerified` is true only when the chosen
-cycle's `verification.deadline === 'verified'` **and** a date exists. Funding score:
-fully funded 3, stipend 2, tuition 1, partial 0.5 (use `funding.type`).
-Eligibility filtering reuses `evaluateEligibility` with the entry's program/cycle
-data (keep a lookup map internally or accept a resolver parameter — do not fetch
-at runtime).
+`toIndexEntry` uses `nextCycle` from `selectors.ts`; `deadlineVerified` is true
+only when the chosen cycle's `verification.deadline === 'verified'` **and** a date
+exists. Funding score: fully funded 3, stipend 2, tuition 1, partial 0.5 (use
+`funding.type`). Compute `likelyEligibleFor` by calling `evaluateEligibility` for
+each `StudyLevel` with nationality `PK` and no age; if there is no `nextCycle`,
+use `[]`. `firstSeen` comes from the program. `filterIndex` is client-safe: it
+never imports `data.ts`, and eligible-only reads `likelyEligibleFor`. A deadline
+window (`30`/`90`) only matches entries where `deadlineVerified` is true and
+`nextDeadline` is non-null; unverified deadlines never act as dates.
 
 - [ ] **Step 4: Verify**
 
@@ -553,9 +662,11 @@ Mobile-first; no horizontal scroll at 375px.
 Run: `npx playwright test tests/e2e/layout.spec.ts` → PASS.
 Run: `npm run build` → succeeds.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Add e2e to CI and commit**
 
-`feat: add researched design system and site layout`
+Add the Playwright step to `.github/workflows/ci.yml`: install chromium with
+dependencies, then `npm run test:e2e` (the config's `webServer` builds and
+previews). Commit: `feat: add researched design system and site layout`.
 
 ---
 
@@ -563,9 +674,21 @@ Run: `npm run build` → succeeds.
 
 **Files:**
 - Create: `src/pages/index.astro` (real page), `src/scripts/home.ts`, `src/components/FilterBar.astro`, `src/components/ListingCard.astro`, `src/components/EmptyState.astro`, `src/components/Pagination.astro`, `src/components/FreshnessBanner.astro` (stub; implemented in Task 13), `tests/e2e/home.spec.ts`
+- Modify: `src/lib/filters.ts`, `tests/unit/filters.test.ts`, `src/lib/format.ts`, `tests/unit/format.test.ts`
 
 **Interfaces:**
-- Produces: home embeds `<script type="application/json" id="program-index">` containing `ProgramIndexEntry[]`; `home.ts` reads it, applies `filterIndex`/`sortIndex`, renders 24 cards per page, syncs filters to the URL, persists the chosen level in `localStorage` key `scholarship-level`, and shows the "Likely eligible" note when the eligible toggle is on.
+- Produces: home embeds `<script type="application/json" id="program-index">` containing `ProgramIndexEntry[]`; `home.ts` reads it, applies `filterIndex`/`sortIndex`, renders 24 cards per page, syncs filters to the URL, persists the chosen current level in `localStorage` key `scholarship-level`, and shows the "Likely eligible" note when the eligible toggle is on. The note carries `data-testid="eligible-note"`; cards may also show a "Likely eligible" pill when the current level is in `likelyEligibleFor`.
+- Filters: search, Study level, I'm currently in, Country, Funding, Deadline window, Eligible only, and Sort. Home defaults to `status: 'active'`, `level: 'all'`, `country: 'all'`, `funding: 'all'`, `deadlineWindow: 'all'`, `sort: 'newest'`, and `currentLevel: 'bachelor'` when no URL/localStorage value exists; the archive page uses `status: 'archived'`.
+- Labels and defaults: the funded-level select is labelled **"Study level"**; the
+  "I'm currently in" selector is labelled **"I'm currently in"** (no "level" in
+  its label, so tests stay unambiguous). On a user change of "I'm currently in",
+  set the Study level select to `stagesForCurrentLevel(newLevel)[0]` (the next
+  stage); initial load still defaults `level: 'all'`.
+- Add `studyLevelLabel(level: StudyLevel): string` to `src/lib/format.ts` with
+  readable labels (`Matric`, `Intermediate`, `Bachelor's`, `Master's`, `PhD`)
+  and a unit test. Extend `FilterState`/`filterIndex` with the optional country
+  filter and the `tuition`/`partial` funding values; add unit tests, including
+  the HEC `partial` case and the Germany country case.
 
 - [ ] **Step 1: Write the failing E2E tests**
 
@@ -573,11 +696,11 @@ Run: `npm run build` → succeeds.
 // tests/e2e/home.spec.ts
 import { expect, test } from '@playwright/test'
 
-test('lists seed programs and filters by level', async ({ page }) => {
+test('lists seed programs and filters by study level', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByTestId('listing-card').first()).toBeVisible()
   const before = await page.getByTestId('listing-card').count()
-  await page.getByLabel(/level/i).selectOption('phd')
+  await page.getByLabel(/study level/i).selectOption('phd')
   const after = await page.getByTestId('listing-card').count()
   expect(after).toBeLessThanOrEqual(before)
 })
@@ -585,13 +708,27 @@ test('lists seed programs and filters by level', async ({ page }) => {
 test('eligible toggle shows the honest note and only active items', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel(/eligible only/i).check()
-  await expect(page.getByText(/Likely eligible/i)).toBeVisible()
+  await expect(page.getByTestId('eligible-note')).toBeVisible()
+  await expect(page.getByTestId('eligible-note')).toContainText(/Likely eligible/i)
 })
 
 test('search with no matches shows the empty state', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel(/search/i).fill('zzzz-no-match')
   await expect(page.getByTestId('empty-state')).toBeVisible()
+})
+
+test('filters by country', async ({ page }) => {
+  await page.goto('/')
+  await page.getByLabel(/country/i).selectOption('Germany')
+  await expect(page.getByTestId('listing-card')).toHaveCount(1)
+  await expect(page.getByTestId('card-daad-epos')).toBeVisible()
+})
+
+test('current level maps the study-level filter to the next stage', async ({ page }) => {
+  await page.goto('/')
+  await page.getByLabel(/i'm currently in/i).selectOption('matric')
+  await expect(page.getByLabel(/study level/i)).toHaveValue('intermediate')
 })
 
 test('unverified deadlines are never rendered as dates', async ({ page }) => {
@@ -607,11 +744,19 @@ Run: `npx playwright test tests/e2e/home.spec.ts` → FAIL.
 
 - [ ] **Step 3: Implement**
 
-Render cards with title, provider, country, levels, funding badge, deadline via
-`formatDeadline`, and a "Likely eligible" pill when applicable. Add filter bar
-(search, level, eligible toggle, funding, deadline window), sort select, result
-count, pagination, and empty state. Use `data-testid="listing-card"` and
-`data-testid="card-<programId>"`.
+Render cards with title, provider, country, levels via `studyLevelLabel`,
+funding badge, deadline via `formatDeadline` (verified date only; provisional
+and unverified show the not-confirmed copy), and a "Likely eligible" pill when
+applicable. Server-render all active cards inside the grid so the page works
+without JavaScript; `home.ts` reads the JSON, maps the server-rendered cards by
+`programId`, and re-appends the filtered/sorted page (24 per page). Add filter
+bar (search, study level, current level, country, eligible toggle, funding,
+deadline window), sort select, result count, pagination, and empty state. Use
+`data-testid="listing-card"`, `data-testid="card-<programId>"`, and
+`data-testid="eligible-note"` on the note. Sync filters to the URL with
+`history.replaceState` and persist the current level in `localStorage`. Use
+`stagesForCurrentLevel` only for the UI study-level mapping, never for
+eligibility.
 
 - [ ] **Step 4: Verify**
 
@@ -626,10 +771,16 @@ Run: `npx playwright test tests/e2e/home.spec.ts` → PASS. `npm run build` → 
 ### Task 9: Listing page with guide and trust rules
 
 **Files:**
-- Create: `src/pages/listing/[slug].astro`, `src/components/GuideSection.astro`, `src/components/VerificationBadge.astro`, `src/components/FundingBadge.astro`, `src/components/EligibilityNote.astro`, `src/components/TrackerControls.astro`, `src/components/ShareButton.astro`, `src/components/ReportIssueLink.astro`, `src/scripts/listing.ts`, `tests/e2e/listing.spec.ts`
+- Create: `src/lib/tracker.ts`, `tests/unit/tracker.test.ts`, `src/pages/listing/[slug].astro`, `src/components/GuideSection.astro`, `src/components/VerificationBadge.astro`, `src/components/FundingBadge.astro`, `src/components/EligibilityNote.astro`, `src/components/TrackerControls.astro`, `src/components/ShareButton.astro`, `src/components/ReportIssueLink.astro`, `src/scripts/listing.ts`, `tests/e2e/listing.spec.ts`
 
 **Interfaces:**
-- Produces: static pages via `getStaticPaths`; cycle tabs (client) defaulting to `nextCycle`; Apply button rendered only when `cycle.verification.applyUrl === 'verified'` and `cycle.apply.url` is non-null; report link opens `https://github.com/<owner>/<repo>/issues/new?title=...&body=...` using `PUBLIC_REPO_URL` from `src/lib/constants.ts`.
+- Produces `src/lib/tracker.ts` (consumed by Task 11's My Applications page):
+  - `TrackerState { version: 1; entries: TrackerEntry[] }`
+  - `TrackerEntry { programId; cycleId; status: 'saved'|'applied'|'interview'|'offer'|'rejected'; note: string; updatedAt: string }`
+  - `loadTracker(storage?: Pick<Storage,'getItem'>): TrackerState` — safe fallback on bad JSON.
+  - `upsertEntry(state, entry): TrackerState`, `removeEntry(state, programId, cycleId): TrackerState`
+  - `exportTracker(state): string` (base64), `importTracker(code: string): TrackerState` (throws `TrackerImportError` on invalid).
+- Produces: static pages via `getStaticPaths`; the displayed cycle defaults to `nextCycle(program) ?? program.cycles[0]` (so archived-only programs still have a page); cycle tabs (client) switch cycles; Apply button rendered only when `cycle.status` is `open|upcoming`, `cycle.verification.applyUrl === 'verified'`, and `cycle.apply.url` is non-null; report link opens `https://github.com/<owner>/<repo>/issues/new?title=...&body=...` using `PUBLIC_REPO_URL` from `src/lib/constants.ts`.
 
 - [ ] **Step 1: Write the failing E2E tests**
 
@@ -661,23 +812,63 @@ test('tracker save persists across reload', async ({ page }) => {
   await page.reload()
   await expect(page.getByText(/saved/i).first()).toBeVisible()
 })
+
+test('archived-only program page shows a closed cycle and no Apply button', async ({ page }) => {
+  await page.goto('/listing/commonwealth-pakistan-2025/')
+  await expect(page.getByText(/closed/i).first()).toBeVisible()
+  await expect(page.getByRole('link', { name: /^Apply/i })).toHaveCount(0)
+})
+```
+
+```ts
+// tests/unit/tracker.test.ts
+import { expect, test } from 'vitest'
+import { exportTracker, importTracker, loadTracker, removeEntry, upsertEntry } from '../../src/lib/tracker'
+
+const entry = { programId: 'chevening-pakistan', cycleId: '2027', status: 'applied' as const, note: '', updatedAt: '2026-11-27T00:00:00Z' }
+
+test('corrupted storage falls back to empty state', () => {
+  const storage = { getItem: () => '{not json' }
+  expect(loadTracker(storage)).toEqual({ version: 1, entries: [] })
+})
+
+test('export/import round-trips', () => {
+  const state = upsertEntry({ version: 1, entries: [] }, entry)
+  expect(importTracker(exportTracker(state))).toEqual(state)
+})
+
+test('invalid import code is rejected', () => {
+  expect(() => importTracker('not-a-code')).toThrow(/invalid/i)
+})
+
+test('removeEntry removes only the matching cycle', () => {
+  const state = upsertEntry({ version: 1, entries: [] }, entry)
+  expect(removeEntry(state, entry.programId, entry.cycleId).entries).toHaveLength(0)
+})
 ```
 
 - [ ] **Step 2: Run and confirm failure**
 
 Run: `npx playwright test tests/e2e/listing.spec.ts` → FAIL.
+Run: `npx vitest run tests/unit/tracker.test.ts` → FAIL (module missing).
 
 - [ ] **Step 3: Implement**
 
-Build the full listing page per spec section 6: guide steps, documents, timeline,
-funding, eligibility, official sources with last-verified dates, trust label, and
-the verification badges. Apply button only for verified URLs. Add tracker controls,
-WhatsApp share, and report-issue link. Cycle tabs switch the displayed cycle
-client-side without a reload.
+Implement the tracker library with versioned storage key
+`scholarship-tracker:v1` (the unit tests above define its behavior; handle
+non-ASCII notes with `TextEncoder`/`TextDecoder` around base64, and guard
+`localStorage` when absent). Build the full listing page per spec section 6:
+guide steps, documents, timeline, funding, eligibility, official sources with
+last-verified dates, trust label, and the verification badges. Default to
+`nextCycle(program) ?? program.cycles[0]`. Apply button only for an
+`open|upcoming` cycle with a verified URL. Add tracker controls, WhatsApp share,
+and report-issue link. Cycle tabs switch the displayed cycle client-side without
+a reload.
 
 - [ ] **Step 4: Verify**
 
 Run: `npx playwright test tests/e2e/listing.spec.ts` → PASS.
+Run: `npx vitest run tests/unit/tracker.test.ts` → PASS.
 
 - [ ] **Step 5: Commit**
 
@@ -728,47 +919,19 @@ Run: `npx playwright test tests/e2e/archive.spec.ts` → PASS.
 
 ---
 
-### Task 11: Tracker library and My Applications page
+### Task 11: My Applications page
 
 **Files:**
-- Create: `src/lib/tracker.ts`, `src/pages/my-applications.astro`, `src/scripts/tracker-page.ts`, `tests/unit/tracker.test.ts`, `tests/e2e/tracker.spec.ts`
+- Create: `src/pages/my-applications.astro`, `src/scripts/tracker-page.ts`, `tests/e2e/tracker.spec.ts`
 
 **Interfaces:**
-- Produces:
-  - `TrackerState { version: 1; entries: TrackerEntry[] }`
-  - `TrackerEntry { programId; cycleId; status: 'saved'|'applied'|'interview'|'offer'|'rejected'; note: string; updatedAt: string }`
-  - `loadTracker(storage?: Pick<Storage,'getItem'>): TrackerState` — safe fallback on bad JSON.
-  - `upsertEntry(state, entry): TrackerState`, `removeEntry(state, programId, cycleId): TrackerState`
-  - `exportTracker(state): string` (base64), `importTracker(code: string): TrackerState` (throws `TrackerImportError` on invalid).
+- Consumes `src/lib/tracker.ts` and its unit tests from Task 9 (already implemented
+  and reviewed; do not recreate them).
+- Produces: a page that joins tracker entries with the index, shows status, note,
+  deadline countdown, remove, and export/import controls with an error message on
+  invalid codes. Empty state explains how to save a listing.
 
-- [ ] **Step 1: Write the failing tests**
-
-```ts
-// tests/unit/tracker.test.ts
-import { expect, test } from 'vitest'
-import { exportTracker, importTracker, loadTracker, removeEntry, upsertEntry } from '../../src/lib/tracker'
-
-const entry = { programId: 'chevening-pakistan', cycleId: '2027', status: 'applied' as const, note: '', updatedAt: '2026-11-27T00:00:00Z' }
-
-test('corrupted storage falls back to empty state', () => {
-  const storage = { getItem: () => '{not json' }
-  expect(loadTracker(storage)).toEqual({ version: 1, entries: [] })
-})
-
-test('export/import round-trips', () => {
-  const state = upsertEntry({ version: 1, entries: [] }, entry)
-  expect(importTracker(exportTracker(state))).toEqual(state)
-})
-
-test('invalid import code is rejected', () => {
-  expect(() => importTracker('not-a-code')).toThrow(/invalid/i)
-})
-
-test('removeEntry removes only the matching cycle', () => {
-  const state = upsertEntry({ version: 1, entries: [] }, entry)
-  expect(removeEntry(state, entry.programId, entry.cycleId).entries).toHaveLength(0)
-})
-```
+- [ ] **Step 1: Write the failing E2E test**
 
 ```ts
 // tests/e2e/tracker.spec.ts
@@ -785,23 +948,23 @@ test('saved listing appears in My Applications and can be exported', async ({ pa
 
 - [ ] **Step 2: Run and confirm failure**
 
-Run: `npx vitest run tests/unit/tracker.test.ts` → FAIL.
+Run: `npx playwright test tests/e2e/tracker.spec.ts` → FAIL (page missing).
 
 - [ ] **Step 3: Implement**
 
-Implement the library with versioned storage key `scholarship-tracker:v1`. Add the
-My Applications page: joins tracker entries with the index, shows status, note,
-deadline countdown, remove, and export/import controls with an error message on
-invalid codes. Empty state explains how to save a listing.
+Add the My Applications page using the Task 9 tracker library. Embed the program
+index for the entries, show status, note, deadline countdown (use `daysUntil`),
+remove, and export/import controls with an error message on invalid codes. Empty
+state explains how to save a listing. Use `data-testid="tracker-entry"` on each
+entry.
 
 - [ ] **Step 4: Verify**
 
-Run: `npx vitest run tests/unit/tracker.test.ts` → PASS.
 Run: `npx playwright test tests/e2e/tracker.spec.ts` → PASS.
 
 - [ ] **Step 5: Commit**
 
-`feat: add on-device application tracker`
+`feat: add My Applications page`
 
 ---
 
@@ -1020,7 +1183,7 @@ Run: `npm run typecheck && npm test && npm run build && npm run test:e2e` → al
 - Level filter / eligible-only / sorting → Tasks 4, 5, 8
 - Listing guide with verification rules → Tasks 6, 9
 - Archive → Task 10
-- On-device tracker → Task 11
+- On-device tracker → Tasks 9 (library + save) and 11 (My Applications)
 - Report issue, share, freshness banner → Tasks 9, 13
 - Admin site → Plan 3 (not in this plan)
 - AI assistant → Plan 4 (not in this plan)
@@ -1037,5 +1200,5 @@ by `toIndexEntry` and consumed by home/archive/tracker scripts. `StudyLevel` and
 `VerificationStatus` come from `constants.ts` everywhere.
 
 **Review Focus coverage:** partial data (Tasks 2, 6, 9), multi-cycle (Tasks 3, 9, 10),
-level edge cases (Task 4), corrupted storage/import (Task 11), empty results and
+level edge cases (Task 4), corrupted storage/import (Tasks 9, 11), empty results and
 null deadlines (Tasks 5, 8).

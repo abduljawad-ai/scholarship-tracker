@@ -1,0 +1,112 @@
+{
+  "programId": "daad-epos",
+  "title": "DAAD EPOS Development-Related Postgraduate Courses",
+  "provider": "German Academic Exchange Service (DAAD)",
+  "providerType": "org",
+  "country": "Germany",
+  "officialUrl": "https://www.daad.de/en/",
+  "fundedLevels": ["master", "phd"],
+  "applicantStages": ["bachelor", "master"],
+  "fields": [
+    "Engineering and environmental sciences",
+    "Economics and social sciences",
+    "Agriculture and forestry"
+  ],
+  "eligibility": {
+    "nationalities": ["PK"],
+    "ageMax": 36,
+    "minDegree": "bachelor",
+    "minMarks": "Minimum CGPA 2.5/4.0 or equivalent (varies by course)",
+    "englishTest": "IELTS 6.0 or TOEFL iBT 80 (course-dependent)",
+    "experienceYears": 2,
+    "other": [
+      "Two years of professional experience recommended for EPOS courses",
+      "Course-specific admission requirements apply"
+    ]
+  },
+  "funding": {
+    "type": "stipend",
+    "tuitionCovered": false,
+    "monthlyStipend": 1200,
+    "currency": "EUR",
+    "otherBenefits": [
+      "Monthly stipend",
+      "Travel allowance",
+      "Health insurance",
+      "Study and research allowance"
+    ]
+  },
+  "guide": {
+    "steps": [
+      "Find an eligible EPOS course in the DAAD course database",
+      "Check the course's admission requirements and language rules",
+      "Apply through the DAAD portal with the course-specific documents",
+      "Provide proof of work experience where required",
+      "Wait for the course provider's admission decision"
+    ],
+    "documents": [
+      "Passport copy",
+      "Degree certificates and transcripts",
+      "Curriculum vitae in tabular form",
+      "Work experience letters",
+      "Language certificate"
+    ],
+    "tips": [
+      "Apply to the course first — DAAD funding follows admission",
+      "Match your work experience to the course profile",
+      "Deadlines differ per course; verify each course page"
+    ],
+    "timeline": [
+      "Applications open: November 2027",
+      "Application deadline: January 2028",
+      "Admission results: April 2028",
+      "Studies begin: October 2028"
+    ]
+  },
+  "cycles": [
+    {
+      "cycleId": "2028",
+      "label": "2028/29 intake",
+      "dates": {
+        "opens": "2027-11-01",
+        "deadline": "2028-01-15",
+        "resultsDate": "2028-04-30",
+        "studyStart": "2028-10-01"
+      },
+      "status": "upcoming",
+      "apply": {
+        "url": "https://www.daad.de/en/study-and-research-in-germany/scholarships/",
+        "portalName": "DAAD online portal",
+        "fee": "No application fee"
+      },
+      "verification": {
+        "deadline": "provisional",
+        "applyUrl": "verified",
+        "funding": "verified",
+        "eligibility": "provisional"
+      },
+      "sources": [
+        {
+          "url": "https://www.daad.de/en/study-and-research-in-germany/scholarships/",
+          "type": "official-page",
+          "lastVerified": "2026-11-24"
+        },
+        {
+          "url": "https://www.daad.de/en/",
+          "type": "official-page",
+          "lastVerified": "2026-11-24"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "funding",
+          "quote": "Sample (demo data): EPOS is listed with a monthly stipend and no tuition coverage for the 2028/29 intake.",
+          "sourceUrl": "https://www.daad.de/en/study-and-research-in-germany/scholarships/"
+        }
+      ],
+      "confidence": 0.75
+    }
+  ],
+  "firstSeen": "2026-11-19T00:00:00.000Z",
+  "lastUpdated": "2026-11-24T00:00:00.000Z"
+}

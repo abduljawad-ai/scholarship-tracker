@@ -1,0 +1,100 @@
+{
+  "programId": "sindh-matric-scholarship",
+  "title": "Sindh Matric Scholarship",
+  "provider": "Government of Sindh — School Education and Literacy Department",
+  "providerType": "gov",
+  "country": "Pakistan",
+  "officialUrl": "https://www.sindh.gov.pk/",
+  "fundedLevels": ["matric"],
+  "applicantStages": ["matric"],
+  "fields": ["Science", "General"],
+  "eligibility": {
+    "nationalities": ["PK"],
+    "ageMax": 19,
+    "minDegree": null,
+    "minMarks": "Minimum 60% marks in the previous annual examination",
+    "englishTest": null,
+    "experienceYears": null,
+    "other": [
+      "Domicile of Sindh province",
+      "Enrolled in a government or registered school in Sindh"
+    ]
+  },
+  "funding": {
+    "type": "stipend",
+    "tuitionCovered": false,
+    "monthlyStipend": 3500,
+    "currency": "PKR",
+    "otherBenefits": [
+      "Annual book allowance"
+    ]
+  },
+  "guide": {
+    "steps": [
+      "Collect the scholarship form from your school's headmaster",
+      "Fill in the student and guardian details",
+      "Attach the previous annual examination result and B-Form copy",
+      "Submit the form to the school before the deadline",
+      "Await the district education office's approval list"
+    ],
+    "documents": [
+      "B-Form or CNIC",
+      "Previous annual examination result card",
+      "School enrolment or attendance record",
+      "Domicile certificate",
+      "Guardian's income declaration"
+    ],
+    "tips": [
+      "Apply through your school — the headmaster forwards the forms",
+      "Attendance records must be stamped by the school",
+      "Keep the original result card safe; only copies are submitted"
+    ],
+    "timeline": [
+      "Forms available: April 2027",
+      "Deadline at schools: June 2027",
+      "District approval list: September 2027",
+      "Stipend starts: October 2027"
+    ]
+  },
+  "cycles": [
+    {
+      "cycleId": "2027",
+      "label": "2027/28 session",
+      "dates": {
+        "opens": "2027-04-01",
+        "deadline": "2027-06-30",
+        "resultsDate": "2027-09-15",
+        "studyStart": "2027-10-01"
+      },
+      "status": "upcoming",
+      "apply": {
+        "url": null,
+        "portalName": "Through the school headmaster or district education office",
+        "fee": "No application fee"
+      },
+      "verification": {
+        "deadline": "provisional",
+        "applyUrl": "unverified",
+        "funding": "provisional",
+        "eligibility": "provisional"
+      },
+      "sources": [
+        {
+          "url": "https://www.sindh.gov.pk/",
+          "type": "official-page",
+          "lastVerified": "2026-11-26"
+        }
+      ],
+      "evidence": [
+        {
+          "field": "fundedLevels",
+          "quote": "Sample (demo data): the programme is listed as a matric-level stipend for students in Sindh.",
+          "sourceUrl": "https://www.sindh.gov.pk/"
+        }
+      ],
+      "confidence": 0.6
+    }
+  ],
+  "firstSeen": "2026-11-21T00:00:00.000Z",
+  "lastUpdated": "2026-11-26T00:00:00.000Z"
+}

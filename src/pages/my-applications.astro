@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { APP_NAME } from '../lib/constants'
+import { loadPrograms } from '../lib/data'
+import type { TrackerData } from '../scripts/tracker-page'
+
+// Build-time only. The page embeds just what the tracker needs: program names
+// and per-cycle labels/status/deadlines, so a saved entry can show its own
+// cycle even when the program has a newer one.
+const programs = loadPrograms()
+const data: TrackerData = {
+  programs: programs.map((program) => ({
+    programId: program.programId,
+    title: program.title,
+    provider: program.provider,
+  })),
+  cycles: programs.flatMap((program) =>
+    program.cycles.map((cycle) => ({
+      programId: program.programId,
+      cycleId: cycle.cycleId,
+      label: cycle.label,
+      status: cycle.status,
+      deadline: cycle.dates.deadline,
+      deadlineVerified: cycle.verification.deadline === 'verified',
+    })),
+  ),
+}
+// Prevent a title from closing the JSON script element.
+const json = JSON.stringify(data).replace(/</g, '\\u003c')
+---
+
+<BaseLayout
+  title={`My Applications | ${APP_NAME}`}
+  description="Track your saved scholarships, application statuses, notes and deadlines. Everything stays in this browser."
+  canonicalPath="/my-applications/"
+>
+  <section class="hero" aria-labelledby="tracker-title">
+    <p class="eyebrow">On this device only</p>
+    <h1 id="tracker-title">My applications</h1>
+    <p class="lede">
+      Keep track of saved scholarships, application statuses, notes and deadlines. There is no
+      account and nothing leaves this browser.
+    </p>
+  </section>
+
+  <noscript>
+    <p class="tracker-notice">
+      My Applications needs JavaScript because your saved applications live in this browser. The
+      rest of the site still works without it.
+    </p>
+  </noscript>
+
+  <section class="tracker-section" aria-labelledby="saved-title">
+    <div class="tracker-section__head">
+      <h2 id="saved-title">Saved applications</h2>
+      <p>Only you can see this list — it is stored on this device.</p>
+    </div>
+
+    <div id="tracker-list" class="tracker-list"></div>
+
+    <div class="tracker-empty" data-testid="tracker-empty" tabindex="-1" hidden>
+      <h3>No saved applications yet</h3>
+      <p>
+        Open any scholarship and choose <strong>Save to My Applications</strong> to track it here.
+        Everything stays on this device.
+      </p>
+      <a class="button--primary" href="/">Browse scholarships</a>
+    </div>
+  </section>
+
+  <section class="tracker-backup" aria-labelledby="backup-title">
+    <h2 id="backup-title">Backup and restore</h2>
+    <p>
+      Export a backup code before clearing site data or moving to another device. The code
+      contains your notes, so keep it private. Importing replaces the applications saved in this
+      browser.
+    </p>
+
+    <div class="tracker-backup__actions">
+      <button type="button" class="button--primary" data-testid="export-tracker">
+        Export backup
+      </button>
+    </div>
+
+    <div class="tracker-backup__output" data-testid="export-output" hidden>
+      <label class="field-label" for="export-code">Backup code</label>
+      <textarea id="export-code" data-testid="export-code" readonly rows="4"></textarea>
+      <p class="tracker-hint">Copy this code and keep it private.</p>
+    </div>
+
+    <div class="field tracker-backup__import">
+      <label class="field-label" for="import-code">Paste a backup code</label>
+      <textarea id="import-code" data-testid="import-code" rows="4"></textarea>
+    </div>
+
+    <div class="tracker-backup__actions">
+      <button type="button" class="button--quiet" data-testid="import-tracker">
+        Import backup
+      </button>
+    </div>
+
+    <p class="tracker-message tracker-message--error" role="alert" data-testid="import-error" hidden></p>
+    <p class="tracker-message" role="status" data-testid="import-success" hidden>Backup imported.</p>
+  </section>
+
+  <script type="application/json" id="tracker-data" is:inline set:html={json}></script>
+
+  <script>
+    import '../scripts/tracker-page'
+  </script>
+</BaseLayout>
