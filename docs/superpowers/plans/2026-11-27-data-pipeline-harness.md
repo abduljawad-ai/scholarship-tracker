@@ -650,9 +650,11 @@ git commit -m "feat: add versioned extraction prompt, schema, and validation"
   `isAllowedHost(url, hosts): boolean`;
   `isAllowedApplyUrl(url, hosts): boolean`;
   `checkApplyUrl(url, hosts, fetchImpl?): Promise<{ ok: boolean; finalUrl: string | null; reason: string }>`;
+  `VerifiableFact extends EvidenceFact { value: string }`;
   `buildVerifyRequest(fact, snapshot, promptsDir): AiRequest`;
   `parseVerification(text): { agreed: boolean; quote: string | null; reason: string }`;
-  `verifyFact(router, fact, snapshot, primaryProviderId, promptsDir): Promise<{ status: 'verified' | 'provisional'; reason: string }>`.
+  `verifyFact(router, fact, snapshot, primaryProviderId, promptsDir, options?): Promise<{ status: 'verified' | 'provisional'; reason: string }>`;
+  `options` is `{ officialHosts?: string[]; today?: string; fetchImpl?: FetchLike }`.
 
 - [ ] **Step 1: Write the failing tests**
 
