@@ -81,6 +81,7 @@ npm run typecheck
 npm test
 npm run build
 npm run test:e2e
+npm run design:shots
 ```
 
 Expected results:
@@ -89,6 +90,7 @@ Expected results:
 - [ ] `npm test` — all unit tests pass
 - [ ] `npm run build` — succeeds, writes `dist/`, creates `sitemap-index.xml`
 - [ ] `npm run test:e2e` — all Playwright tests pass on the dedicated port 4322
+- [ ] `npm run design:shots` — 12 screenshots at 360/768/1440 plus 1024 px overflow checks
 - [ ] `npm run preview -- --port 4321` — `/` shows the demo-data banner and cards
 - [ ] `/listing/chevening-pakistan/` — sources, last-verified dates, and Apply rules render
 - [ ] `/archive/` — only closed cycles, `Closed` badge, no Apply buttons
@@ -104,7 +106,8 @@ Expected results:
 - `npm run typecheck`: 0 errors, 0 warnings
 - `npm test`: 55 tests passed
 - `npm run build`: 14 pages, sitemap created
-- `npm run test:e2e`: 37 tests passed
+- `npm run test:e2e`: 53 tests passed, including 16 design checks
+- `npm run design:shots`: 12 screenshots at 360/768/1440 plus 1024 px overflow checks
 - Local preview: home, listing, archive, about, My Applications, sitemap, and robots
   returned 200; an unknown path returned 404; the demo-data banner was visible
 - Cloudflare deployment: **not performed here** — the owner completes the one-time
