@@ -18,3 +18,12 @@ test('home has no horizontal scroll at 375px', async ({ page }) => {
   }))
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.innerWidth)
 })
+
+test('skip link moves keyboard focus to main', async ({ page }) => {
+  await page.goto('/')
+  const skipLink = page.getByRole('link', { name: 'Skip to main content' })
+  await page.keyboard.press('Tab')
+  await expect(skipLink).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(page.locator('#main')).toBeFocused()
+})
