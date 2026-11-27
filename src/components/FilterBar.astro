@@ -12,13 +12,13 @@ const { countries, mode = 'active' } = Astro.props
 
 <form class="filter-form" data-filter-form aria-label="Filter scholarships">
   <div class="filter-grid">
-    <div class="field">
+    <div class="field field--search">
       <label class="field-label" for="search">Search</label>
       <input
         id="search"
         type="search"
         data-filter="q"
-        placeholder="Programme, provider or country"
+        placeholder="Programme or provider"
         autocomplete="off"
       />
     </div>

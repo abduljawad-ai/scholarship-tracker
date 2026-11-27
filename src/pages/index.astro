@@ -5,52 +5,122 @@ import FilterBar from '../components/FilterBar.astro'
 import ListingCard from '../components/ListingCard.astro'
 import Pagination from '../components/Pagination.astro'
 import { APP_NAME } from '../lib/constants'
-import { loadPrograms } from '../lib/data'
+import { activePrograms, loadPrograms } from '../lib/data'
+import { formatDate } from '../lib/format'
 import { sortIndex, toIndexEntry } from '../lib/filters'
+import { nextCycle } from '../lib/selectors'
 
 // Build-time only: the client reads the embedded index below, never data.ts.
+const programs = activePrograms(loadPrograms())
 const entries = sortIndex(
-  loadPrograms()
-    .map(toIndexEntry)
-    .filter((entry) => entry.status === 'active'),
+  programs.map(toIndexEntry),
   'newest',
 )
 const countries = [...new Set(entries.map((entry) => entry.country))].sort((a, b) =>
   a.localeCompare(b),
 )
+
+const deadlineDesk = programs
+  .flatMap((program) => {
+    const cycle = nextCycle(program)
+    if (
+      !cycle ||
+      cycle.dates.deadline === null ||
+      cycle.verification.deadline !== 'verified'
+    ) {
+      return []
+    }
+    return [{ program, cycle, date: cycle.dates.deadline }]
+  })
+  .sort((a, b) => a.date.localeCompare(b.date))
+  .slice(0, 3)
+
+// One real evidence quote, straight from the published data.
+const proof = programs
+  .flatMap((program) =>
+    program.cycles.flatMap((cycle) =>
+      cycle.evidence.map((evidence) => ({ program, cycle, evidence })),
+    ),
+  )
+  .find((item) => item.evidence.quote.trim() !== '')
+
 // Prevent a title from closing the JSON script element.
 const json = JSON.stringify(entries).replace(/</g, '\\u003c')
 ---
 
 <BaseLayout
   title={APP_NAME}
-  description="Compare current scholarships by study level, country, funding and deadline."
+  description="A short, verified list of scholarships for Pakistani students. Filter by study level, country, funding and deadline, and check every official source."
   canonicalPath="/"
 >
-  <section class="hero home-hero" aria-labelledby="hero-title">
-    <p class="eyebrow">Independent scholarship guidance</p>
-    <h1 id="hero-title">Find scholarships with confidence</h1>
-    <p class="lede">
-      Compare current opportunities and check each listing's official source before you apply.
-    </p>
+  <section class="masthead" aria-labelledby="hero-title">
+    <div class="masthead__copy">
+      <p class="eyebrow">Verified scholarship register · Pakistan</p>
+      <h1 id="hero-title" class="masthead__title">
+        Find a scholarship you can actually apply for.
+      </h1>
+      <p class="lede">
+        A short, checked list for Pakistani students. Every listing starts on the provider's
+        official page, with the quote and the date we checked it.
+      </p>
+      <p class="masthead__note">Built for Sindh · No account · Works on a slow connection</p>
+      <p class="masthead__actions">
+        <a class="button--primary" href="#find">Find scholarships</a>
+      </p>
+    </div>
+
+    <aside class="deadline-desk" aria-labelledby="deadline-desk-title">
+      <div class="deadline-desk__head">
+        <p class="mono-label">Deadline desk</p>
+        <span class="stamp stamp--verified">Verified dates only</span>
+      </div>
+      <h2 id="deadline-desk-title">Next verified deadlines</h2>
+
+      {deadlineDesk.length > 0 ? (
+        <ul class="deadline-desk__list">
+          {deadlineDesk.map((item) => (
+            <li class="deadline-desk__item">
+              <a href={`/listing/${item.program.programId}/`}>{item.program.title}</a>
+              <span class="deadline-desk__date">
+                <time datetime={item.date}>{formatDate(item.date)}</time>
+              </span>
+              <span class="deadline-desk__cycle">{item.cycle.label}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="deadline-desk__empty">
+          No deadline has been verified yet. Open a listing to check its official page.
+        </p>
+      )}
+
+      <p class="deadline-desk__note">
+        A date appears here only when the provider's own page or document confirms it.
+      </p>
+    </aside>
   </section>
 
-  <section class="listing-section" aria-labelledby="listing-heading">
-    <h2 id="listing-heading" class="sr-only">Scholarship listings</h2>
+  <section id="find" class="register-search" aria-labelledby="find-title">
+    <div class="register-search__head">
+      <h2 id="find-title">Filter the register</h2>
+      <p>Choose by level, country, funding or deadline.</p>
+    </div>
 
     <FilterBar countries={countries} />
 
-    <div class="listing-toolbar">
+    <div class="register-toolbar">
       <p class="results-count" data-testid="results-count" aria-live="polite" aria-atomic="true">
         {entries.length} {entries.length === 1 ? 'scholarship' : 'scholarships'}
       </p>
-      <div class="field field--sort">
-        <label class="field-label" for="sort">Sort by</label>
-        <select id="sort" data-filter="sort">
-          <option value="newest">Newest first</option>
-          <option value="best-funded">Best funded</option>
-          <option value="deadline">Soonest deadline</option>
-        </select>
+      <div class="register-toolbar__actions">
+        <div class="field field--sort">
+          <label class="field-label" for="sort">Sort by</label>
+          <select id="sort" data-filter="sort">
+            <option value="newest">Newest first</option>
+            <option value="best-funded">Best funded</option>
+            <option value="deadline">Soonest deadline</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -58,14 +128,82 @@ const json = JSON.stringify(entries).replace(/</g, '\\u003c')
       Eligible only shows listings marked <strong>Likely eligible</strong> for your current stage.
       Confirm the details on each official page before applying.
     </p>
+  </section>
+
+  <noscript>
+    <p class="noscript-note">
+      Filters need JavaScript. Every current scholarship is listed below, and every listing page
+      works without it.
+    </p>
+  </noscript>
+
+  <section aria-labelledby="register-title">
+    <h2 id="register-title" class="sr-only">Scholarship register</h2>
+
+    <div class="register__head" aria-hidden="true">
+      <span class="mono-label">Source</span>
+      <span class="mono-label">Scholarship</span>
+      <span class="mono-label">Deadline</span>
+    </div>
 
     <!-- No-JS fallback: every active card is rendered on the server. -->
-    <div id="listing-grid" class="listing-grid" data-list-status="active">
+    <div id="listing-grid" class="register" data-list-status="active">
       {entries.map((entry) => <ListingCard entry={entry} />)}
     </div>
 
     <EmptyState />
     <Pagination />
+  </section>
+
+  <section class="proof" aria-labelledby="proof-title">
+    <div class="proof__intro">
+      <p class="eyebrow">Proof, not promises</p>
+      <h2 id="proof-title">Every fact has a source</h2>
+      <p>
+        We keep the exact quote behind each important detail, the official page it came from, and
+        the date we last checked. A label tells you how far that check got.
+      </p>
+
+      <ul class="proof__labels">
+        <li>
+          <span class="stamp stamp--verified">Verified</span>
+          <span>Read on the provider's own page or document, with the quote stored.</span>
+        </li>
+        <li>
+          <span class="stamp stamp--check">Provisional</span>
+          <span>An official source exists, but the detail could not be fully checked.</span>
+        </li>
+        <li>
+          <span class="stamp stamp--neutral">Unverified</span>
+          <span>Not confirmed. A deadline is never shown as a date, and Apply stays hidden.</span>
+        </li>
+      </ul>
+
+      <a class="proof__method-link" href="/about/">Read the full method</a>
+    </div>
+
+    {proof ? (
+      <figure class="proof__clipping">
+        <div class="figure-meta">
+          <span class="mono-label">Evidence quote</span>
+          <span class="stamp stamp--verified">Source quote</span>
+        </div>
+        <blockquote>{proof.evidence.quote}</blockquote>
+        <figcaption>
+          <span>Field: {proof.evidence.field}</span>
+          <a class="proof__source" href={proof.evidence.sourceUrl} rel="noopener noreferrer">
+            {proof.program.title} — view source
+          </a>
+        </figcaption>
+      </figure>
+    ) : (
+      <div class="proof__clipping">
+        <p class="mono-label">Evidence quote</p>
+        <p>
+          No evidence quote is published yet. Open a listing to see its official sources.
+        </p>
+      </div>
+    )}
   </section>
 
   <script type="application/json" id="program-index" is:inline set:html={json}></script>

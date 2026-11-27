@@ -26,6 +26,14 @@ function initCycleTabs(): void {
   if (tabs.length === 0) return
   const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-cycle-panel]'))
 
+  // The server renders every panel so all cycles are readable without
+  // JavaScript. Once the tabs are live, show only the default panel.
+  const defaultPanel =
+    panels.find((panel) => panel.dataset.cycleDefault === 'true') ?? panels[0]
+  for (const panel of panels) {
+    panel.hidden = panel !== defaultPanel
+  }
+
   function select(tab: HTMLButtonElement, moveFocus = false): void {
     const cycleId = tab.dataset.cycleId
     for (const candidate of tabs) {

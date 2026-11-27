@@ -303,6 +303,13 @@ function init(): void {
     const isEmpty = sorted.length === 0
     list!.hidden = isEmpty
     empty!.hidden = !isEmpty
+
+    // While the file is empty, export is a quiet, disabled secondary action.
+    // Once an entry exists, it becomes the page's one primary action.
+    exportButton!.disabled = isEmpty
+    exportButton!.classList.toggle('button--primary', !isEmpty)
+    exportButton!.classList.toggle('button--quiet', isEmpty)
+    if (isEmpty) exportOutput!.hidden = true
   }
 
   exportButton.addEventListener('click', () => {

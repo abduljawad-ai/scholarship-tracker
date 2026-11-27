@@ -20,6 +20,7 @@ const fingerprint = `${status.mode}:${status.lastSuccessfulRun ?? 'none'}`
   aria-label="Data status"
   hidden={state === 'fresh'}
 >
+  <span class="mono-label freshness-banner__label">Data status</span>
   <p class="freshness-banner__message" data-freshness-message>{message}</p>
   <a class="freshness-banner__link" href="/about/">How we verify</a>
   <button

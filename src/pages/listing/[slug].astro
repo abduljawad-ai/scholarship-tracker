@@ -48,6 +48,10 @@ function dateOrNot(date: string | null): string {
   return date === null ? 'Not listed' : formatDate(date)
 }
 
+function isClosed(cycle: Cycle): boolean {
+  return cycle.status === 'closed' || cycle.status === 'archived'
+}
+
 // Trust threshold: show "Check official page" unless confidence >= 0.8 AND
 // every per-fact verification is "verified". Below either bar the summary is
 // not presented as confirmed, and an unverified deadline never shows a date.
@@ -67,7 +71,7 @@ function canApply(cycle: Cycle): boolean {
 }
 
 function applyReason(cycle: Cycle): string {
-  if (cycle.status === 'closed' || cycle.status === 'archived') {
+  if (isClosed(cycle)) {
     return 'Applications are closed for this cycle.'
   }
   if (cycle.verification.applyUrl !== 'verified') {
@@ -77,6 +81,11 @@ function applyReason(cycle: Cycle): string {
     return 'No application link listed — check official page.'
   }
   return ''
+}
+
+function lastCheckedIso(cycle: Cycle): string {
+  const dates = cycle.sources.map((source) => source.lastVerified).sort()
+  return dates[dates.length - 1] ?? program.lastUpdated.slice(0, 10)
 }
 
 const nationalities =
@@ -107,13 +116,18 @@ const description = `${program.title} at ${program.provider} in ${program.countr
   description={description}
   canonicalPath={`/listing/${program.programId}/`}
 >
-  <nav class="detail-backlink" aria-label="Breadcrumb">
-    <a href="/">← Back to all scholarships</a>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">← All scholarships</a>
   </nav>
 
-  <header class="detail-header">
+  <header class="dossier-header">
     <p class="eyebrow">{capitalize(program.providerType)} provider · {program.country}</p>
-    <h1>{program.title}</h1>
+    <div class="dossier-header__title">
+      <h1>{program.title}</h1>
+      <span class={needsCheck(defaultCycle) ? 'stamp stamp--check' : 'stamp stamp--verified'}>
+        {needsCheck(defaultCycle) ? 'Provisional' : 'Verified'}
+      </span>
+    </div>
     <p class="lede">{program.provider}</p>
 
     <ul class="badge-list" aria-label="Cycle status">
@@ -125,7 +139,7 @@ const description = `${program.title} at ${program.provider} in ${program.countr
       )}
     </ul>
 
-    <dl class="detail-facts detail-header__facts">
+    <dl class="dossier-header__facts">
       <div>
         <dt>Last updated</dt>
         <dd><time datetime={program.lastUpdated.slice(0, 10)}>{updatedDate}</time></dd>
@@ -169,10 +183,26 @@ const description = `${program.title} at ${program.provider} in ${program.countr
     const tabId = `tab-${program.programId}-${cycle.cycleId}`
     const isDefault = cycle.cycleId === defaultCycle.cycleId
     const hasTabs = program.cycles.length > 1
-    const deadlineValue = formatDeadline(cycle.dates.deadline, cycle.verification.deadline)
-    const verifiedDeadline =
+    const closed = isClosed(cycle)
+    const deadlineVerified =
       cycle.dates.deadline !== null && cycle.verification.deadline === 'verified'
+    const deadlineValue = formatDeadline(cycle.dates.deadline, cycle.verification.deadline)
     const applyUrl = canApply(cycle) ? cycle.apply.url : null
+    const slipClass = closed
+      ? 'slip slip--closed'
+      : deadlineVerified
+        ? 'slip'
+        : 'slip slip--unconfirmed'
+    const slipLabel = closed ? 'Status' : 'Deadline'
+    const slipValue = closed
+      ? 'Applications closed'
+      : deadlineVerified
+        ? formatDate(cycle.dates.deadline!)
+        : cycle.dates.deadline === null
+          ? 'Not listed'
+          : 'Not confirmed'
+    const slipNote =
+      !closed && !deadlineVerified ? 'Check official page' : null
 
     const timeline: TimelineItem[] = [
       {
@@ -183,7 +213,7 @@ const description = `${program.title} at ${program.provider} in ${program.countr
       {
         label: 'Deadline',
         value: deadlineValue,
-        dateTime: verifiedDeadline ? (cycle.dates.deadline ?? undefined) : undefined,
+        dateTime: deadlineVerified ? (cycle.dates.deadline ?? undefined) : undefined,
       },
       {
         label: 'Results',
@@ -205,7 +235,7 @@ const description = `${program.title} at ${program.provider} in ${program.countr
         aria-labelledby={hasTabs ? tabId : undefined}
         data-cycle-panel
         data-cycle-id={cycle.cycleId}
-        hidden={!isDefault}
+        data-cycle-default={isDefault ? 'true' : undefined}
       >
         <div class="cycle-panel__head">
           <h2>{cycle.label}</h2>
@@ -215,141 +245,185 @@ const description = `${program.title} at ${program.provider} in ${program.countr
           </ul>
         </div>
 
-        <GuideSection
-          panelId={panelId}
-          steps={program.guide.steps}
-          documents={program.guide.documents}
-          timeline={timeline}
-          tips={program.guide.tips}
-        />
+        <div class="dossier">
+          <aside class="dossier__rail" aria-labelledby={`${panelId}-status-title`}>
+            <div class="status-panel">
+              <div class="status-panel__head">
+                <h2 id={`${panelId}-status-title`}>Cycle status</h2>
+                <span
+                  class={
+                    closed
+                      ? 'stamp stamp--closed'
+                      : cycle.status === 'open'
+                        ? 'stamp stamp--verified'
+                        : 'stamp stamp--check'
+                  }
+                >
+                  {capitalize(cycle.status)}
+                </span>
+              </div>
 
-        <section class="detail-section" aria-labelledby={`${panelId}-apply-title`}>
-          <h2 id={`${panelId}-apply-title`}>Where to apply</h2>
-          {applyUrl !== null ? (
-            <div class="apply-callout">
-              <a class="button--primary" href={applyUrl}>
-                Apply for {cycle.label} on the official portal
-              </a>
-              {cycle.apply.portalName && <p>Via {cycle.apply.portalName}</p>}
-              {cycle.apply.fee && <p>{cycle.apply.fee}</p>}
-            </div>
-          ) : (
-            <p class="apply-reason">{applyReason(cycle)}</p>
-          )}
-          <p>
-            <a href={program.officialUrl} rel="noopener noreferrer">Visit official page</a>
-          </p>
-        </section>
+              <div class="status-panel__deadline">
+                <span class={slipClass}>
+                  <span class="slip__label">{slipLabel}</span>
+                  <span class="slip__date">
+                    {deadlineVerified && !closed ? (
+                      <time datetime={cycle.dates.deadline ?? undefined}>{slipValue}</time>
+                    ) : (
+                      slipValue
+                    )}
+                  </span>
+                  {slipNote && <span class="slip__note">{slipNote}</span>}
+                </span>
+              </div>
 
-        <section class="detail-section" aria-labelledby={`${panelId}-funding-title`}>
-          <h2 id={`${panelId}-funding-title`}>Funding</h2>
-          <FundingBadge type={program.funding.type} status={cycle.verification.funding} />
-          <dl class="detail-facts">
-            <div>
-              <dt>Tuition</dt>
-              <dd>
-                {program.funding.tuitionCovered
-                  ? 'Tuition fees covered'
-                  : 'Tuition fees not covered'}
-              </dd>
+              <div class="status-panel__checks">
+                <VerificationBadge label="Deadline" status={cycle.verification.deadline} />
+                <VerificationBadge label="Apply link" status={cycle.verification.applyUrl} />
+              </div>
+
+              <div class="status-panel__actions">
+                {applyUrl !== null ? (
+                  <a class="button--primary" href={applyUrl}>
+                    Apply for {cycle.label} on the official portal
+                  </a>
+                ) : (
+                  <p class="apply-reason">{applyReason(cycle)}</p>
+                )}
+              </div>
+
+              <p class="status-panel__official">
+                <a href={program.officialUrl} rel="noopener noreferrer">Visit official page</a>
+              </p>
+
+              <div class="status-panel__tracker">
+                <h3>Track this application</h3>
+                <p>Keep a note of your progress on this device — no account needed.</p>
+                <TrackerControls
+                  programId={program.programId}
+                  cycle={cycle}
+                  idPrefix={`${program.programId}-${cycle.cycleId}`}
+                />
+              </div>
+
+              <p class="status-panel__meta">
+                Last checked:{' '}
+                <time datetime={lastCheckedIso(cycle)}>{formatDate(lastCheckedIso(cycle))}</time>
+                <span>{cycle.sources.length} official {cycle.sources.length === 1 ? 'source' : 'sources'}</span>
+              </p>
             </div>
-            <div>
-              <dt>Monthly stipend</dt>
-              <dd>{stipend ?? 'Not listed'}</dd>
-            </div>
-          </dl>
-          {program.funding.otherBenefits.length > 0 && (
-            <>
-              <h3>Other benefits</h3>
-              <ul class="detail-list">
-                {program.funding.otherBenefits.map((benefit) => <li>{benefit}</li>)}
+          </aside>
+
+          <div class="dossier__main">
+            <GuideSection
+              panelId={panelId}
+              steps={program.guide.steps}
+              documents={program.guide.documents}
+              timeline={timeline}
+              tips={program.guide.tips}
+            />
+
+            <section class="detail-section" aria-labelledby={`${panelId}-funding-title`}>
+              <h2 id={`${panelId}-funding-title`}>Funding</h2>
+              <FundingBadge type={program.funding.type} status={cycle.verification.funding} />
+              <dl class="detail-facts">
+                <div>
+                  <dt>Tuition</dt>
+                  <dd>
+                    {program.funding.tuitionCovered
+                      ? 'Tuition fees covered'
+                      : 'Tuition fees not covered'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Monthly stipend</dt>
+                  <dd>{stipend ?? 'Not listed'}</dd>
+                </div>
+              </dl>
+              {program.funding.otherBenefits.length > 0 && (
+                <>
+                  <h3>Other benefits</h3>
+                  <ul class="detail-list">
+                    {program.funding.otherBenefits.map((benefit) => <li>{benefit}</li>)}
+                  </ul>
+                </>
+              )}
+            </section>
+
+            <section class="detail-section" aria-labelledby={`${panelId}-eligibility-title`}>
+              <h2 id={`${panelId}-eligibility-title`}>Eligibility</h2>
+              <VerificationBadge label="Eligibility" status={cycle.verification.eligibility} />
+              <dl class="detail-facts">
+                <div>
+                  <dt>Nationalities</dt>
+                  <dd>{nationalities}</dd>
+                </div>
+                <div>
+                  <dt>Maximum age</dt>
+                  <dd>{maxAge}</dd>
+                </div>
+                <div>
+                  <dt>Minimum degree</dt>
+                  <dd>{minDegree}</dd>
+                </div>
+                <div>
+                  <dt>Minimum marks</dt>
+                  <dd>{program.eligibility.minMarks ?? 'Not listed'}</dd>
+                </div>
+                <div>
+                  <dt>English test</dt>
+                  <dd>{program.eligibility.englishTest ?? 'Not listed'}</dd>
+                </div>
+                <div>
+                  <dt>Experience</dt>
+                  <dd>{experience}</dd>
+                </div>
+              </dl>
+              {program.eligibility.other.length > 0 && (
+                <ul class="detail-list">
+                  {program.eligibility.other.map((rule) => <li>{rule}</li>)}
+                </ul>
+              )}
+              <EligibilityNote />
+            </section>
+
+            <section class="detail-section" aria-labelledby={`${panelId}-sources-title`}>
+              <h2 id={`${panelId}-sources-title`}>Official sources</h2>
+              <ul class="sources-list">
+                {cycle.sources.map((source) => (
+                  <li>
+                    <a href={source.url} rel="noopener noreferrer">{source.url}</a>
+                    <p class="source-meta">
+                      {source.type} · Last verified:{' '}
+                      <time datetime={source.lastVerified}>{formatDate(source.lastVerified)}</time>
+                    </p>
+                  </li>
+                ))}
               </ul>
-            </>
-          )}
-        </section>
+            </section>
 
-        <section class="detail-section" aria-labelledby={`${panelId}-eligibility-title`}>
-          <h2 id={`${panelId}-eligibility-title`}>Eligibility</h2>
-          <VerificationBadge label="Eligibility" status={cycle.verification.eligibility} />
-          <dl class="detail-facts">
-            <div>
-              <dt>Nationalities</dt>
-              <dd>{nationalities}</dd>
-            </div>
-            <div>
-              <dt>Maximum age</dt>
-              <dd>{maxAge}</dd>
-            </div>
-            <div>
-              <dt>Minimum degree</dt>
-              <dd>{minDegree}</dd>
-            </div>
-            <div>
-              <dt>Minimum marks</dt>
-              <dd>{program.eligibility.minMarks ?? 'Not listed'}</dd>
-            </div>
-            <div>
-              <dt>English test</dt>
-              <dd>{program.eligibility.englishTest ?? 'Not listed'}</dd>
-            </div>
-            <div>
-              <dt>Experience</dt>
-              <dd>{experience}</dd>
-            </div>
-          </dl>
-          {program.eligibility.other.length > 0 && (
-            <ul class="detail-list">
-              {program.eligibility.other.map((rule) => <li>{rule}</li>)}
-            </ul>
-          )}
-          <EligibilityNote />
-        </section>
+            <section class="detail-section" aria-labelledby={`${panelId}-evidence-title`}>
+              <h2 id={`${panelId}-evidence-title`}>Evidence from official sources</h2>
+              {cycle.evidence.length > 0 ? (
+                <ul class="evidence-list">
+                  {cycle.evidence.map((item) => (
+                    <li>
+                      <p class="evidence-field">Field: {item.field}</p>
+                      <blockquote>{item.quote}</blockquote>
+                      <a href={item.sourceUrl} rel="noopener noreferrer">View source</a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No evidence quotes are stored for this cycle.</p>
+              )}
+            </section>
 
-        <section class="detail-section" aria-labelledby={`${panelId}-sources-title`}>
-          <h2 id={`${panelId}-sources-title`}>Official sources</h2>
-          <ul class="sources-list">
-            {cycle.sources.map((source) => (
-              <li>
-                <a href={source.url} rel="noopener noreferrer">{source.url}</a>
-                <p class="source-meta">
-                  {source.type} · Last verified:{' '}
-                  <time datetime={source.lastVerified}>{formatDate(source.lastVerified)}</time>
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section class="detail-section" aria-labelledby={`${panelId}-evidence-title`}>
-          <h2 id={`${panelId}-evidence-title`}>Evidence from official sources</h2>
-          {cycle.evidence.length > 0 ? (
-            <ul class="evidence-list">
-              {cycle.evidence.map((item) => (
-                <li>
-                  <p class="evidence-field">Field: {item.field}</p>
-                  <blockquote>{item.quote}</blockquote>
-                  <a href={item.sourceUrl} rel="noopener noreferrer">View source</a>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No evidence quotes are stored for this cycle.</p>
-          )}
-        </section>
-
-        <section class="detail-section" aria-labelledby={`${panelId}-tracker-title`}>
-          <h2 id={`${panelId}-tracker-title`}>Track this application</h2>
-          <p>Keep a note of your progress on this device — no account needed.</p>
-          <TrackerControls
-            programId={program.programId}
-            cycle={cycle}
-            idPrefix={`${program.programId}-${cycle.cycleId}`}
-          />
-        </section>
-
-        <div class="detail-actions">
-          <ShareButton title={program.title} />
-          <ReportIssueLink program={program} cycle={cycle} />
+            <div class="detail-actions">
+              <ShareButton title={program.title} />
+              <ReportIssueLink program={program} cycle={cycle} />
+            </div>
+          </div>
         </div>
       </section>
     )

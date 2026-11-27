@@ -1,5 +1,16 @@
 ---
 import { APP_NAME } from '../lib/constants'
+
+const path = Astro.url.pathname
+const links = [
+  { href: '/archive/', label: 'Archive' },
+  { href: '/my-applications/', label: 'My Applications' },
+  { href: '/about/', label: 'About' },
+]
+
+function isCurrent(href: string): boolean {
+  return path === href || path.startsWith(href)
+}
 ---
 
 <header class="site-header">
@@ -21,9 +32,15 @@ import { APP_NAME } from '../lib/constants'
     </a>
 
     <nav class="site-nav" aria-label="Main navigation">
-      <a class="site-nav__link" href="/about/">About</a>
-      <a class="site-nav__link" href="/archive/">Archive</a>
-      <a class="site-nav__link" href="/my-applications/">My Applications</a>
+      {links.map((link) => (
+        <a
+          class="site-nav__link"
+          href={link.href}
+          aria-current={isCurrent(link.href) ? 'page' : undefined}
+        >
+          {link.label}
+        </a>
+      ))}
     </nav>
 
     <button

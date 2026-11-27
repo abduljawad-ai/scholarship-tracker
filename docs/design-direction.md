@@ -84,6 +84,7 @@ Ratios were calculated from the sRGB hex values with the WCAG 2.x relative-lumin
 | Accent tint surface | `--color-accent-soft` | `#e6f0e9` | `#203b30` |
 | Text on accent button | `--color-accent-contrast` | `#ffffff` | `#0d1a14` |
 | Border | `--color-border` | `#d5d8d0` | `#3a4b42` |
+| Control border | `--color-control-border` | `#7a857e` | `#6b8074` |
 | Focus indicator | `--color-focus-ring` | `#0b5c3e` | `#7fd3ae` |
 
 Measured ratios:
@@ -97,6 +98,8 @@ Measured ratios:
 | Accent link on accent tint | 6.89:1 (`#0b5c3e` / `#e6f0e9`) | 6.84:1 (`#7fd3ae` / `#203b30`) |
 | Accent-button text on accent background | 8.03:1 (`#ffffff` / `#0b5c3e`) | 10.07:1 (`#0d1a14` / `#7fd3ae`) |
 | Focus ring on page background | 7.69:1 (`#0b5c3e` / `#fbfaf7`) | 10.25:1 (`#7fd3ae` / `#101714`) |
+| Control border on raised surface (non-text) | 3.83:1 (`#7a857e` / `#ffffff`) | 3.86:1 (`#6b8074` / `#18221e`) |
+| Control border on page background (non-text) | 3.67:1 (`#7a857e` / `#fbfaf7`) | 4.30:1 (`#6b8074` / `#101714`) |
 
 Status colours (added later with explicit icons/labels, never colour alone) will use accent tint for positive, warm amber `#8a4b08` on `#fff4e2` for caution, and `#9d2b25` on `#fdeceb` for negative; each pair is ≥ 4.5:1.
 
