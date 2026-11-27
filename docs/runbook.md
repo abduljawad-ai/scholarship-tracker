@@ -52,6 +52,12 @@ The sitemap and canonical URLs depend on this value. The report-issue links
 point at the project repository. Keep that repository public before launch, or
 the links will return 404 for visitors who are not signed in to GitHub.
 
+The previous project, `scholarship-tracker` (hostname
+`scholarship-tracker-6wv.pages.dev`), still exists and builds from the same
+repository. It is a temporary backup. Delete it in **Workers & Pages** when the
+new project has been stable for a few days, so each push stops triggering two
+builds.
+
 ### Reconnect Git when Cloudflare says the project is disconnected
 
 If the Pages project shows **“This project is disconnected from your Git
