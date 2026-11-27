@@ -1,0 +1,57 @@
+---
+import type { ProgramIndexEntry } from '../lib/filters'
+import { formatDeadline, fundingLabel, studyLevelLabel } from '../lib/format'
+
+interface Props {
+  entry: ProgramIndexEntry
+}
+
+const { entry } = Astro.props
+const deadline = formatDeadline(
+  entry.nextDeadline,
+  entry.deadlineVerified ? 'verified' : 'unverified',
+)
+const verifiedDeadline = entry.deadlineVerified && entry.nextDeadline !== null
+---
+
+<article class="listing-card" data-program-id={entry.programId} data-testid="listing-card">
+  <div class="listing-card__inner" data-testid={`card-${entry.programId}`}>
+    <div class="listing-card__head">
+      <h3 class="listing-card__title">
+        <a href={`/listing/${entry.programId}/`}>{entry.title}</a>
+      </h3>
+      <span class="badge badge--eligible" data-eligible-pill hidden={!entry.likelyEligibleFor.includes('bachelor')}>
+        Likely eligible
+      </span>
+    </div>
+
+    <p class="listing-card__provider">{entry.provider}</p>
+
+    <ul class="badge-list" aria-label="Funded levels">
+      {entry.fundedLevels.map((level) => (
+        <li class="badge">{studyLevelLabel(level)}</li>
+      ))}
+    </ul>
+
+    <dl class="listing-card__facts">
+      <div>
+        <dt>Country</dt>
+        <dd>{entry.country}</dd>
+      </div>
+      <div>
+        <dt>Funding</dt>
+        <dd><span class="badge badge--funding">{fundingLabel(entry.fundingType)}</span></dd>
+      </div>
+      <div>
+        <dt>Deadline</dt>
+        <dd>
+          {verifiedDeadline ? (
+            <time datetime={entry.nextDeadline ?? undefined}>{deadline}</time>
+          ) : (
+            <span>{deadline}</span>
+          )}
+        </dd>
+      </div>
+    </dl>
+  </div>
+</article>

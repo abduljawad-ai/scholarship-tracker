@@ -1,16 +1,21 @@
 // Build-time only: reads the seed JSON from disk. Never import this module
 // from client scripts — import the pure selectors from "./selectors" instead.
-import { readdirSync, readFileSync } from "node:fs"
+import { existsSync, readdirSync, readFileSync } from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { parseProgram, type Program } from "./schema"
 
 export { activePrograms, archivedPrograms, isActive, nextCycle } from "./selectors"
 
-const PROGRAMS_DIR = path.join(
+// Vite bundles this module into dist/.prerender/chunks at build time, so
+// import.meta.url no longer points at src/lib. Prefer the source tree from the
+// project root and keep the module-relative path as a fallback.
+const SOURCE_PROGRAMS_DIR = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   "../data/programs",
 )
+const ROOT_PROGRAMS_DIR = path.resolve(process.cwd(), "src/data/programs")
+const PROGRAMS_DIR = existsSync(ROOT_PROGRAMS_DIR) ? ROOT_PROGRAMS_DIR : SOURCE_PROGRAMS_DIR
 
 /** Reads, parses and validates every `src/data/programs/*.json` seed file. */
 export function loadPrograms(): Program[] {

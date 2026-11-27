@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
-import { daysUntil, formatDate, formatDeadline, formatMoney, fundingLabel } from '../../src/lib/format'
+import { STUDY_LEVELS } from '../../src/lib/constants'
+import { daysUntil, formatDate, formatDeadline, formatMoney, fundingLabel, studyLevelLabel } from '../../src/lib/format'
 
 test('formats ISO dates in UTC', () => {
   expect(formatDate('2027-01-15')).toBe('15 Jan 2027')
@@ -29,4 +30,14 @@ test('formatMoney contains PKR and formatted amount', () => {
 
 test('fundingLabel returns Fully funded', () => {
   expect(fundingLabel('fully-funded')).toBe('Fully funded')
+})
+
+test('studyLevelLabel returns readable labels for every level', () => {
+  expect(STUDY_LEVELS.map(studyLevelLabel)).toEqual([
+    'Matric',
+    'Intermediate',
+    "Bachelor's",
+    "Master's",
+    'PhD',
+  ])
 })

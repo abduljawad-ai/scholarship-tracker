@@ -1,4 +1,4 @@
-import type { FundingType, VerificationStatus } from "./constants"
+import type { FundingType, StudyLevel, VerificationStatus } from "./constants"
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
@@ -36,6 +36,19 @@ const FUNDING_LABELS: Record<FundingType, string> = {
 
 export function fundingLabel(type: FundingType): string {
   return FUNDING_LABELS[type]
+}
+
+const STUDY_LEVEL_LABELS: Record<StudyLevel, string> = {
+  matric: "Matric",
+  intermediate: "Intermediate",
+  bachelor: "Bachelor's",
+  master: "Master's",
+  phd: "PhD",
+}
+
+/** Human-readable name for a funded or current study level. */
+export function studyLevelLabel(level: StudyLevel): string {
+  return STUDY_LEVEL_LABELS[level]
 }
 
 export function formatMoney(amount: number, currency: string): string {

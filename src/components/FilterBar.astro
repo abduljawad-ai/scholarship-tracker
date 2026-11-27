@@ -1,0 +1,81 @@
+---
+import { STUDY_LEVELS } from '../lib/constants'
+import { studyLevelLabel } from '../lib/format'
+
+interface Props {
+  countries: string[]
+}
+
+const { countries } = Astro.props
+---
+
+<form class="filter-form" data-filter-form aria-label="Filter scholarships">
+  <div class="filter-grid">
+    <div class="field">
+      <label class="field-label" for="search">Search</label>
+      <input
+        id="search"
+        type="search"
+        data-filter="q"
+        placeholder="Programme, provider or country"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="study-level">Study level</label>
+      <select id="study-level" data-filter="level">
+        <option value="all">All levels</option>
+        {STUDY_LEVELS.map((level) => (
+          <option value={level}>{studyLevelLabel(level)}</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="current-level">I'm currently in</label>
+      <select id="current-level" data-filter="current">
+        {STUDY_LEVELS.map((level) => (
+          <option value={level} selected={level === 'bachelor'}>{studyLevelLabel(level)}</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="country">Country</label>
+      <select id="country" data-filter="country">
+        <option value="all">All countries</option>
+        {countries.map((country) => (
+          <option value={country}>{country}</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="funding">Funding</label>
+      <select id="funding" data-filter="funding">
+        <option value="all">Any funding</option>
+        <option value="fully">Fully funded</option>
+        <option value="stipend">Stipend</option>
+        <option value="tuition">Tuition covered</option>
+        <option value="partial">Partial funding</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="deadline">Deadline</label>
+      <select id="deadline" data-filter="deadline">
+        <option value="all">Any deadline</option>
+        <option value="30">Next 30 days</option>
+        <option value="90">Next 90 days</option>
+      </select>
+    </div>
+
+    <div class="field field--checkbox">
+      <label class="checkbox-label" for="eligible-only">
+        <input id="eligible-only" type="checkbox" data-filter="eligible" aria-describedby="eligible-note" />
+        <span>Eligible only</span>
+      </label>
+    </div>
+  </div>
+</form>

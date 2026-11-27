@@ -51,3 +51,13 @@ test('empty filters return an empty list, not a crash', () => {
   const out = filterIndex(entries, { query: 'zzzz-no-match', level: 'all', currentLevel: 'master', eligibleOnly: false, funding: 'all', deadlineWindow: 'all', status: 'all' }, now)
   expect(out).toEqual([])
 })
+
+test('country filter matches the exact country', () => {
+  const out = filterIndex(entries, { query: '', level: 'all', country: 'Germany', currentLevel: 'bachelor', eligibleOnly: false, funding: 'all', deadlineWindow: 'all', status: 'all' }, now)
+  expect(out.map(e => e.programId)).toEqual(['daad-epos'])
+})
+
+test('partial funding matches the HEC need-based program', () => {
+  const out = filterIndex(entries, { query: '', level: 'all', currentLevel: 'bachelor', eligibleOnly: false, funding: 'partial', deadlineWindow: 'all', status: 'all' }, now)
+  expect(out.map(e => e.programId)).toEqual(['hec-need-based'])
+})

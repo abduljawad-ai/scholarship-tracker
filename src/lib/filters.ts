@@ -24,11 +24,19 @@ export interface ProgramIndexEntry {
 export interface FilterState {
   query: string
   level: StudyLevel | "all"
+  country?: string | "all"
   currentLevel: StudyLevel
   eligibleOnly: boolean
-  funding: "all" | "fully" | "stipend"
+  funding: "all" | "fully" | "stipend" | "tuition" | "partial"
   deadlineWindow: "all" | "30" | "90"
   status: "active" | "archived" | "all"
+}
+
+const FUNDING_FILTER: Record<Exclude<FilterState["funding"], "all">, FundingType> = {
+  fully: "fully-funded",
+  stipend: "stipend",
+  tuition: "tuition",
+  partial: "partial",
 }
 
 const FUNDING_SCORE: Record<FundingType, number> = {
@@ -116,13 +124,13 @@ export function filterIndex(
   for (const entry of entries) {
     if (!matchesQuery(entry, filters.query)) continue
     if (filters.level !== "all" && !entry.fundedLevels.includes(filters.level)) continue
+    if (filters.country && filters.country !== "all" && entry.country !== filters.country) continue
     if (filters.status !== "all" && entry.status !== filters.status) continue
     if (filters.eligibleOnly) {
       if (entry.status !== "active") continue
       if (!entry.likelyEligibleFor.includes(filters.currentLevel)) continue
     }
-    if (filters.funding === "fully" && entry.fundingType !== "fully-funded") continue
-    if (filters.funding === "stipend" && entry.fundingType !== "stipend") continue
+    if (filters.funding !== "all" && entry.fundingType !== FUNDING_FILTER[filters.funding]) continue
     if (filters.deadlineWindow !== "all") {
       const n = Number(filters.deadlineWindow)
       if (!(entry.deadlineVerified && entry.nextDeadline !== null)) continue
