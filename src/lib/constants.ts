@@ -1,5 +1,5 @@
 export const APP_NAME = "Scholarship Tracker"
-export const PUBLIC_REPO_URL = "https://github.com/OWNER/REPO"
+export const PUBLIC_REPO_URL = "https://github.com/abduljawad-ai/scholarship-tracker"
 
 export const STUDY_LEVELS = ["matric", "intermediate", "bachelor", "master", "phd"] as const
 export type StudyLevel = (typeof STUDY_LEVELS)[number]

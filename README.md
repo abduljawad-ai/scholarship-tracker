@@ -104,8 +104,9 @@ Cloudflare dashboard.
 
 See **[docs/runbook.md](docs/runbook.md)** for the full checklist, rollback steps,
 placeholder values to replace, and troubleshooting. In particular, replace the
-placeholder origin in `astro.config.mjs` and `public/robots.txt`, and
-`PUBLIC_REPO_URL` in `src/lib/constants.ts`, before launch.
+placeholder origin in `astro.config.mjs` and `public/robots.txt` before launch. The
+report-issue links already point at the project repository; make that repository
+public before launch if you want visitors to be able to file issues.
 
 ## Documentation
 

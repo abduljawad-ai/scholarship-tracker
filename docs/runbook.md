@@ -34,16 +34,16 @@ app: Cloudflare Pages serves the files produced by `npm run build` from `dist/`.
 
 ### Placeholders to replace at deploy
 
-These are deliberately placeholders until the owner names the project:
+These are deliberately placeholders until the Cloudflare project name is fixed:
 
 | File | Value |
 | --- | --- |
 | `astro.config.mjs` | `site: 'https://scholarship-tracker.pages.dev'` |
 | `public/robots.txt` | `Sitemap: https://scholarship-tracker.pages.dev/sitemap-index.xml` |
-| `src/lib/constants.ts` | `PUBLIC_REPO_URL = 'https://github.com/OWNER/REPO'` |
 
-All three must use the real production origin. The sitemap, canonical URLs, and
-the “Report an issue” links depend on them.
+Both must use the real production origin. The sitemap and canonical URLs depend on
+them. The report-issue links already point at the project repository; if that
+repository is private, make it public before launch or the links will return 404.
 
 ## Preview and production behaviour
 
