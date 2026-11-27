@@ -100,6 +100,8 @@ Never present unreviewed UI as done. First drafts are never done.
 - `npm run preview` — preview the build
 - `npm run typecheck` — Astro and TypeScript checks
 - `npm test` — unit tests
+- `npm run eval` — replay the golden fixtures through the real pipeline code
+- `npm run pipeline -- --dry-run` — pipeline dry run; no AI keys, no writes
 - `npm run test:e2e` — Playwright tests on a fresh build
 - `npm run design:shots` — 360/768/1440 screenshots to `test-results/design-review/`
 
