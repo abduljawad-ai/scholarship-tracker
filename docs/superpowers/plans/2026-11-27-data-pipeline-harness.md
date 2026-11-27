@@ -490,6 +490,12 @@ git commit -m "feat: add fetching, robots checks, HTML text, and PDF extraction"
   `ProviderQuotaError`; `ProviderAuthError`; `ProviderRequestError`.
   `Provider` is `{ id: ProviderId; model: string; complete(request:
   AiRequest, signal: AbortSignal): Promise<string> }`.
+  Router deps are `{ config: PipelineConfig; store: StateStore; fetchImpl?:
+  FetchLike; now?: () => Date }`. `StateStore` is `{ get(): PipelineState;
+  set(next: PipelineState): void }`; `createMemoryStore` and
+  `createFileStore` live in `state.ts`. The store is shared with the
+  orchestrator so item checkpoints and provider usage cannot clobber each
+  other.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -532,11 +538,11 @@ model ID.
 
 - [ ] **Step 4: Implement the router**
 
-`createRouter({ config, state, persist, fetchImpl, now })` builds only the
+`createRouter({ config, store, fetchImpl, now })` builds only the
 configured providers. `complete` walks `config.routing[request.task]`, skips
 excluded/cooling/over-cap providers, catches quota/auth errors (records cooldown
 and persists), and returns the first success. On success,
-`recordProviderCall(state, id, todayInPakistan(now()))` then `persist()`.
+`store.set(recordProviderCall(store.get(), id, todayInPakistan(now())))`.
 `available(task, exclude)` returns the ready provider IDs without calling.
 
 - [ ] **Step 5: Run the tests and typecheck**
@@ -819,19 +825,21 @@ git commit -m "feat: merge verified facts and publish program data atomically"
 **Files:**
 - Create: `scripts/pipeline/run.ts`, `report.ts`, `main.ts`
 - Test: `tests/unit/pipeline-run.test.ts`, `pipeline-report.test.ts`
-- Modify: `package.json` (`pipeline` script already added in Task 2)
+- Modify: `package.json` (`pipeline` script)
 
 **Interfaces:**
 - Consumes: everything from Tasks 2–7.
-- Produces: `runPipeline(options): Promise<RunSummary>`;
-  `writeReport(config, report): string`;
+- Produces: `runPipeline(options): Promise<{ summary: RunSummary; report:
+  RunReport }>`; `writeReport(config, report): string`;
   `renderSummary(report): string`;
   `parseArgs(argv): CliOptions` (exported from `main.ts` for tests).
-  `options` is `{ config: PipelineConfig; router: Router; fetchImpl: typeof
-  fetch; now: Date; dryRun: boolean; maxItems: number; sourceId?: string;
-  allowLive: boolean }`. `RunSummary` is `{ runId, status, published:
+  `options` is `{ config: PipelineConfig; router: Router; store?: StateStore;
+  fetchImpl?: FetchLike; now: Date; dryRun: boolean; maxItems: number;
+  sourceId?: string; allowLive: boolean; sleep?: (ms: number) => Promise<void>;
+  random?: () => number }`. `RunSummary` is `{ runId, status, published:
   string[], unchanged: string[], failed: string[], paused: string[],
-  unhealthy: string[], candidates: number, checked: number }`.
+  unhealthy: string[], candidates: number, checked: number }`. `runPipeline`
+  writes the report itself unless `dryRun`.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -879,14 +887,16 @@ Expected: FAIL — modules not found.
 2. Start or resume a run; `runId = now.toISOString().replace(/[:.]/g, '-')`.
 3. Build the queue from non-archived sources (optionally one `sourceId`):
    `{ sourceId, programId, url }` per `pageUrl`. Skip items already `published`
-   or `dead`; retry `failed` while `attempts < maxAttempts`.
+   or `dead`; retry every other item. Content errors dead-letter at
+   `maxAttempts`; fetch failures stay `failed` and are governed by source
+   retirement, so a permanently broken host can reach five failures.
 4. For each item, up to `maxItems`:
    - skip when the source is `retired` or `nextEligibleAt > now`; count it as
-     skipped.
+     skipped and add it to `unhealthy`.
    - robots check; on deny mark `dead` and report.
    - fetch text; on failure increment source failures, set `nextEligibleAt` to
-     `now + min(24h, 15min * 2^failures)`, mark item `failed`; at five failures
-     set `retired: true`.
+     `now + min(24h, 15min * 2^failures)`, mark item `failed` without
+     dead-lettering; at five failures set `retired: true`.
    - hash; if equal to `state.pages[itemKey].hash`, mark `published`, count it
      as `unchanged`, and continue.
    - suspicion check: if `snapshot.text.length < 400`, or the previous
@@ -929,8 +939,9 @@ Record<string,{calls,errors,cooldowns}> }`. Write to
 
 `main.ts`: `parseArgs` with `node:util`; build providers from config; if none,
 print `No AI providers configured — pipeline skipped.` and exit 0 without
-writing. Build the router with `persist`; run; print the summary; append to
-`GITHUB_STEP_SUMMARY` when set; exit 0 for complete/paused/skipped, 1 for failed.
+writing. Build one `StateStore` and pass it to both the router and the
+orchestrator; run; print the summary; append to `GITHUB_STEP_SUMMARY` when set;
+exit 0 for complete/paused/skipped, 1 for failed.
 
 - [ ] **Step 4: Run the tests and typecheck**
 

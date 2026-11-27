@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest'
 import { loadConfig } from '../../scripts/pipeline/config'
 import { ProvidersExhaustedError, createRouter } from '../../scripts/pipeline/router'
-import { emptyState, recordProviderCall, setProviderCooldown } from '../../scripts/pipeline/state'
+import { emptyState, createMemoryStore, recordProviderCall, setProviderCooldown } from '../../scripts/pipeline/state'
 import type { FetchLike } from '../../scripts/pipeline/http'
 import type { AiRequest, PipelineState } from '../../scripts/pipeline/types'
 
@@ -38,10 +38,9 @@ interface FixtureOptions {
 
 function fixture(options: FixtureOptions = {}) {
   const config = loadConfig({ GEMINI_API_KEY: 'g', GROQ_API_KEY: 'q' }, '/srv/app')
-  let state = options.state ?? emptyState()
-  const persist = vi.fn((next: PipelineState) => {
-    state = next
-  })
+  const base = createMemoryStore(options.state ?? emptyState())
+  const persist = vi.fn((next: PipelineState) => base.set(next))
+  const store = { get: base.get, set: persist }
   const fetchImpl = vi.fn<FetchLike>(async (url) =>
     url.includes('groq.com')
       ? (options.groq ?? (() => groqAnswer('from groq')))()
@@ -49,12 +48,11 @@ function fixture(options: FixtureOptions = {}) {
   )
   const router = createRouter({
     config,
-    state,
-    persist,
+    store,
     fetchImpl,
     now: () => NOW,
   })
-  return { router, persist, getState: () => state, fetchImpl }
+  return { router, persist, getState: () => store.get(), fetchImpl }
 }
 
 test('the first configured provider in the task order is used', async () => {
@@ -121,8 +119,7 @@ test('available lists only configured, ready providers', () => {
   const config = loadConfig({ GROQ_API_KEY: 'q' }, '/srv/app')
   const router = createRouter({
     config,
-    state: emptyState(),
-    persist: () => {},
+    store: createMemoryStore(emptyState()),
     fetchImpl: vi.fn<FetchLike>(),
     now: () => NOW,
   })

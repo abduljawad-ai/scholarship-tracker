@@ -95,6 +95,37 @@ export function emptyState(): PipelineState {
   }
 }
 
+/**
+ * Shared mutable state used by the orchestrator and the router. Both write
+ * through the same store, so an item checkpoint and a provider call cannot
+ * clobber each other.
+ */
+export interface StateStore {
+  get(): PipelineState
+  set(next: PipelineState): void
+}
+
+export function createMemoryStore(initial: PipelineState = emptyState()): StateStore {
+  let state = initial
+  return {
+    get: () => state,
+    set: (next) => {
+      state = next
+    },
+  }
+}
+
+export function createFileStore(file: string, initial: PipelineState = loadState(file)): StateStore {
+  let state = initial
+  return {
+    get: () => state,
+    set: (next) => {
+      state = next
+      saveState(file, next)
+    },
+  }
+}
+
 export function loadState(file: string): PipelineState {
   if (!existsSync(file)) return emptyState()
 
@@ -128,7 +159,8 @@ export function itemKey(sourceId: string, url: string): string {
 
 /**
  * Keep a run that is still running or paused; start a fresh one after a
- * complete or failed run. The paused run keeps its items, so retries resume.
+ * complete or failed run. Failed items carry their attempt count into the new
+ * run so dead-lettering works across days; published items are re-checked.
  */
 export function startOrResumeRun(
   state: PipelineState,
@@ -139,9 +171,16 @@ export function startOrResumeRun(
     return state
   }
 
+  const carried: Record<string, ItemCheckpoint> = {}
+  for (const [key, item] of Object.entries(state.run?.items ?? {})) {
+    if (item.state === "failed" || item.state === "pending") {
+      carried[key] = item
+    }
+  }
+
   return {
     ...state,
-    run: { runId, startedAt, status: "running", items: {} },
+    run: { runId, startedAt, status: "running", items: carried },
   }
 }
 

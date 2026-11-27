@@ -83,14 +83,25 @@ export function quoteSupportsDate(quote: string, isoDate: string): boolean {
  * past or further out is a data error, not a real application window.
  */
 export function isPlausibleDeadline(isoDate: string, today: string): boolean {
+  return isPlausibleDate(isoDate, today, { pastYears: 0, futureYears: 3 })
+}
+
+/** Generic date window used for opens/results/study dates. */
+export function isPlausibleDate(
+  isoDate: string,
+  today: string,
+  window: { pastYears: number; futureYears: number },
+): boolean {
   const target = parseIso(isoDate)
   const start = parseIso(today)
   if (!target || !start) return false
 
   const targetTime = Date.UTC(target.year, target.month - 1, target.day)
   const startTime = Date.UTC(start.year, start.month - 1, start.day)
-  const limit = new Date(startTime)
-  limit.setUTCFullYear(limit.getUTCFullYear() + 3)
+  const lower = new Date(startTime)
+  lower.setUTCFullYear(lower.getUTCFullYear() - window.pastYears)
+  const upper = new Date(startTime)
+  upper.setUTCFullYear(upper.getUTCFullYear() + window.futureYears)
 
-  return targetTime >= startTime && targetTime <= limit.getTime()
+  return targetTime >= lower.getTime() && targetTime <= upper.getTime()
 }
