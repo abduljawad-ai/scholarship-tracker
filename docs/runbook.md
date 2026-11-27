@@ -49,29 +49,39 @@ Both must use the stable production alias. Never use a per-deployment hash URL
 (such as `a2cffc5e.scholarship-tracker-6wv.pages.dev`): the hash changes on every
 deploy, so canonical links and the sitemap would point at an old frozen build.
 The sitemap and canonical URLs depend on this value. The report-issue links
-already point at the project repository; if that repository is private, make it
-public before launch or the links will return 404.
+point at the project repository. Keep that repository public before launch, or
+the links will return 404 for visitors who are not signed in to GitHub.
 
 ### Reconnect Git when Cloudflare says the project is disconnected
 
 If the Pages project shows **“This project is disconnected from your Git
 account. This may cause deployments to fail.”**, pushes to `main` will not
-deploy. Fix it in the dashboard:
+deploy. Cloudflare's documented fix is to check repository access first, then
+reinstall the GitHub app if access is already granted.
+
+The GitHub app is named **Cloudflare Workers and Pages**. It is shared by
+Workers and Pages projects. Uninstalling it affects every project connected to
+that GitHub account, so do that only if the access check does not fix it.
 
 1. Open the Cloudflare dashboard → **Workers & Pages** → the project.
-2. Go to **Settings** → **Builds & deployments** → **Git repository**.
-3. Choose **Manage** (or **Connect**) next to GitHub.
-4. Install or re-authorise the **Cloudflare Pages** GitHub App for the
-   `abduljawad-ai/scholarship-tracker` repository. If the app is already
-   installed, open GitHub → **Settings** → **Applications** → **Cloudflare
-   Pages** → **Configure** and grant access to this repository.
-5. Return to Cloudflare and reconnect the repository with the same build
-   settings: branch `main`, command `npm run build`, output `dist`,
-   `NODE_VERSION=24`.
-6. Trigger a deployment: push an empty commit, or use **Retry deployment** on
-   the latest production build.
-7. **Expected:** the warning disappears and a new production deployment builds
-   from the latest `main` commit.
+2. Go to **Settings** → **Builds** → **Git Repository** → **Manage**.
+3. On GitHub, open the **Cloudflare Workers and Pages** app settings.
+   Under **Repository access**, confirm that **Only select repositories**
+   includes `abduljawad-ai/scholarship-tracker`. If it is missing, add it and
+   save. Then retry a deployment.
+4. If access is already granted, reinstall the app:
+   - In the GitHub app settings, choose **Uninstall "Cloudflare Workers and
+     Pages"** → **Uninstall**.
+   - Return to Cloudflare → **Workers & Pages** → **Create application** →
+     **Pages** → **Connect to Git**.
+   - Choose **+ Add account**, select the GitHub account, then **Install &
+     Authorize**. Grant access to `scholarship-tracker`.
+5. Return to the existing project (do not create a duplicate) and use
+   **Retry deployment** on the latest production build, or push an empty commit
+   to `main`.
+6. **Expected:** the warning disappears and a new production deployment builds
+   from the latest `main` commit with branch `main`, command `npm run build`,
+   output `dist`, and `NODE_VERSION=24`.
 
 ## Preview and production behaviour
 
