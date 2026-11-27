@@ -22,7 +22,7 @@ Also read: [frontend deep dive](https://developer.mozilla.org/en-US/blog/mdn-fro
 
 Patterns that work:
 
-- **Task-oriented top-level navigation and descriptive link labels.** The nav groups content by what a reader is trying to do (`HTML`, `CSS`, `Learn`, `Tools`, `About`) and sub-menus use plain language such as `Learn CSS: Styling basics`. Why: a large body of reference material stays navigable without a search-first mindset. Applied: a deliberately short three-destination header (`Scholarship Tracker`, `About`, `My Applications`) with descriptive, non-marketing labels; later tasks can grow the nav without restructuring it.
+- **Task-oriented top-level navigation and descriptive link labels.** The nav groups content by what a reader is trying to do (`HTML`, `CSS`, `Learn`, `Tools`, `About`) and sub-menus use plain language such as `Learn CSS: Styling basics`. Why: a large body of reference material stays navigable without a search-first mindset. Applied: a deliberately short four-destination header (`Scholarship Tracker`, `About`, `Archive`, `My Applications`) with descriptive, non-marketing labels; the nav can grow without restructuring.
 - **Two explicit skip links (main content and search).** Why: different keyboard tasks need different bypass targets. Applied: the single main-content skip link required here; a second skip target would be added only if a persistent search control is introduced.
 - **Simplified, unified styles and minimal shipped CSS/JS.** The 2026 frontend write-up describes replacing entangled styles with a flat, token-driven structure and shipping only the CSS/JS a page uses. Why: predictable styling and fast first render. Applied: one token file, semantic component classes, and a single tiny inline pre-paint script for theme selection — no theme framework or client-side router.
 
@@ -34,7 +34,7 @@ Also read: [Get started](https://docs.stripe.com/get-started).
 
 Patterns that work:
 
-- **Outcome-first entry points.** The landing content starts with `Create an account`, then `Start building`, then `Common use cases`, instead of an alphabetical product dump. Why: first-time visitors can identify their next action immediately. Applied: the placeholder home leads with a short, action-oriented statement; later tasks can place the "browse" and "track" actions in the same order.
+- **Outcome-first entry points.** The landing content starts with `Create an account`, then `Start building`, then `Common use cases`, instead of an alphabetical product dump. Why: first-time visitors can identify their next action immediately. Applied: the home leads with a short, action-oriented statement and puts browsing first, with saved applications one click away in the header.
 - **Short sections with plain, self-contained link text.** Each group is a small set of links whose text makes sense out of context. Why: scanning and screen-reader link lists both work. Applied: footer and nav links are explicit (`Report an issue or correction`, `My Applications`) rather than `click here`.
 - **Restrained colour and generous whitespace around text-heavy content.** Why: hierarchy comes from spacing and size, not decoration. Applied: warm neutral surfaces, a single deep-emerald accent reserved for links, focus, and primary actions, and a spacing scale based on 4px increments.
 

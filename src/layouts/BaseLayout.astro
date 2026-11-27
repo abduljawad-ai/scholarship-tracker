@@ -15,9 +15,10 @@ interface Props {
 const { title, description, canonicalPath, noindex = false } = Astro.props
 
 // Never publish a canonical URL for a local preview or an unconfigured site.
+// A noindex page (the 404) is not a canonical destination either.
 const site = Astro.site
 const isLocalhost = site?.hostname === 'localhost' || site?.hostname === '127.0.0.1' || site?.hostname === '[::1]'
-const canonicalURL = site && !isLocalhost
+const canonicalURL = site && !isLocalhost && !noindex
   ? new URL(canonicalPath ?? Astro.url.pathname, site).href
   : undefined
 ---
@@ -33,7 +34,7 @@ const canonicalURL = site && !isLocalhost
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={APP_NAME} />
-    <meta property="og:locale" content="en" />
+    <meta property="og:locale" content="en_PK" />
     {canonicalURL && <meta property="og:url" content={canonicalURL} />}
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
