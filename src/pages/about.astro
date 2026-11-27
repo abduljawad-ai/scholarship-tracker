@@ -1,8 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { APP_NAME, PUBLIC_REPO_URL } from '../lib/constants'
+import { loadPrograms } from '../lib/data'
 
 const reportHref = `${PUBLIC_REPO_URL}/issues/new?title=${encodeURIComponent('Correction or problem')}`
+
+// A real quote from the published data, so the method page shows the same
+// evidence standard the listings use.
+const proof = loadPrograms()
+  .flatMap((program) =>
+    program.cycles.flatMap((cycle) =>
+      cycle.evidence.map((evidence) => ({ program, cycle, evidence })),
+    ),
+  )
+  .find((item) => item.evidence.quote.trim() !== '')
 ---
 
 <BaseLayout
@@ -11,90 +22,138 @@ const reportHref = `${PUBLIC_REPO_URL}/issues/new?title=${encodeURIComponent('Co
   canonicalPath="/about/"
 >
   <article>
-    <header class="hero">
-      <p class="eyebrow">About</p>
-      <h1>How Scholarship Tracker works</h1>
-      <p class="lede">
-        A free, independent directory of scholarships for Pakistani students. Every listing is
-        built from official pages and documents, with the evidence and the date it was last
-        checked.
-      </p>
-    </header>
+    <section class="page-intro" aria-labelledby="about-title">
+      <div class="page-intro__copy">
+        <p class="eyebrow">About</p>
+        <h1 id="about-title">How Scholarship Tracker works</h1>
+        <p class="lede">
+          A free, independent directory of scholarships for Pakistani students. Every listing is
+          built from official pages and documents, with the evidence and the date it was last
+          checked.
+        </p>
+      </div>
 
-    <section class="detail-section" aria-labelledby="what-you-get">
-      <h2 id="what-you-get">What every listing shows</h2>
-      <ul class="detail-list">
-        <li>Who can apply, and the study levels a scholarship accepts</li>
-        <li>The documents you need and the steps to apply</li>
-        <li>The application timeline and funding on offer</li>
-        <li>The official page, a direct apply link when it is verified, and the date we last checked</li>
-      </ul>
-      <p>
-        &ldquo;Likely eligible&rdquo; is a conservative guide based on the study levels a
-        scholarship accepts. It is not the provider&rsquo;s decision, and it never replaces their
-        rules.
-      </p>
+      <aside class="intro-slip" aria-labelledby="about-slip-title">
+        <p class="mono-label">What this is not</p>
+        <h2 id="about-slip-title">No ads. No agents. No account.</h2>
+        <ul>
+          <li>No paid placement and no advertising trackers.</li>
+          <li>No “application agent” and no processing fee.</li>
+          <li>No server copy of your saved applications.</li>
+        </ul>
+        <a href="#method">Read the method</a>
+      </aside>
     </section>
 
-    <section class="detail-section" aria-labelledby="sourcing">
-      <h2 id="sourcing">Where the information comes from</h2>
-      <p>
-        Every listing links to the official sources used &mdash; the provider&rsquo;s own page,
-        prospectus or application PDF. We store the evidence quote behind each important fact, so
-        you can check it yourself.
-      </p>
-      <p>
-        News articles and scholarship aggregators are never treated as facts. They can help us
-        discover a programme, but a published detail must be confirmed on the provider&rsquo;s own
-        material. A daily automated check revisits each source, records what it finds, and updates
-        the last-verified date. When a source cannot be read, the listing is marked provisional
-        instead of guessed.
-      </p>
-    </section>
+    <section class="method" id="method" aria-labelledby="method-title">
+      <h2 id="method-title" class="sr-only">The method</h2>
 
-    <section class="detail-section" aria-labelledby="labels">
-      <h2 id="labels">What the labels mean</h2>
-      <dl class="detail-facts">
+      <div class="method__step">
+        <p class="method__number">01</p>
         <div>
-          <dt>Verified</dt>
-          <dd>
-            The detail was read on an official page or document, and the supporting quote is kept
-            with the listing.
-          </dd>
+          <h2>Start on the provider's own page</h2>
+          <p>
+            Every listing links to the official sources used — the provider's own page,
+            prospectus or application PDF. News articles and scholarship aggregators are never
+            treated as facts. They can help us discover a programme, but a published detail must
+            be confirmed on the provider's own material.
+          </p>
         </div>
+      </div>
+
+      <div class="method__step">
+        <p class="method__number">02</p>
         <div>
-          <dt>Provisional</dt>
-          <dd>
-            An official source exists but could not be fully checked &mdash; for example, the page
-            blocks automated access, or the deadline appears only in an image or a Facebook post.
-            Treat it as a lead, not a fact.
-          </dd>
+          <h2>Keep the quote behind the fact</h2>
+          <p>
+            We store the exact quote behind each important detail, so you can check it yourself
+            instead of trusting a summary. Here is a real one from the published data:
+          </p>
+          {proof ? (
+            <figure class="method-specimen">
+              <div class="figure-meta">
+                <span class="mono-label">Evidence quote</span>
+                <span class="stamp stamp--verified">Source quote</span>
+              </div>
+              <blockquote>{proof.evidence.quote}</blockquote>
+              <figcaption>
+                <span>Field: {proof.evidence.field}</span>
+                <a href={proof.evidence.sourceUrl} rel="noopener noreferrer">
+                  {proof.program.title} — view source
+                </a>
+              </figcaption>
+            </figure>
+          ) : (
+            <p>No evidence quote is published yet.</p>
+          )}
         </div>
+      </div>
+
+      <div class="method__step">
+        <p class="method__number">03</p>
         <div>
-          <dt>Unverified</dt>
-          <dd>
-            We could not confirm the detail. An unverified deadline is never shown as a date, and
-            an Apply button appears only for a verified, open cycle.
-          </dd>
+          <h2>Label how far the check got</h2>
+          <p>
+            A daily automated check revisits each source, records what it finds, and updates the
+            last-verified date. When a source cannot be read, the listing is marked provisional
+            instead of guessed.
+          </p>
+          <dl class="detail-facts">
+            <div>
+              <dt><span class="stamp stamp--verified">Verified</span></dt>
+              <dd>
+                The detail was read on an official page or document, and the supporting quote is
+                kept with the listing.
+              </dd>
+            </div>
+            <div>
+              <dt><span class="stamp stamp--check">Provisional</span></dt>
+              <dd>
+                An official source exists but could not be fully checked — for example, the page
+                blocks automated access, or the deadline appears only in an image or a Facebook
+                post. Treat it as a lead, not a fact.
+              </dd>
+            </div>
+            <div>
+              <dt><span class="stamp stamp--neutral">Unverified</span></dt>
+              <dd>
+                We could not confirm the detail. An unverified deadline is never shown as a date,
+                and an Apply button appears only for a verified, open cycle.
+              </dd>
+            </div>
+          </dl>
         </div>
-      </dl>
-      <p>
-        When something is not confirmed, the listing says so plainly and sends you to the official
-        page rather than filling the gap.
-      </p>
+      </div>
+
+      <div class="method__step">
+        <p class="method__number">04</p>
+        <div>
+          <h2>Send you to the official application</h2>
+          <p>
+            We do not process applications and we do not charge for listings. When a cycle is
+            verified and open, the listing shows one Apply button that goes straight to the
+            provider's portal. When it is not safe to apply, the page explains why instead of
+            showing a dead button.
+          </p>
+          <p>
+            “Likely eligible” is a conservative guide based on the study levels a scholarship
+            accepts. It is not the provider's decision, and it never replaces their rules.
+          </p>
+        </div>
+      </div>
     </section>
 
     <section class="detail-section" aria-labelledby="privacy">
       <h2 id="privacy">Your applications stay on your device</h2>
       <p>
-        My Applications uses your browser&rsquo;s local storage. There is no account, no email
-        address, and no copy on a server. Export a backup code before clearing site data or moving
-        to another device, and keep that code private because it contains your notes.
+        My Applications uses your browser's local storage. There is no account, no email address,
+        and no copy on a server. Export a backup code before clearing site data or moving to
+        another device, and keep that code private because it contains your notes.
       </p>
       <p>
         There are no advertising trackers. If you use the AI assistant when it becomes available,
-        never share personal details &mdash; CNIC or passport numbers, phone numbers, email
-        addresses, your address or documents. It does not need them, and it will never ask.
+        never share personal details — CNIC or passport numbers, phone numbers, email addresses,
+        your address or documents. It does not need them, and it will never ask.
       </p>
     </section>
 
@@ -103,7 +162,7 @@ const reportHref = `${PUBLIC_REPO_URL}/issues/new?title=${encodeURIComponent('Co
       <p>
         {APP_NAME} is independent and not affiliated with any scholarship provider. We do not
         charge for listings and we do not process applications. Scholarship details can change at
-        any time, so always confirm eligibility, documents and deadlines on the provider&rsquo;s
+        any time, so always confirm eligibility, documents and deadlines on the provider's
         official page before you apply or pay anything.
       </p>
       <p>
@@ -117,5 +176,13 @@ const reportHref = `${PUBLIC_REPO_URL}/issues/new?title=${encodeURIComponent('Co
         </a>
       </p>
     </section>
+
+    <div class="method__end">
+      <div>
+        <p class="mono-label">Start here</p>
+        <h2>Browse the register</h2>
+      </div>
+      <a class="button--primary" href="/">Browse scholarships</a>
+    </div>
   </article>
 </BaseLayout>

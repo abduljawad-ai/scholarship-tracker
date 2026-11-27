@@ -7,6 +7,8 @@ const routes = [
   { path: '/listing/chevening-pakistan/', name: 'listing' },
   { path: '/archive/', name: 'archive' },
   { path: '/my-applications/', name: 'my-applications' },
+  { path: '/about/', name: 'about' },
+  { path: '/does-not-exist/', name: '404' },
 ]
 
 const viewports = [
@@ -43,5 +45,30 @@ for (const route of routes) {
 
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth)
     expect(scrollWidth).toBeLessThanOrEqual(1024)
+  })
+}
+
+// The brief requires the same semantic tokens in dark mode. Capture the
+// screens that exercise the most components: the register, the dossier and
+// the long-form method page.
+const darkRoutes = [
+  { path: '/', name: 'home', width: 360, height: 800 },
+  { path: '/listing/chevening-pakistan/', name: 'listing', width: 1440, height: 900 },
+  { path: '/about/', name: 'about', width: 1440, height: 900 },
+]
+
+for (const route of darkRoutes) {
+  test(`dark design shot: ${route.name} at ${route.width}px`, async ({ page }) => {
+    await page.setViewportSize({ width: route.width, height: route.height })
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await page.goto(route.path)
+
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth)
+    expect(scrollWidth).toBeLessThanOrEqual(route.width)
+
+    await page.screenshot({
+      path: join(outputDir, `${route.name}-${route.width}-dark.png`),
+      fullPage: true,
+    })
   })
 }

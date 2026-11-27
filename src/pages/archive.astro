@@ -29,24 +29,31 @@ const json = JSON.stringify(entries).replace(/</g, '\\u003c')
   description="Browse closed scholarship cycles and past listing details for reference."
   canonicalPath="/archive/"
 >
-  <section class="hero" aria-labelledby="archive-title">
-    <p class="eyebrow">Past opportunities</p>
-    <h1 id="archive-title">Scholarship archive</h1>
-    <p class="lede">
-      Scholarships whose application cycles have closed are kept here for reference. Check the
-      official page for any future intake.
-    </p>
+  <section class="page-intro" aria-labelledby="archive-title">
+    <div class="page-intro__copy">
+      <p class="eyebrow">Past opportunities</p>
+      <h1 id="archive-title">Scholarship archive</h1>
+      <p class="lede">
+        Scholarships whose application cycles have closed are kept here for reference. Check the
+        official page for any future intake.
+      </p>
+    </div>
+
+    <aside class="intro-slip" aria-labelledby="archive-slip-title">
+      <p class="mono-label">Closed cycles</p>
+      <h2 id="archive-slip-title">A record, not a live listing</h2>
+      <p>
+        Closed cycles never show an Apply button and never show a deadline as if it were still
+        open. The official page is always one click away.
+      </p>
+      <a class="button--primary" href="/">Browse current scholarships</a>
+    </aside>
   </section>
 
-  <section class="listing-section" aria-labelledby="listing-heading">
-    <h2 id="listing-heading" class="sr-only">Archived scholarship listings</h2>
+  <div class="archive-layout">
+    <aside class="archive-filter" aria-label="Filter the archive">
+      <FilterBar countries={countries} mode="archived" />
 
-    <FilterBar countries={countries} mode="archived" />
-
-    <div class="listing-toolbar">
-      <p class="results-count" data-testid="results-count" aria-live="polite" aria-atomic="true">
-        {entries.length} {entries.length === 1 ? 'scholarship' : 'scholarships'}
-      </p>
       <div class="field field--sort">
         <label class="field-label" for="sort">Sort by</label>
         <select id="sort" data-filter="sort">
@@ -54,21 +61,39 @@ const json = JSON.stringify(entries).replace(/</g, '\\u003c')
           <option value="best-funded">Best funded</option>
         </select>
       </div>
-    </div>
 
-    <!-- No-JS fallback: every archived card is rendered on the server. -->
-    <div id="listing-grid" class="listing-grid" data-list-status="archived">
-      {entries.map((entry) => (
-        <ListingCard entry={entry} officialUrl={officialUrls.get(entry.programId)} />
-      ))}
-    </div>
+      <p class="results-count" data-testid="results-count" aria-live="polite" aria-atomic="true">
+        {entries.length} {entries.length === 1 ? 'scholarship' : 'scholarships'}
+      </p>
 
-    <EmptyState
-      title="No past scholarships match these filters"
-      body="Try a different search, or clear the filters to see every past listing."
-    />
-    <Pagination />
-  </section>
+      <p class="archive-filter__note">
+        The archive keeps every past cycle. It is never overwritten by a new intake.
+      </p>
+    </aside>
+
+    <section class="archive-register" aria-labelledby="listing-heading">
+      <h2 id="listing-heading" class="sr-only">Archived scholarship listings</h2>
+
+      <div class="register__head" aria-hidden="true">
+        <span class="mono-label">Source</span>
+        <span class="mono-label">Scholarship</span>
+        <span class="mono-label">Status</span>
+      </div>
+
+      <!-- No-JS fallback: every archived card is rendered on the server. -->
+      <div id="listing-grid" class="register" data-list-status="archived">
+        {entries.map((entry) => (
+          <ListingCard entry={entry} officialUrl={officialUrls.get(entry.programId)} />
+        ))}
+      </div>
+
+      <EmptyState
+        title="No past scholarships match these filters"
+        body="Try a different search, or clear the filters to see every past listing."
+      />
+      <Pagination />
+    </section>
+  </div>
 
   <script type="application/json" id="program-index" is:inline set:html={json}></script>
 

@@ -34,13 +34,29 @@ const json = JSON.stringify(data).replace(/</g, '\\u003c')
   description="Track your saved scholarships, application statuses, notes and deadlines. Everything stays in this browser."
   canonicalPath="/my-applications/"
 >
-  <section class="hero" aria-labelledby="tracker-title">
-    <p class="eyebrow">On this device only</p>
-    <h1 id="tracker-title">My applications</h1>
-    <p class="lede">
-      Keep track of saved scholarships, application statuses, notes and deadlines. There is no
-      account and nothing leaves this browser.
-    </p>
+  <section class="page-intro" aria-labelledby="tracker-title">
+    <div class="page-intro__copy">
+      <p class="eyebrow">On this device only</p>
+      <h1 id="tracker-title">My applications</h1>
+      <p class="lede">
+        Keep track of saved scholarships, application statuses, notes and deadlines. There is no
+        account and nothing leaves this browser.
+      </p>
+    </div>
+
+    <aside class="intro-slip" aria-labelledby="tracker-slip-title">
+      <div class="intro-slip__head">
+        <p class="mono-label">Your file</p>
+        <span class="stamp stamp--verified">On this device</span>
+      </div>
+      <h2 id="tracker-slip-title">No login. No server copy.</h2>
+      <ul>
+        <li>Saved in this browser's local storage.</li>
+        <li>No account, email address or tracking.</li>
+        <li>Export a backup before clearing site data.</li>
+      </ul>
+      <a href="/about/">How your data stays private</a>
+    </aside>
   </section>
 
   <noscript>
@@ -59,6 +75,7 @@ const json = JSON.stringify(data).replace(/</g, '\\u003c')
     <div id="tracker-list" class="tracker-list"></div>
 
     <div class="tracker-empty" data-testid="tracker-empty" tabindex="-1" hidden>
+      <p class="mono-label">Empty file</p>
       <h3>No saved applications yet</h3>
       <p>
         Open any scholarship and choose <strong>Save to My Applications</strong> to track it here.
@@ -69,7 +86,10 @@ const json = JSON.stringify(data).replace(/</g, '\\u003c')
   </section>
 
   <section class="tracker-backup" aria-labelledby="backup-title">
-    <h2 id="backup-title">Backup and restore</h2>
+    <div class="tracker-section__head">
+      <h2 id="backup-title">Backup and restore</h2>
+      <p>A private code, not a cloud account.</p>
+    </div>
     <p>
       Export a backup code before clearing site data or moving to another device. The code
       contains your notes, so keep it private. Importing replaces the applications saved in this
@@ -77,7 +97,13 @@ const json = JSON.stringify(data).replace(/</g, '\\u003c')
     </p>
 
     <div class="tracker-backup__actions">
-      <button type="button" class="button--primary" data-testid="export-tracker">
+      <button
+        type="button"
+        class="button--quiet"
+        data-testid="export-tracker"
+        data-export-button
+        disabled
+      >
         Export backup
       </button>
     </div>
