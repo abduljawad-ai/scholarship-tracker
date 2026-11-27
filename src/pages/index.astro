@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro'
 import EmptyState from '../components/EmptyState.astro'
 import FilterBar from '../components/FilterBar.astro'
-import FreshnessBanner from '../components/FreshnessBanner.astro'
 import ListingCard from '../components/ListingCard.astro'
 import Pagination from '../components/Pagination.astro'
 import { APP_NAME } from '../lib/constants'
@@ -35,8 +34,6 @@ const json = JSON.stringify(entries).replace(/</g, '\\u003c')
       Compare current opportunities and check each listing's official source before you apply.
     </p>
   </section>
-
-  <FreshnessBanner />
 
   <section class="listing-section" aria-labelledby="listing-heading">
     <h2 id="listing-heading" class="sr-only">Scholarship listings</h2>

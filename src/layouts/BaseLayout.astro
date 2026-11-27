@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css'
 import Footer from '../components/Footer.astro'
+import FreshnessBanner from '../components/FreshnessBanner.astro'
 import Header from '../components/Header.astro'
 import { APP_NAME } from '../lib/constants'
 
@@ -77,6 +78,7 @@ const canonicalURL = site && !isLocalhost
     <Header />
     <main id="main" tabindex="-1" class="site-main">
       <div class="container">
+        <FreshnessBanner />
         <slot />
       </div>
     </main>
