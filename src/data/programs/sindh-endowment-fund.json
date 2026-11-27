@@ -67,7 +67,7 @@
         "resultsDate": "2027-09-30",
         "studyStart": "2027-10-01"
       },
-      "status": "open",
+      "status": "upcoming",
       "apply": {
         "url": "https://www.sindh.gov.pk/",
         "portalName": "Sindh Endowment Fund application form",
@@ -97,5 +97,5 @@
     }
   ],
   "firstSeen": "2026-11-20T00:00:00.000Z",
-  "lastUpdated": "2026-11-25T00:00:00.000Z"
+  "lastUpdated": "2026-11-27T00:00:00.000Z"
 }
