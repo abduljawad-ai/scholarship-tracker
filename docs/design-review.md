@@ -96,3 +96,50 @@ Purpose 3/3 · Hierarchy 2/3 · Psychology 3/3 · Responsive 3/3 · States 2/3 �
 ```
 
 Vague feedback ("make it modern", "add polish") is forbidden.
+
+## Review record — 2026-11-27
+
+Commit `645bf6b` on `plan-1-5-design`. Evidence set: 21 screenshots in
+`test-results/design-review/` — home, listing, archive, my-applications, about, and 404 at
+360/768/1440 px, plus dark mode for home, listing, and about.
+
+### Score
+
+Purpose 3/3 · Hierarchy 3/3 · Psychology 3/3 · Responsive 3/3 · States 3/3 · Access 3/3
+= **18/18 = 100/100 — PORTFOLIO-GRADE**
+
+### Automatic fails
+
+- none
+
+### Evidence
+
+- **Purpose.** The masthead names the job and the action in one line. Each listing has one
+  Apply gate: a saturated button only for a verified, open cycle, otherwise an explanation.
+  The evidence quote, source link, and last-verified date sit in the status rail beside the
+  deadline.
+- **Hierarchy.** Three distinct faces: Source Serif 4 display, Inter text, mono for dates
+  and stamps. Register rows scan stamp → title → deadline. One `button--primary` per page,
+  confirmed by source scan.
+- **Psychology.** Three top-level nav links plus the brand. The filter group holds seven
+  controls. Save, remove, and backup feedback is synchronous, so it lands under 100 ms. The
+  tracker empty state and the stamped 404 carry the peak-end polish.
+- **Responsive.** 360/768/1440 screenshots clean; the 1024 px overflow test passes. The
+  register becomes stacked cards below 60rem, and prose is capped at 65ch at 1440.
+- **States.** Hover, focus-visible, active, and disabled are styled (`global.css:537`).
+  Empty, error (invalid backup), and success (saved and restored) are covered by e2e. No
+  asynchronous action exists, so no loading state is reachable. Reduced motion is handled
+  at `global.css:206`; scrollbars are themed at `global.css:122`.
+- **Access.** axe reports no serious violations on home, listing, archive, and
+  my-applications. Body text is at least 4.5:1; the control border measures 3.83:1 light
+  and 3.86:1 dark. Status is carried by stamp text and border, never colour alone. The
+  audit script finds no standalone target under 44×44 px.
+
+### Notes carried into Plan 2
+
+- Seed data marks some cycles `open` before their `opens` date (Chevening 2027/28, Erasmus
+  2028). The UI trusts `status`; Plan 2 must derive status from dates before publishing.
+- Evidence is one quote per cycle today. Plan 2 should attach a quote to every published
+  timeline and guide fact.
+
+`SHIP`
