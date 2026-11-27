@@ -2,14 +2,16 @@
 import '../styles/global.css'
 import Footer from '../components/Footer.astro'
 import Header from '../components/Header.astro'
+import { APP_NAME } from '../lib/constants'
 
 interface Props {
   title: string
   description: string
   canonicalPath?: string
+  noindex?: boolean
 }
 
-const { title, description, canonicalPath } = Astro.props
+const { title, description, canonicalPath, noindex = false } = Astro.props
 
 // Never publish a canonical URL for a local preview or an unconfigured site.
 const site = Astro.site
@@ -29,9 +31,14 @@ const canonicalURL = site && !isLocalhost
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={APP_NAME} />
+    <meta property="og:locale" content="en" />
     {canonicalURL && <meta property="og:url" content={canonicalURL} />}
     <meta name="twitter:card" content="summary" />
-    <meta name="theme-color" content="" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="theme-color" content="#fbfaf7" />
+    {noindex && <meta name="robots" content="noindex" />}
     {canonicalURL && <link rel="canonical" href={canonicalURL} />}
 
     <script is:inline>
