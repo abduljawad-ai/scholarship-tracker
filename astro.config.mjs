@@ -2,9 +2,10 @@ import { defineConfig } from 'astro/config'
 import sitemap from '@astrojs/sitemap'
 import tailwindcss from '@tailwindcss/vite'
 
-// Placeholder production URL. The owner replaces it at deploy; the sitemap,
-// canonical links and robots.txt must use the same origin.
-const site = 'https://a2cffc5e.scholarship-tracker-6wv.pages.dev'
+// Stable production URL (Cloudflare Pages alias). Use the alias, never a
+// per-deployment hash URL: canonical links, the sitemap and robots.txt must
+// keep one origin across deployments.
+const site = 'https://scholarship-tracker-6wv.pages.dev'
 
 export default defineConfig({
   site,

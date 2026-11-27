@@ -32,18 +32,46 @@ app: Cloudflare Pages serves the files produced by `npm run build` from `dist/`.
 6. Optional custom domain: add it in **Custom domains**. Then replace the
    placeholder origin before the next deploy (see “Placeholders to replace”).
 
-### Placeholders to replace at deploy
+### Production origin
 
-These are deliberately placeholders until the Cloudflare project name is fixed:
+The production URL is:
+
+```text
+https://scholarship-tracker-6wv.pages.dev
+```
 
 | File | Value |
 | --- | --- |
-| `astro.config.mjs` | `site: 'https://scholarship-tracker.pages.dev'` |
-| `public/robots.txt` | `Sitemap: https://scholarship-tracker.pages.dev/sitemap-index.xml` |
+| `astro.config.mjs` | `site: 'https://scholarship-tracker-6wv.pages.dev'` |
+| `public/robots.txt` | `Sitemap: https://scholarship-tracker-6wv.pages.dev/sitemap-index.xml` |
 
-Both must use the real production origin. The sitemap and canonical URLs depend on
-them. The report-issue links already point at the project repository; if that
-repository is private, make it public before launch or the links will return 404.
+Both must use the stable production alias. Never use a per-deployment hash URL
+(such as `a2cffc5e.scholarship-tracker-6wv.pages.dev`): the hash changes on every
+deploy, so canonical links and the sitemap would point at an old frozen build.
+The sitemap and canonical URLs depend on this value. The report-issue links
+already point at the project repository; if that repository is private, make it
+public before launch or the links will return 404.
+
+### Reconnect Git when Cloudflare says the project is disconnected
+
+If the Pages project shows **“This project is disconnected from your Git
+account. This may cause deployments to fail.”**, pushes to `main` will not
+deploy. Fix it in the dashboard:
+
+1. Open the Cloudflare dashboard → **Workers & Pages** → the project.
+2. Go to **Settings** → **Builds & deployments** → **Git repository**.
+3. Choose **Manage** (or **Connect**) next to GitHub.
+4. Install or re-authorise the **Cloudflare Pages** GitHub App for the
+   `abduljawad-ai/scholarship-tracker` repository. If the app is already
+   installed, open GitHub → **Settings** → **Applications** → **Cloudflare
+   Pages** → **Configure** and grant access to this repository.
+5. Return to Cloudflare and reconnect the repository with the same build
+   settings: branch `main`, command `npm run build`, output `dist`,
+   `NODE_VERSION=24`.
+6. Trigger a deployment: push an empty commit, or use **Retry deployment** on
+   the latest production build.
+7. **Expected:** the warning disappears and a new production deployment builds
+   from the latest `main` commit.
 
 ## Preview and production behaviour
 
@@ -135,7 +163,8 @@ The banner is dismissible per browser session and appears on every page.
 | Symptom | Check |
 | --- | --- |
 | Build fails with “Invalid program file” | The message names the JSON file; fix it against `src/lib/schema.ts`. |
-| Sitemap or canonical URLs use the wrong domain | Update `site` in `astro.config.mjs` and the `Sitemap:` line in `public/robots.txt`. |
+| Sitemap or canonical URLs use the wrong domain | Update `site` in `astro.config.mjs` and the `Sitemap:` line in `public/robots.txt`. Use the stable `scholarship-tracker-6wv.pages.dev` alias, never a deployment hash URL. |
+| “This project is disconnected from your Git account” | Reconnect GitHub in **Settings → Builds & deployments → Git repository**; see “Reconnect Git” above. |
 | “Report an issue” points at `OWNER/REPO` | Update `PUBLIC_REPO_URL` in `src/lib/constants.ts`. |
 | e2e fails because port 4322 is busy | Stop the stale preview; the Playwright config always builds fresh and refuses to reuse a server. |
 | Cloudflare build uses the wrong Node version | Set `NODE_VERSION=24` in the Pages environment variables. |
