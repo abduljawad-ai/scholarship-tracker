@@ -1,0 +1,42 @@
+{
+  "pageKind": "program",
+  "cycles": [
+    {
+      "label": "2028/29 intake",
+      "dates": {
+        "opens": "2027-11-01",
+        "deadline": "2028-01-15",
+        "resultsDate": "2028-04-30",
+        "studyStart": null
+      },
+      "apply": {
+        "url": "https://www.daad.de/en/study-and-research-in-germany/scholarships/",
+        "portalName": "DAAD online portal",
+        "fee": null
+      },
+      "evidence": [
+        {
+          "field": "opens",
+          "quote": "Applications open on 1 November 2027.",
+          "sourceUrl": "https://www.daad.de/en/study-and-research-in-germany/scholarships/"
+        },
+        {
+          "field": "deadline",
+          "quote": "Applications close on 15 January 2028.",
+          "sourceUrl": "https://www.daad.de/en/study-and-research-in-germany/scholarships/"
+        },
+        {
+          "field": "resultsDate",
+          "quote": "Admission results are announced in April 2028.",
+          "sourceUrl": "https://www.daad.de/en/study-and-research-in-germany/scholarships/"
+        },
+        {
+          "field": "applyUrl",
+          "quote": "Apply at https://www.daad.de/en/study-and-research-in-germany/scholarships/.",
+          "sourceUrl": "https://www.daad.de/en/study-and-research-in-germany/scholarships/"
+        }
+      ]
+    }
+  ],
+  "guide": null
+}

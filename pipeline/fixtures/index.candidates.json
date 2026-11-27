@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "candidates": [
+    {
+      "candidateId": "example-scholarship-2027",
+      "title": "Example Scholarship 2027",
+      "provider": "Example Foundation",
+      "country": "Pakistan",
+      "officialUrl": "https://example.org/scholarships/example-scholarship/",
+      "deadline": "2027-12-01",
+      "applyUrl": "https://example.org/apply/",
+      "evidence": [
+        {
+          "field": "title",
+          "quote": "Example Scholarship 2027",
+          "sourceUrl": "https://example.org/scholarships/example-scholarship/"
+        },
+        {
+          "field": "deadline",
+          "quote": "Applications close on 1 December 2027.",
+          "sourceUrl": "https://example.org/scholarships/example-scholarship/"
+        },
+        {
+          "field": "applyUrl",
+          "quote": "Apply at https://example.org/apply/ before the deadline.",
+          "sourceUrl": "https://example.org/scholarships/example-scholarship/"
+        }
+      ],
+      "sourceId": "example",
+      "discoveredAt": "2026-11-27T06:00:00.000Z",
+      "status": "pending-review",
+      "discoveredVia": "index"
+    }
+  ]
+}

@@ -11,7 +11,8 @@
     "test:e2e": "playwright test",
     "design:shots": "playwright test tests/e2e/design-review.spec.ts",
     "typecheck": "astro check",
-    "pipeline": "tsx scripts/pipeline/main.ts"
+    "pipeline": "tsx scripts/pipeline/main.ts",
+    "eval": "tsx scripts/pipeline/eval.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.6",
