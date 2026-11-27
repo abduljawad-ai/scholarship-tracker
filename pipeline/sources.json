@@ -1,0 +1,92 @@
+[
+  {
+    "sourceId": "chevening",
+    "programId": "chevening-pakistan",
+    "provider": "UK Foreign, Commonwealth and Development Office",
+    "officialHosts": ["chevening.org"],
+    "pageUrls": ["https://www.chevening.org/scholarships/"],
+    "indexUrls": ["https://www.chevening.org/scholarships/"],
+    "discovery": true,
+    "archived": false
+  },
+  {
+    "sourceId": "fulbright",
+    "programId": "fulbright-pakistan",
+    "provider": "United States Educational Foundation in Pakistan",
+    "officialHosts": ["usefp.org"],
+    "pageUrls": ["https://www.usefp.org/"],
+    "indexUrls": ["https://www.usefp.org/"],
+    "discovery": true,
+    "archived": false
+  },
+  {
+    "sourceId": "daad",
+    "programId": "daad-epos",
+    "provider": "German Academic Exchange Service (DAAD)",
+    "officialHosts": ["daad.de"],
+    "pageUrls": ["https://www.daad.de/en/"],
+    "indexUrls": ["https://www.daad.de/en/"],
+    "discovery": true,
+    "archived": false
+  },
+  {
+    "sourceId": "erasmus",
+    "programId": "erasmus-mundus-joint-masters",
+    "provider": "European Commission (Erasmus Mundus)",
+    "officialHosts": ["eacea.ec.europa.eu", "ec.europa.eu"],
+    "pageUrls": ["https://eacea.ec.europa.eu/"],
+    "indexUrls": ["https://eacea.ec.europa.eu/"],
+    "discovery": true,
+    "archived": false
+  },
+  {
+    "sourceId": "hec",
+    "programId": "hec-need-based",
+    "provider": "Higher Education Commission of Pakistan",
+    "officialHosts": ["hec.gov.pk"],
+    "pageUrls": ["https://www.hec.gov.pk/english/Pages/default.aspx"],
+    "indexUrls": ["https://www.hec.gov.pk/english/Pages/default.aspx"],
+    "discovery": true,
+    "archived": false
+  },
+  {
+    "sourceId": "sindh-endowment",
+    "programId": "sindh-endowment-fund",
+    "provider": "Government of Sindh",
+    "officialHosts": ["sindh.gov.pk"],
+    "pageUrls": ["https://www.sindh.gov.pk/"],
+    "indexUrls": ["https://www.sindh.gov.pk/"],
+    "discovery": true,
+    "archived": false
+  },
+  {
+    "sourceId": "sindh-matric",
+    "programId": "sindh-matric-scholarship",
+    "provider": "Government of Sindh",
+    "officialHosts": ["sindh.gov.pk"],
+    "pageUrls": ["https://www.sindh.gov.pk/"],
+    "indexUrls": ["https://www.sindh.gov.pk/"],
+    "discovery": false,
+    "archived": false
+  },
+  {
+    "sourceId": "turkiye",
+    "programId": "turkiye-burslari",
+    "provider": "Türkiye Bursları",
+    "officialHosts": ["turkiyeburslari.gov.tr"],
+    "pageUrls": ["https://www.turkiyeburslari.gov.tr/en"],
+    "indexUrls": ["https://www.turkiyeburslari.gov.tr/en"],
+    "discovery": true,
+    "archived": false
+  },
+  {
+    "sourceId": "commonwealth",
+    "programId": "commonwealth-pakistan-2025",
+    "provider": "Commonwealth Scholarship Commission in the UK",
+    "officialHosts": ["cscuk.fcdo.gov.uk"],
+    "pageUrls": ["https://cscuk.fcdo.gov.uk/scholarships/"],
+    "indexUrls": [],
+    "discovery": false,
+    "archived": true
+  }
+]
