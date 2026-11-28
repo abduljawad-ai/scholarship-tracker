@@ -4,6 +4,7 @@ import path from 'node:path'
 import { expect, test, vi } from 'vitest'
 import { loadConfig } from '../../scripts/pipeline/config'
 import {
+  buildDiscoverRequest,
   extractFeedLinks,
   extractSitemapLinks,
   loadCandidates,
@@ -20,6 +21,7 @@ import { createMemoryStore } from '../../scripts/pipeline/state'
 import type {
   AiRequest,
   Candidate,
+  PageSnapshot,
   PipelineConfig,
   Router,
   SourceConfig,
@@ -585,4 +587,22 @@ test('no provider means no discovery and no failure', async () => {
   expect(result.fetched).toBe(0)
   expect(fetchImpl).not.toHaveBeenCalled()
   expect(existsSync(f.config.candidatesPath)).toBe(true)
+})
+
+test('a discovery batch stays below the free-tier tokens-per-minute ceiling', () => {
+  // A 30,000-character batch was measured at 8,605 tokens by Groq, above the
+  // 8,000 TPM limit. Leave headroom for the prompt and tokenisation variance.
+  const pages: PageSnapshot[] = Array.from({ length: 10 }, (_, i) => ({
+    url: `${SITE}/scholarships/${i}/`,
+    finalUrl: `${SITE}/scholarships/${i}/`,
+    status: 200,
+    contentType: 'text/html',
+    hash: `hash-${i}`,
+    text: 'Scholarship details for Pakistani students. '.repeat(100),
+    html: `<title>Scholarship ${i}</title>`,
+  }))
+
+  const request = buildDiscoverRequest(pages, path.join(process.cwd(), 'pipeline', 'prompts'))
+
+  expect(request.user.length).toBeLessThan(24_000)
 })
