@@ -1,0 +1,128 @@
+{
+  "runId": "2026-11-28T10-22-24-730Z",
+  "startedAt": "2026-11-28T10:22:24.730Z",
+  "finishedAt": "2026-11-28T10:23:27.548Z",
+  "status": "complete",
+  "published": [],
+  "unchanged": [
+    "erasmus-mundus-joint-masters",
+    "hec-need-based",
+    "chevening-pakistan",
+    "fulbright-pakistan",
+    "daad-epos",
+    "sindh-endowment-fund",
+    "sindh-matric-scholarship",
+    "turkiye-burslari"
+  ],
+  "skipped": [],
+  "failed": [],
+  "paused": [],
+  "unhealthy": [],
+  "review": [],
+  "candidates": 0,
+  "checked": 8,
+  "sources": {
+    "erasmus": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "hec": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "chevening": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "fulbright": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "daad": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "sindh-endowment": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "sindh-matric": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "turkiye": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    }
+  },
+  "providers": {
+    "groq": {
+      "calls": 1,
+      "errors": 0,
+      "cooldowns": 0,
+      "keys": {
+        "groq:6": {
+          "calls": 1,
+          "errors": 0,
+          "cooling": false
+        }
+      }
+    }
+  },
+  "discovery": {
+    "rounds": [
+      {
+        "round": 1,
+        "queries": [
+          "UK Foreign, Commonwealth and Development Office scholarship",
+          "chevening.org scholarships",
+          "United States Educational Foundation in Pakistan scholarship",
+          "usefp.org scholarships",
+          "German Academic Exchange Service (DAAD) scholarship",
+          "daad.de scholarships"
+        ],
+        "fetched": 0,
+        "accepted": 0,
+        "gaps": [],
+        "stopReason": "no-new-urls"
+      }
+    ],
+    "fetched": 0,
+    "accepted": 0,
+    "queries": [
+      "UK Foreign, Commonwealth and Development Office scholarship",
+      "chevening.org scholarships",
+      "United States Educational Foundation in Pakistan scholarship",
+      "usefp.org scholarships",
+      "German Academic Exchange Service (DAAD) scholarship",
+      "daad.de scholarships",
+      "European Commission (Erasmus Mundus) scholarship",
+      "eacea.ec.europa.eu scholarships",
+      "ec.europa.eu scholarships",
+      "Higher Education Commission of Pakistan scholarship",
+      "hec.gov.pk scholarships",
+      "Government of Sindh scholarship",
+      "sindh.gov.pk scholarships",
+      "Türkiye Bursları scholarship",
+      "turkiyeburslari.gov.tr scholarships",
+      "Punjab government scholarship",
+      "Balochistan higher education scholarship",
+      "Pakistan merit based scholarship",
+      "Women’s education scholarship Pakistan",
+      "Khyber Pakhtunkhwa scholarship program",
+      "Gilgit Baltistan student scholarship",
+      "World Bank scholarship Pakistan",
+      "British Council scholarships Pakistan"
+    ],
+    "stopReason": "no-new-urls",
+    "errors": []
+  }
+}
