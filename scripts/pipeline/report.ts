@@ -71,5 +71,20 @@ export function renderSummary(report: RunReport): string {
     )
   }
 
+  const providerEntries = Object.entries(report.providers)
+  if (providerEntries.length > 0) {
+    lines.push("", "### AI Providers")
+    for (const [id, stats] of providerEntries) {
+      let line = `- ${id}: ${stats.calls} calls, ${stats.errors} errors`
+      if (stats.keys && Object.keys(stats.keys).length > 0) {
+        const keyParts = Object.entries(stats.keys).map(
+          ([lbl, k]) => `${lbl}: ${k.calls}${k.cooling ? " (cooling)" : ""}`,
+        )
+        line += ` [${keyParts.join(", ")}]`
+      }
+      lines.push(line)
+    }
+  }
+
   return `${lines.join("\n")}\n`
 }

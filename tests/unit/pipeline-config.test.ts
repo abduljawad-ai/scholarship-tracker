@@ -13,6 +13,7 @@ test('GEMINI_API_KEY configures only Gemini with the default model', () => {
   expect(config.providers.gemini).toEqual({
     apiKey: 'test-key',
     model: 'gemini-2.5-flash',
+    keys: [{ label: 'gemini:1', apiKey: 'test-key' }],
   })
 })
 
@@ -22,6 +23,76 @@ test('GEMINI_MODEL overrides the default model', () => {
     '/srv/app',
   )
   expect(config.providers.gemini!.model).toBe('gemini-3-pro')
+})
+
+test('GROQ_API_KEY configures Groq with a default single key', () => {
+  const config = loadConfig({ GROQ_API_KEY: 'g-default' }, '/srv/app')
+  expect(config.providers.groq).toEqual({
+    apiKey: 'g-default',
+    model: 'openai/gpt-oss-120b',
+    keys: [{ label: 'groq:1', apiKey: 'g-default' }],
+  })
+})
+
+test('GROQ_API_KEY_1 through 8 configures a key pool', () => {
+  const env: Record<string, string> = {}
+  for (let i = 1; i <= 8; i++) {
+    env[`GROQ_API_KEY_${i}`] = `groq-key-${i}`
+  }
+  const config = loadConfig(env, '/srv/app')
+  expect(config.providers.groq?.keys).toHaveLength(8)
+  expect(config.providers.groq?.keys?.[0]).toEqual({ label: 'groq:1', apiKey: 'groq-key-1' })
+  expect(config.providers.groq?.keys?.[7]).toEqual({ label: 'groq:8', apiKey: 'groq-key-8' })
+  expect(config.providers.groq?.apiKey).toBe('groq-key-1')
+})
+
+test('GROQ_API_KEY deduplicates against GROQ_API_KEY_1', () => {
+  const config = loadConfig(
+    { GROQ_API_KEY: 'same-key', GROQ_API_KEY_1: 'same-key', GROQ_API_KEY_2: 'key-2' },
+    '/srv/app',
+  )
+  expect(config.providers.groq?.keys).toEqual([
+    { label: 'groq:1', apiKey: 'same-key' },
+    { label: 'groq:2', apiKey: 'key-2' },
+  ])
+})
+
+test('GROQ_API_KEYS parses comma-separated keys and adapts to any count', () => {
+  const keys = ['key-a', 'key-b', 'key-c', 'key-d', 'key-e', 'key-f', 'key-g', 'key-h', 'key-i', 'key-j']
+  const config = loadConfig({ GROQ_API_KEYS: keys.join(',') }, '/srv/app')
+  expect(config.providers.groq?.keys).toHaveLength(10)
+  expect(config.providers.groq?.keys?.[0]).toEqual({ label: 'groq:1', apiKey: 'key-a' })
+  expect(config.providers.groq?.keys?.[9]).toEqual({ label: 'groq:10', apiKey: 'key-j' })
+})
+
+test('GROQ_API_KEYS parses newline-separated keys with whitespace', () => {
+  const input = `
+    key-x
+    key-y
+    key-z
+  `
+  const config = loadConfig({ GROQ_API_KEYS: input }, '/srv/app')
+  expect(config.providers.groq?.keys).toEqual([
+    { label: 'groq:1', apiKey: 'key-x' },
+    { label: 'groq:2', apiKey: 'key-y' },
+    { label: 'groq:3', apiKey: 'key-z' },
+  ])
+})
+
+test('GROQ_API_KEY_<number> handles arbitrary high numbers dynamically', () => {
+  const config = loadConfig(
+    {
+      GROQ_API_KEY_100: 'key-100',
+      GROQ_API_KEY_5: 'key-5',
+      GROQ_API_KEY_25: 'key-25',
+    },
+    '/srv/app',
+  )
+  expect(config.providers.groq?.keys).toEqual([
+    { label: 'groq:5', apiKey: 'key-5' },
+    { label: 'groq:25', apiKey: 'key-25' },
+    { label: 'groq:100', apiKey: 'key-100' },
+  ])
 })
 
 test('Cloudflare needs both the token and the account id', () => {
@@ -41,6 +112,7 @@ test('Cloudflare needs both the token and the account id', () => {
     apiKey: 'token',
     model: '@cf/meta/llama-3.1-8b-instruct',
     accountId: 'account',
+    keys: [{ label: 'cloudflare:1', apiKey: 'token' }],
   })
 })
 

@@ -43,6 +43,31 @@ export function parseRetryAfter(value: string | null, now: number = Date.now()):
 }
 
 /**
+ * Parse rate-limit reset durations from headers like x-ratelimit-reset-tokens or
+ * x-ratelimit-reset-requests, e.g. "9.172s", "6m0s", "250ms", "1s".
+ */
+export function parseResetDuration(value: string | null): number | null {
+  if (!value) return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+
+  const seconds = Number(trimmed)
+  if (Number.isFinite(seconds) && seconds >= 0) return Math.round(seconds * 1000)
+
+  let total = 0
+  let found = false
+  for (const part of trimmed.matchAll(/([\d.]+)\s*(ms|s|m|h)/gi)) {
+    const amount = Number(part[1])
+    if (!Number.isFinite(amount) || amount < 0) continue
+    found = true
+    const unit = (part[2] ?? "s").toLowerCase()
+    const factor = unit === "ms" ? 1 : unit === "m" ? 60_000 : unit === "h" ? 3_600_000 : 1000
+    total += amount * factor
+  }
+  return found ? Math.round(total) : null
+}
+
+/**
  * Some providers put the wait in the message instead of a Retry-After header.
  * Groq, for example, says "Please try again in 9.1725s". Reading it keeps a
  * one-minute quota from becoming a fifteen-minute outage.
@@ -134,10 +159,12 @@ export async function postJson(
     throw new ProviderAuthError(message)
   }
   if (response.status === 429 || /RESOURCE_EXHAUSTED|quota|rate limit/i.test(message)) {
-    throw new ProviderQuotaError(
-      message,
-      parseRetryAfter(response.headers.get("retry-after")) ?? parseRetryHint(message),
-    )
+    const retryWait =
+      parseRetryAfter(response.headers.get("retry-after")) ??
+      parseResetDuration(response.headers.get("x-ratelimit-reset-tokens")) ??
+      parseResetDuration(response.headers.get("x-ratelimit-reset-requests")) ??
+      parseRetryHint(message)
+    throw new ProviderQuotaError(message, retryWait)
   }
   throw new ProviderRequestError(message, response.status)
 }

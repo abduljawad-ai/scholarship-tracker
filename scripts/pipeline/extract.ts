@@ -4,7 +4,16 @@
 import { z } from "zod"
 import { loadPrompt, renderPrompt } from "./prompts"
 import { normalizeUrl, quoteAppearsIn } from "./text"
-import type { AiRequest, Extraction, PageSnapshot, SourceConfig } from "./types"
+import type {
+  AiRequest,
+  ExtractedCycle,
+  Extraction,
+  Guide,
+  PageSnapshot,
+  ProviderId,
+  Router,
+  SourceConfig,
+} from "./types"
 
 export class ExtractionParseError extends Error {
   constructor(message: string) {
@@ -68,6 +77,223 @@ const PAGE_LIMITS = { extract: 24_000, "extract-long": 60_000 } as const
 
 const EXTRACT_SYSTEM =
   "You extract scholarship facts from one official page. Return JSON only. Never invent or infer a value."
+
+export function splitTextIntoChunks(
+  text: string,
+  chunkSize = 20_000,
+  overlap = 500,
+): string[] {
+  if (text.length <= chunkSize) return [text]
+
+  const safeOverlap = Math.min(overlap, Math.floor(chunkSize / 4))
+  const chunks: string[] = []
+  let start = 0
+
+  while (start < text.length) {
+    let end = start + chunkSize
+    if (end >= text.length) {
+      chunks.push(text.slice(start))
+      break
+    }
+
+    const lookback = Math.min(1000, Math.floor(chunkSize / 2))
+    const windowStart = Math.max(start, end - lookback)
+    const searchWindow = text.slice(windowStart, end)
+    const paragraphBreak = searchWindow.lastIndexOf("\n\n")
+
+    if (paragraphBreak !== -1) {
+      end = windowStart + paragraphBreak + 2
+      chunks.push(text.slice(start, end))
+      start = end
+    } else {
+      const lineBreak = searchWindow.lastIndexOf("\n")
+      if (lineBreak !== -1) {
+        end = windowStart + lineBreak + 1
+        chunks.push(text.slice(start, end))
+        start = end
+      } else {
+        chunks.push(text.slice(start, end))
+        start = Math.max(start + 1, end - safeOverlap)
+      }
+    }
+  }
+
+  return chunks
+}
+
+export function buildCompactionRequest(
+  source: SourceConfig,
+  chunkText: string,
+  partNumber: number,
+  totalParts: number,
+  previousExtraction: Extraction | null,
+  promptsDir: string,
+): AiRequest {
+  if (!previousExtraction || partNumber === 1) {
+    const template = loadPrompt("extract", promptsDir)
+    const user = renderPrompt(template, {
+      provider: source.provider,
+      sourceUrl: source.pageUrls[0] || "",
+      pageText: chunkText,
+    })
+    return {
+      task: "extract",
+      system: EXTRACT_SYSTEM,
+      user,
+      temperature: 0,
+      maxOutputTokens: 4096,
+    }
+  }
+
+  const user = [
+    `# PARTIAL UPDATE: Part ${partNumber} of ${totalParts}`,
+    `Provider: ${source.provider}`,
+    `Source URL: ${source.pageUrls[0] || ""}`,
+    "",
+    "## PREVIOUS EXTRACTED STATE (from earlier parts of this document)",
+    "```json",
+    JSON.stringify(previousExtraction, null, 2),
+    "```",
+    "",
+    `## NEW SECTION TEXT (part ${partNumber} of ${totalParts})`,
+    chunkText,
+    "",
+    "## INSTRUCTIONS",
+    "1. Merge and update the extracted state with any new cycles, dates, apply URLs, evidence quotes, or guide items from this section.",
+    "2. If an existing cycle is completed or clarified, update its fields.",
+    "3. Keep all verified facts from earlier sections unless this section explicitly supersedes them.",
+    "4. Return the complete, updated JSON object following the required schema.",
+  ].join("\n")
+
+  return {
+    task: "extract",
+    system: EXTRACT_SYSTEM,
+    user,
+    temperature: 0,
+    maxOutputTokens: 4096,
+  }
+}
+
+export function mergeExtractions(base: Extraction, addition: Extraction): Extraction {
+  const pageKind = addition.pageKind === "program" ? "program" : base.pageKind
+
+  const mergedCycles: ExtractedCycle[] = [...base.cycles]
+
+  for (const newCycle of addition.cycles) {
+    const matchIndex = mergedCycles.findIndex(
+      (c) =>
+        (c.label !== null &&
+          newCycle.label !== null &&
+          c.label.toLowerCase() === newCycle.label.toLowerCase()) ||
+        (c.apply.url !== null && newCycle.apply.url !== null && c.apply.url === newCycle.apply.url),
+    )
+
+    if (matchIndex === -1) {
+      mergedCycles.push(newCycle)
+    } else {
+      const existing = mergedCycles[matchIndex]!
+      const dates = {
+        opens: newCycle.dates.opens ?? existing.dates.opens,
+        deadline: newCycle.dates.deadline ?? existing.dates.deadline,
+        resultsDate: newCycle.dates.resultsDate ?? existing.dates.resultsDate,
+        studyStart: newCycle.dates.studyStart ?? existing.dates.studyStart,
+      }
+      const apply = {
+        url: newCycle.apply.url ?? existing.apply.url,
+        portalName: newCycle.apply.portalName ?? existing.apply.portalName,
+        fee: newCycle.apply.fee ?? existing.apply.fee,
+      }
+      const evidence = [...existing.evidence]
+      for (const ev of newCycle.evidence) {
+        if (!evidence.some((e) => e.field === ev.field && e.quote === ev.quote)) {
+          evidence.push(ev)
+        }
+      }
+      mergedCycles[matchIndex] = {
+        label: newCycle.label ?? existing.label,
+        status: newCycle.status ?? existing.status,
+        dates,
+        apply,
+        evidence,
+      }
+    }
+  }
+
+  let guide: Guide | null = null
+  if (base.guide || addition.guide) {
+    const baseGuide = base.guide ?? { steps: [], documents: [], tips: [], timeline: [] }
+    const addGuide = addition.guide ?? { steps: [], documents: [], tips: [], timeline: [] }
+    const dedup = (a: string[], b: string[]) => Array.from(new Set([...a, ...b]))
+    guide = {
+      steps: dedup(baseGuide.steps, addGuide.steps),
+      documents: dedup(baseGuide.documents, addGuide.documents),
+      tips: dedup(baseGuide.tips, addGuide.tips),
+      timeline: dedup(baseGuide.timeline, addGuide.timeline),
+    }
+  }
+
+  return {
+    pageKind,
+    cycles: mergedCycles,
+    guide,
+  }
+}
+
+export interface ExtractOptions {
+  source: SourceConfig
+  snapshot: PageSnapshot
+  promptsDir: string
+  router: Router
+  chunkSize?: number
+}
+
+export async function extractScholarship(
+  options: ExtractOptions,
+): Promise<{ extraction: Extraction; providerId: ProviderId; keyLabel?: string }> {
+  const { source, snapshot, promptsDir, router, chunkSize = 20_000 } = options
+
+  const chunks = splitTextIntoChunks(snapshot.text, chunkSize)
+
+  if (chunks.length <= 1) {
+    const request = buildExtractRequest(source, snapshot, promptsDir)
+    const response = await router.complete(request)
+    const extraction = parseExtraction(response.text)
+    return {
+      extraction,
+      providerId: response.providerId,
+      keyLabel: response.keyLabel,
+    }
+  }
+
+  let currentExtraction: Extraction | null = null
+  let lastProviderId: ProviderId = "groq"
+  let lastKeyLabel: string | undefined
+
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i]!
+    const request = buildCompactionRequest(
+      source,
+      chunk,
+      i + 1,
+      chunks.length,
+      currentExtraction,
+      promptsDir,
+    )
+
+    const response = await router.complete(request)
+    lastProviderId = response.providerId
+    lastKeyLabel = response.keyLabel
+
+    const parsed = parseExtraction(response.text)
+    currentExtraction = currentExtraction ? mergeExtractions(currentExtraction, parsed) : parsed
+  }
+
+  return {
+    extraction: currentExtraction!,
+    providerId: lastProviderId,
+    keyLabel: lastKeyLabel,
+  }
+}
 
 export function buildExtractRequest(
   source: SourceConfig,

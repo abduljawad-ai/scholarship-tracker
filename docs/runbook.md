@@ -326,6 +326,61 @@ To run maintenance without discovery (for example after editing a source):
 npm run pipeline -- --no-discovery
 ```
 
+### Groq multi-key pool rotation
+
+The pipeline dynamically adapts to any number of Groq keys. It supports both a
+single multi-key secret (`GROQ_API_KEYS`) and individual numbered secrets
+(`GROQ_API_KEY_1`, `GROQ_API_KEY_2`, etc., alongside legacy `GROQ_API_KEY`).
+
+- **Per-request rotation**: Calls cycle round-robin across ready keys in the pool,
+  spreading TPM and RPM limits evenly across all your keys.
+- **Failover & skip-and-continue**: If a key hits a rate limit (429) or auth error
+  (401/403), that key is cooled down in `pipeline/state.json` and the router immediately
+  rotates to the next ready key in the pool without pausing the run.
+- **Cooldown recovery**: When keys are cooling, their reset window is respected; as soon
+  as a key's reset timestamp passes, it re-enters the active rotation.
+- **Inline short wait**: If all keys in the pool are temporarily cooling with short
+  resets (<=30s), the router waits out the shortest cooldown and retries.
+- **Large-input compaction**: Pages longer than 20,000 characters are automatically
+  chunked at paragraph boundaries. Facts and extracted state are compacted and passed
+  sequentially across chunks, ensuring complete facts and exact verbatim evidence quotes.
+
+#### How to configure your keys
+
+You can provide your keys in either of two ways:
+
+**Method 1: Single multi-key secret `GROQ_API_KEYS` (Recommended)**
+Store all your keys (comma-separated or newline-separated) in one secret. You can
+have 8, 15, 50, or 100 keys; the pipeline automatically detects them and scales the pool:
+
+```bash
+# In your terminal (any directory where gh is authenticated):
+gh secret set GROQ_API_KEYS --body "gsk_key1,gsk_key2,gsk_key3,gsk_key4,gsk_key5,gsk_key6,gsk_key7,gsk_key8"
+```
+
+Or multiline from a file or stdin:
+```bash
+gh secret set GROQ_API_KEYS < /path/to/my-groq-keys.txt
+```
+
+**Method 2: Separate numbered secrets**
+```bash
+gh secret set GROQ_API_KEY_1 --body "gsk_..."
+gh secret set GROQ_API_KEY_2 --body "gsk_..."
+# ... repeat for as many keys as you have
+```
+
+**Method 3: Via GitHub Web UI**
+1. Open the repository on GitHub: `https://github.com/abduljawad-ai/scholarship-tracker`
+2. Go to **Settings** → **Secrets and variables** → **Actions**.
+3. Under **Repository secrets**, click **New repository secret**.
+4. Name: `GROQ_API_KEYS`, Secret: paste your keys (comma-separated or one per line), then click **Add secret**.
+
+Verify the secrets with:
+```bash
+gh secret list
+```
+
 ### Annual source URL curation
 
 Official program pages move with each intake (for example a `.../2026` news

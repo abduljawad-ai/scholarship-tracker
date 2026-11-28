@@ -6,10 +6,12 @@ import {
   callsOn,
   emptyState,
   itemKey,
+  keyReady,
   loadState,
   providerReady,
   recordProviderCall,
   saveState,
+  setKeyCooldown,
   setProviderCooldown,
   startOrResumeRun,
   updateItem,
@@ -116,4 +118,56 @@ test('saved JSON is pretty-printed with a trailing newline', () => {
   const raw = readFileSync(file, 'utf8')
   expect(raw.endsWith('\n')).toBe(true)
   expect(raw).toContain('\n  "version": 1')
+})
+
+test('recordProviderCall tracks key-level counts alongside provider totals', () => {
+  let state = emptyState()
+  state = recordProviderCall(state, 'groq', '2026-11-28', 'groq:1')
+  state = recordProviderCall(state, 'groq', '2026-11-28', 'groq:2')
+  state = recordProviderCall(state, 'groq', '2026-11-28', 'groq:1')
+
+  expect(callsOn(state, '2026-11-28')).toBe(3)
+  expect(state.providers.groq.callsByDay['2026-11-28']).toBe(3)
+  expect(state.providers.groq.keys?.['groq:1']?.callsByDay['2026-11-28']).toBe(2)
+  expect(state.providers.groq.keys?.['groq:2']?.callsByDay['2026-11-28']).toBe(1)
+})
+
+test('setKeyCooldown cools only that key, keeping the provider ready if others are free', () => {
+  const now = new Date('2026-11-28T12:00:00.000Z')
+  let state = emptyState()
+  state = recordProviderCall(state, 'groq', '2026-11-28', 'groq:1')
+  state = recordProviderCall(state, 'groq', '2026-11-28', 'groq:2')
+
+  state = setKeyCooldown(state, 'groq', 'groq:1', '2026-11-28T12:15:00.000Z', 'rate limit 429')
+
+  expect(keyReady(state, 'groq', 'groq:1', now)).toBe(false)
+  expect(keyReady(state, 'groq', 'groq:2', now)).toBe(true)
+  // Provider is still ready because groq:2 is ready
+  expect(providerReady(state, 'groq', now)).toBe(true)
+  expect(state.providers.groq.keys?.['groq:1']?.lastError).toBe('rate limit 429')
+
+  // After cooldown expires, groq:1 is ready again
+  expect(keyReady(state, 'groq', 'groq:1', new Date('2026-11-28T12:16:00.000Z'))).toBe(true)
+})
+
+test('legacy state without keys parses cleanly and round-trips', () => {
+  const legacy = {
+    version: 1,
+    run: null,
+    pages: {},
+    sources: {},
+    providers: {
+      groq: {
+        callsByDay: { '2026-11-28': 5 },
+        cooldownUntil: null,
+        lastError: null,
+      },
+    },
+    lastSuccessfulRun: null,
+  }
+  const file = stateFile(legacy)
+  const loaded = loadState(file)
+  expect(loaded.providers.groq.callsByDay['2026-11-28']).toBe(5)
+  expect(loaded.providers.groq.keys).toBeUndefined()
+  expect(providerReady(loaded, 'groq', new Date())).toBe(true)
 })
