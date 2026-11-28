@@ -5,7 +5,11 @@ const paths = ['/', '/listing/chevening-pakistan/', '/archive/', '/my-applicatio
 
 for (const path of paths) {
   test(`no serious axe violations on ${path}`, async ({ page }) => {
+    // Scan with motion disabled: a fade-in caught mid-transition reads as low
+    // contrast and makes the result depend on machine load.
+    await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.goto(path)
+    await page.evaluate(() => document.fonts.ready)
     const results = await new AxeBuilder({ page }).analyze()
     expect(results.violations.filter((v) => ['serious', 'critical'].includes(v.impact!))).toEqual(
       [],

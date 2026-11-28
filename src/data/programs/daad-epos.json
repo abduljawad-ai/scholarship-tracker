@@ -4,16 +4,24 @@
   "provider": "German Academic Exchange Service (DAAD)",
   "providerType": "org",
   "country": "Germany",
-  "officialUrl": "https://www.daad.de/en/",
-  "fundedLevels": ["master", "phd"],
-  "applicantStages": ["bachelor", "master"],
+  "officialUrl": "https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777",
+  "fundedLevels": [
+    "master",
+    "phd"
+  ],
+  "applicantStages": [
+    "bachelor",
+    "master"
+  ],
   "fields": [
     "Engineering and environmental sciences",
     "Economics and social sciences",
     "Agriculture and forestry"
   ],
   "eligibility": {
-    "nationalities": ["PK"],
+    "nationalities": [
+      "PK"
+    ],
     "ageMax": 36,
     "minDegree": "bachelor",
     "minMarks": "Minimum CGPA 2.5/4.0 or equivalent (varies by course)",
@@ -38,75 +46,74 @@
   },
   "guide": {
     "steps": [
-      "Find an eligible EPOS course in the DAAD course database",
-      "Check the course's admission requirements and language rules",
-      "Apply through the DAAD portal with the course-specific documents",
-      "Provide proof of work experience where required",
-      "Wait for the course provider's admission decision"
+      "You send your complete application(s) directly to the according postgraduate course",
+      "A selection committee suggests potential candidates for a DAAD scholarship",
+      "The suggested candidates will be contacted by DAAD to upload their complete application to the DAAD Portal",
+      "The selection process will be finalized, and the suggested candidates will be informed accordingly"
     ],
     "documents": [
-      "Passport copy",
-      "Degree certificates and transcripts",
-      "Curriculum vitae in tabular form",
-      "Work experience letters",
-      "Language certificate"
+      "Completed and signed checklist",
+      "EPOS application form",
+      "Curriculum vitae in reverse chronological order",
+      "Letter of Motivation",
+      "Letter of recommendation from your current employer",
+      "Certificate(s) of Employment",
+      "Proof of Language Skills",
+      "Copies of higher education degree certificates",
+      "Copy of transcript of records"
     ],
-    "tips": [
-      "Apply to the course first — DAAD funding follows admission",
-      "Match your work experience to the course profile",
-      "Deadlines differ per course; verify each course page"
-    ],
-    "timeline": [
-      "Applications open: November 2027",
-      "Application deadline: January 2028",
-      "Admission results: April 2028",
-      "Studies begin: October 2028"
-    ]
+    "tips": [],
+    "timeline": []
   },
   "cycles": [
     {
-      "cycleId": "2028",
-      "label": "2028/29 intake",
+      "cycleId": "2027",
+      "label": "2027/2028 intake",
       "dates": {
-        "opens": "2027-11-01",
-        "deadline": "2028-01-15",
-        "resultsDate": "2028-04-30",
-        "studyStart": "2028-10-01"
+        "opens": null,
+        "deadline": null,
+        "resultsDate": null,
+        "studyStart": null
       },
       "status": "upcoming",
       "apply": {
-        "url": "https://www.daad.de/en/study-and-research-in-germany/scholarships/",
-        "portalName": "DAAD online portal",
-        "fee": "No application fee"
+        "url": null,
+        "portalName": null,
+        "fee": null
       },
       "verification": {
-        "deadline": "provisional",
-        "applyUrl": "verified",
-        "funding": "verified",
-        "eligibility": "provisional"
+        "deadline": "unverified",
+        "applyUrl": "unverified",
+        "funding": "unverified",
+        "eligibility": "unverified"
       },
       "sources": [
         {
-          "url": "https://www.daad.de/en/study-and-research-in-germany/scholarships/",
+          "url": "https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777",
           "type": "official-page",
-          "lastVerified": "2026-11-24"
-        },
-        {
-          "url": "https://www.daad.de/en/",
-          "type": "official-page",
-          "lastVerified": "2026-11-24"
+          "lastVerified": "2026-11-28"
         }
       ],
       "evidence": [
         {
-          "field": "funding",
-          "quote": "Sample (demo data): EPOS is listed with a monthly stipend and no tuition coverage for the 2028/29 intake.",
-          "sourceUrl": "https://www.daad.de/en/study-and-research-in-germany/scholarships/"
+          "field": "label",
+          "quote": "List of all Postgraduate courses with application deadlines 2027/2028.",
+          "sourceUrl": "https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777"
+        },
+        {
+          "field": "guide.steps",
+          "quote": "Step 1: You send your complete application(s) directly to the according postgraduate course.",
+          "sourceUrl": "https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777"
+        },
+        {
+          "field": "guide.documents",
+          "quote": "Required documents (in the following order): Completed and signed checklist",
+          "sourceUrl": "https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777"
         }
       ],
-      "confidence": 0.75
+      "confidence": 0
     }
   ],
   "firstSeen": "2026-11-19T00:00:00.000Z",
-  "lastUpdated": "2026-11-24T00:00:00.000Z"
+  "lastUpdated": "2026-11-28T03:42:26.621Z"
 }

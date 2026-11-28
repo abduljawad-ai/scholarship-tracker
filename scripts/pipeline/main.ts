@@ -14,6 +14,7 @@ export interface CliOptions {
   sourceId?: string
   dryRun: boolean
   live: boolean
+  discovery: boolean
 }
 
 export function parseArgs(argv: string[]): CliOptions {
@@ -24,6 +25,7 @@ export function parseArgs(argv: string[]): CliOptions {
       source: { type: "string" },
       "dry-run": { type: "boolean" },
       live: { type: "boolean" },
+      "no-discovery": { type: "boolean" },
     },
     strict: true,
     allowPositionals: false,
@@ -40,6 +42,7 @@ export function parseArgs(argv: string[]): CliOptions {
     sourceId: values.source,
     dryRun: values["dry-run"] ?? false,
     live: values.live ?? false,
+    discovery: !(values["no-discovery"] ?? false),
   }
 }
 
@@ -69,6 +72,7 @@ export async function main(
     maxItems: options.maxItems,
     sourceId: options.sourceId,
     allowLive: options.live,
+    discovery: options.discovery,
   })
 
   const summary = renderSummary(result.report)

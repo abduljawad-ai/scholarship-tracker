@@ -91,6 +91,7 @@ function source(overrides: Partial<SourceConfig> = {}): SourceConfig {
     indexUrls: [INDEX_URL],
     discovery: true,
     archived: false,
+    mode: 'extract',
     ...overrides,
   }
 }

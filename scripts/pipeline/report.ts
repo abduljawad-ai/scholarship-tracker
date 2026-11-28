@@ -25,6 +25,7 @@ export function renderSummary(report: RunReport): string {
     `- Unchanged: ${report.unchanged.length}`,
     `- Failed: ${report.failed.length}`,
     `- Paused: ${report.paused.length}`,
+    `- Review needed: ${report.review.length}`,
     `- Candidates: ${report.candidates}`,
     `- Unhealthy sources: ${report.unhealthy.length}`,
   ]
@@ -47,6 +48,13 @@ export function renderSummary(report: RunReport): string {
   }
   if (report.paused.length > 0) {
     lines.push("", "### Paused", ...report.paused.map((item) => `- ${item}`))
+  }
+  if (report.review.length > 0) {
+    lines.push(
+      "",
+      "### Review needed",
+      ...report.review.map((item) => `- ${item.sourceId}: ${item.url} (${item.reason})`),
+    )
   }
   if (report.unhealthy.length > 0) {
     lines.push(

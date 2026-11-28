@@ -75,15 +75,28 @@ export function quoteSupportsDate(quote: string, isoDate: string): boolean {
     patterns.push(`\\b${day}[/-]${month}[/-]${yearPart}\\b`)
   }
 
-  return patterns.some((pattern) => new RegExp(pattern).test(text))
+  if (patterns.some((pattern) => new RegExp(pattern).test(text))) return true
+
+  // A range such as "10 January - 20 February 2026" gives the year once, at
+  // the end. Accept the day and month when the quote contains exactly one year
+  // and that year is the target year. Two different years are ambiguous.
+  const years = new Set(text.match(/\b(?:19|20)\d{2}\b/g) ?? [])
+  if (years.size === 1 && years.has(yearPart)) {
+    const dayMonth = new RegExp(`\\b${dayPart}\\s+(?:of\\s+)?(?:${monthNames})\\b`)
+    const monthDay = new RegExp(`\\b(?:${monthNames})\\s+${dayPart}\\b`)
+    if (dayMonth.test(text) || monthDay.test(text)) return true
+  }
+
+  return false
 }
 
 /**
- * A deadline is plausible from today through three years ahead. Anything in the
- * past or further out is a data error, not a real application window.
+ * A deadline is plausible from two years back through three years ahead. The
+ * past window keeps real closed cycles in the archive; anything older or
+ * further out is a data error, not a real application window.
  */
 export function isPlausibleDeadline(isoDate: string, today: string): boolean {
-  return isPlausibleDate(isoDate, today, { pastYears: 0, futureYears: 3 })
+  return isPlausibleDate(isoDate, today, { pastYears: 2, futureYears: 3 })
 }
 
 /** Generic date window used for opens/results/study dates. */

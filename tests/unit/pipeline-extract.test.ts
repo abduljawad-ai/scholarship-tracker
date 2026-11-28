@@ -27,6 +27,7 @@ const SOURCE: SourceConfig = {
   indexUrls: [],
   discovery: false,
   archived: false,
+  mode: 'extract',
 }
 
 const SNAPSHOT: PageSnapshot = {
@@ -46,6 +47,7 @@ function validExtraction(): Extraction {
     cycles: [
       {
         label: '2027/28 intake',
+        status: null,
         dates: {
           opens: '2027-08-01',
           deadline: '2027-11-03',
@@ -153,6 +155,25 @@ test('an apply URL without applyUrl evidence is rejected', () => {
   )
 
   expect(validateExtraction(extraction, SNAPSHOT, SOURCE).join(' ')).toMatch(/apply/i)
+})
+
+test('a status without status evidence is rejected', () => {
+  const extraction = validExtraction()
+  extraction.cycles[0]!.status = 'closed'
+
+  expect(validateExtraction(extraction, SNAPSHOT, SOURCE).join(' ')).toMatch(/status/i)
+})
+
+test('a status with a quoted page sentence passes', () => {
+  const extraction = validExtraction()
+  extraction.cycles[0]!.status = 'closed'
+  extraction.cycles[0]!.evidence.push({
+    field: 'status',
+    quote: 'Chevening Scholarships applications open on 1 August 2027 and close on 3 November 2027.',
+    sourceUrl: PAGE_URL,
+  })
+
+  expect(validateExtraction(extraction, SNAPSHOT, SOURCE)).toEqual([])
 })
 
 test('a quote that is not in the page text is rejected', () => {

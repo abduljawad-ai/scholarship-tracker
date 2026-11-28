@@ -997,6 +997,19 @@ a:hover {
   line-height: var(--leading-sm);
 }
 
+/* A neutral caveat: the listing never claims eligibility without the
+   reader's own level, marks, and documents. */
+.eligibility-caveat {
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--color-border);
+  border-radius: 0 var(--radius-small) var(--radius-small) 0;
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  font-size: var(--type-sm);
+  line-height: var(--leading-sm);
+}
+
 .register {
   margin-top: var(--space-1);
 }

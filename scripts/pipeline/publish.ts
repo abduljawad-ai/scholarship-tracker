@@ -17,18 +17,18 @@ export interface MergeOptions {
 const DATE_ONLY_FIELDS = ["opens", "resultsDate", "studyStart"] as const
 
 /** A stable cycle id: the first year in the label, else the fallback date year. */
-export function cycleIdFromLabel(label: string, fallbackDate: string | null): string {
-  const year = /(?:19|20)\d{2}/.exec(label)?.[0]
+export function cycleIdFromLabel(label: string | null, fallbackDate: string | null): string {
+  const year = label === null ? null : /(?:19|20)\d{2}/.exec(label)?.[0]
   if (year) return year
 
   const fallbackYear = fallbackDate?.match(/^(\d{4})-/)?.[1]
   if (fallbackYear) return fallbackYear
 
-  const slug = label
+  const slug = (label ?? "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
-  return slug || "cycle"
+  return slug || "current"
 }
 
 function sourceUrlsFor(extraction: Extraction, source: SourceConfig): string[] {
@@ -149,7 +149,7 @@ function mergeExistingCycle(
   return {
     ...existing,
     dates,
-    status: statusFor(dates, options.today, existing.status),
+    status: statusFor(dates, options.today, extracted.status ?? existing.status),
     apply,
     verification,
     sources: refreshSources(existing.sources, extraction, source, options.today),
@@ -189,9 +189,11 @@ function createCycle(
 
   return {
     cycleId,
-    label: extracted.label,
+    label:
+      extracted.label ??
+      (cycleId === "current" ? "Current cycle" : `${cycleId} application cycle`),
     dates,
-    status: statusFor(dates, options.today, "upcoming"),
+    status: statusFor(dates, options.today, extracted.status ?? "upcoming"),
     apply: {
       url: applyUrl,
       portalName: applyUrl === null ? null : extracted.apply.portalName,

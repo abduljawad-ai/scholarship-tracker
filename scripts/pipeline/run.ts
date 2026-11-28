@@ -50,6 +50,8 @@ export interface RunOptions {
   maxItems: number
   sourceId?: string
   allowLive: boolean
+  /** Maintenance runs can skip the discovery loop and only check known pages. */
+  discovery?: boolean
   /** Injected by tests so fetch retries do not spend real time. */
   sleep?: (ms: number) => Promise<void>
   random?: () => number
@@ -327,6 +329,7 @@ function providerStats(
  */
 export async function runPipeline(options: RunOptions): Promise<RunResult> {
   const { config, router, now, dryRun, maxItems, sourceId, allowLive } = options
+  const discoveryEnabled = options.discovery ?? true
   const fetchImpl = options.fetchImpl ?? fetch
   const startedAt = now.toISOString()
   const today = todayInPakistan(now)
@@ -360,6 +363,7 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
   const skipped: string[] = []
   const failed: { item: string; error: string }[] = []
   const unhealthy = new Set<string>()
+  const review: RunReport["review"] = []
   const sourceStats: RunReport["sources"] = {}
   let checked = 0
   let processed = 0
@@ -472,6 +476,31 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
           continue
         }
 
+        // Monitor-only sources have no machine-readable cycle. Store the hash
+        // and ask a human to review a change; never extract or publish.
+        if (source.mode === "monitor") {
+          if (previousPage !== undefined && previousPage.hash !== snapshot.hash) {
+            review.push({
+              sourceId: source.sourceId,
+              url,
+              reason: "Official page changed; review the cycle and guide by hand",
+            })
+          } else {
+            unchanged.push(source.programId!)
+          }
+          commit(
+            updateItem(state, key, {
+              state: "published",
+              hash: snapshot.hash,
+              lastError: null,
+              updatedAt: startedAt,
+            }),
+          )
+          commit(updatePage(state, key, snapshot, startedAt))
+          commit(resetSourceHealth(state, source.sourceId, startedAt))
+          continue
+        }
+
         const suspicious =
           snapshot.text.length < MIN_PAGE_LENGTH ||
           (previousPage !== undefined &&
@@ -577,6 +606,7 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
     // known-program queue, is skipped by dry runs, and its failures are
     // reported without failing the run.
     if (
+      discoveryEnabled &&
       status !== "paused" &&
       !dryRun &&
       !(checked === 0 && failed.length > 0)
@@ -651,6 +681,7 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
     failed,
     paused,
     unhealthy: [...unhealthy],
+    review,
     candidates: discoveryResult?.accepted.length ?? 0,
     checked,
     sources: sourceStats,
@@ -669,6 +700,7 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
       failed: failed.map((item) => item.item),
       paused,
       unhealthy: [...unhealthy],
+      review: review.map((item) => item.url),
       candidates: discoveryResult?.accepted.length ?? 0,
       checked,
     },

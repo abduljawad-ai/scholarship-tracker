@@ -25,7 +25,8 @@ const EvidenceSchema = z
 
 const ExtractedCycleSchema = z
   .object({
-    label: z.string().min(1),
+    label: z.string().min(1).nullable(),
+    status: z.enum(["open", "upcoming", "closed"]).nullable().default(null),
     dates: z
       .object({
         opens: IsoDate.nullable(),
@@ -151,20 +152,24 @@ export function validateExtraction(
       const value = cycle.dates[field]
       if (value === null) continue
       if (!DATE_RE.test(value) || Number.isNaN(Date.parse(value))) {
-        errors.push(`Cycle "${cycle.label}" has an invalid ${field} date: ${value}`)
+        errors.push(`Cycle "${cycle.label ?? "(unnamed)"}" has an invalid ${field} date: ${value}`)
       }
       if (!fields.has(field)) {
-        errors.push(`Cycle "${cycle.label}" has a ${field} date with no ${field} evidence`)
+        errors.push(`Cycle "${cycle.label ?? "(unnamed)"}" has a ${field} date with no ${field} evidence`)
       }
     }
 
     if (cycle.apply.url !== null) {
       if (!cycle.apply.url.startsWith("https://")) {
-        errors.push(`Cycle "${cycle.label}" has a non-HTTPS apply URL: ${cycle.apply.url}`)
+        errors.push(`Cycle "${cycle.label ?? "(unnamed)"}" has a non-HTTPS apply URL: ${cycle.apply.url}`)
       }
       if (!fields.has("applyUrl")) {
-        errors.push(`Cycle "${cycle.label}" has an apply URL with no applyUrl evidence`)
+        errors.push(`Cycle "${cycle.label ?? "(unnamed)"}" has an apply URL with no applyUrl evidence`)
       }
+    }
+
+    if (cycle.status !== null && !fields.has("status")) {
+      errors.push(`Cycle "${cycle.label ?? "(unnamed)"}" has a status with no status evidence`)
     }
   }
 

@@ -4,80 +4,98 @@
     "programId": "chevening-pakistan",
     "provider": "UK Foreign, Commonwealth and Development Office",
     "officialHosts": ["chevening.org"],
-    "pageUrls": ["https://www.chevening.org/scholarships/"],
+    "pageUrls": ["https://www.chevening.org/scholarship/pakistan/"],
     "indexUrls": ["https://www.chevening.org/scholarships/"],
     "discovery": true,
-    "archived": false
+    "archived": false,
+    "mode": "extract"
   },
   {
     "sourceId": "fulbright",
     "programId": "fulbright-pakistan",
     "provider": "United States Educational Foundation in Pakistan",
     "officialHosts": ["usefp.org"],
-    "pageUrls": ["https://www.usefp.org/"],
+    "pageUrls": ["https://www.usefp.org/scholarships/fulbright-degree.cfm"],
     "indexUrls": ["https://www.usefp.org/"],
     "discovery": true,
-    "archived": false
+    "archived": false,
+    "mode": "extract"
   },
   {
     "sourceId": "daad",
     "programId": "daad-epos",
     "provider": "German Academic Exchange Service (DAAD)",
     "officialHosts": ["daad.de"],
-    "pageUrls": ["https://www.daad.de/en/"],
-    "indexUrls": ["https://www.daad.de/en/"],
+    "pageUrls": [
+      "https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777"
+    ],
+    "indexUrls": ["https://www.daad.de/en/studying-in-germany/scholarships/"],
     "discovery": true,
-    "archived": false
+    "archived": false,
+    "mode": "extract"
   },
   {
     "sourceId": "erasmus",
     "programId": "erasmus-mundus-joint-masters",
     "provider": "European Commission (Erasmus Mundus)",
     "officialHosts": ["eacea.ec.europa.eu", "ec.europa.eu"],
-    "pageUrls": ["https://eacea.ec.europa.eu/"],
-    "indexUrls": ["https://eacea.ec.europa.eu/"],
+    "pageUrls": [
+      "https://erasmus-plus.ec.europa.eu/opportunities/individuals/students/erasmus-mundus-joint-masters"
+    ],
+    "indexUrls": ["https://erasmus-plus.ec.europa.eu/opportunities/individuals/students"],
     "discovery": true,
-    "archived": false
+    "archived": false,
+    "mode": "monitor"
   },
   {
     "sourceId": "hec",
     "programId": "hec-need-based",
     "provider": "Higher Education Commission of Pakistan",
     "officialHosts": ["hec.gov.pk"],
-    "pageUrls": ["https://www.hec.gov.pk/english/Pages/default.aspx"],
-    "indexUrls": ["https://www.hec.gov.pk/english/Pages/default.aspx"],
+    "pageUrls": [
+      "https://www.hec.gov.pk/english/scholarshipsgrants/NBS/Pages/default.aspx"
+    ],
+    "indexUrls": ["https://www.hec.gov.pk/english/scholarshipsgrants/Pages/default.aspx"],
     "discovery": true,
-    "archived": false
+    "archived": false,
+    "mode": "monitor"
   },
   {
     "sourceId": "sindh-endowment",
     "programId": "sindh-endowment-fund",
     "provider": "Government of Sindh",
     "officialHosts": ["sindh.gov.pk"],
-    "pageUrls": ["https://www.sindh.gov.pk/"],
-    "indexUrls": ["https://www.sindh.gov.pk/"],
+    "pageUrls": [
+      "https://seef.sindh.gov.pk/news/apply-online-seef-scholarship-program-2026"
+    ],
+    "indexUrls": ["https://seef.sindh.gov.pk/news/notifications?show=news"],
     "discovery": true,
-    "archived": false
+    "archived": false,
+    "mode": "extract"
   },
   {
     "sourceId": "sindh-matric",
     "programId": "sindh-matric-scholarship",
     "provider": "Government of Sindh",
-    "officialHosts": ["sindh.gov.pk"],
-    "pageUrls": ["https://www.sindh.gov.pk/"],
-    "indexUrls": ["https://www.sindh.gov.pk/"],
+    "officialHosts": ["sef.org.pk", "sindh.gov.pk"],
+    "pageUrls": ["https://www.sef.org.pk/scholarship"],
+    "indexUrls": ["https://www.sef.org.pk/scholarship"],
     "discovery": false,
-    "archived": false
+    "archived": false,
+    "mode": "extract"
   },
   {
     "sourceId": "turkiye",
     "programId": "turkiye-burslari",
     "provider": "Türkiye Bursları",
     "officialHosts": ["turkiyeburslari.gov.tr"],
-    "pageUrls": ["https://www.turkiyeburslari.gov.tr/en"],
+    "pageUrls": [
+      "https://www.turkiyeburslari.gov.tr/announcements/turkiye-scholarships-2026-applications-121"
+    ],
     "indexUrls": ["https://www.turkiyeburslari.gov.tr/en"],
     "discovery": true,
-    "archived": false
+    "archived": false,
+    "mode": "extract"
   },
   {
     "sourceId": "commonwealth",
@@ -87,6 +105,7 @@
     "pageUrls": ["https://cscuk.fcdo.gov.uk/scholarships/"],
     "indexUrls": [],
     "discovery": false,
-    "archived": true
+    "archived": true,
+    "mode": "extract"
   }
 ]

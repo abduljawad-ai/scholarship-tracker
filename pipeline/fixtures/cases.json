@@ -6,6 +6,7 @@
       "kind": "extract",
       "html": "chevening.html",
       "output": "chevening.extraction.json",
+      "url": "https://www.chevening.org/scholarships/",
       "sourceId": "chevening",
       "programId": "chevening-pakistan",
       "today": "2026-11-27",

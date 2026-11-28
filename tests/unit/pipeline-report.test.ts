@@ -18,6 +18,13 @@ function report(): RunReport {
     failed: [{ item: 'fulbright::https://www.usefp.org/', error: 'HTTP 500' }],
     paused: [],
     unhealthy: ['daad'],
+    review: [
+      {
+        sourceId: 'hec',
+        url: 'https://www.hec.gov.pk/english/scholarshipsgrants/NBS/Pages/default.aspx',
+        reason: 'Official page changed; review the cycle and guide by hand',
+      },
+    ],
     candidates: 2,
     checked: 3,
     sources: {
@@ -65,6 +72,7 @@ test('renderSummary reports counts and lists the outcomes', () => {
   expect(markdown).toContain('Published: 1')
   expect(markdown).toContain('Unchanged: 1')
   expect(markdown).toContain('Failed: 1')
+  expect(markdown).toContain('Review needed: 1')
   expect(markdown).toContain('Candidates: 2')
   expect(markdown).toContain('- chevening-pakistan')
   expect(markdown).toContain('- fulbright::https://www.usefp.org/: HTTP 500')
