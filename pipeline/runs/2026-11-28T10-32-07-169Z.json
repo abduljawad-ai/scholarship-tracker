@@ -1,0 +1,163 @@
+{
+  "runId": "2026-11-28T10-32-07-169Z",
+  "startedAt": "2026-11-28T10:32:07.169Z",
+  "finishedAt": "2026-11-28T10:33:25.566Z",
+  "status": "complete",
+  "published": [
+    "daad-epos",
+    "sindh-endowment-fund",
+    "sindh-matric-scholarship",
+    "turkiye-burslari"
+  ],
+  "unchanged": [
+    "erasmus-mundus-joint-masters",
+    "hec-need-based"
+  ],
+  "skipped": [],
+  "failed": [
+    {
+      "item": "chevening::https://www.chevening.org/scholarship/pakistan/",
+      "error": "Extraction schema violation: [\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"sourceUrl\",\n      \"evidence\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized keys: \\\"sourceUrl\\\", \\\"evidence\\\"\"\n  }\n]"
+    },
+    {
+      "item": "fulbright::https://www.usefp.org/scholarships/fulbright-degree.cfm",
+      "error": "Evidence quote for \"guide.documents\" is not in the page text: \"An application package includes: An application form, Three reference letters, GRE score report, Scanned transcripts, ...\""
+    }
+  ],
+  "paused": [],
+  "unhealthy": [],
+  "review": [],
+  "candidates": 0,
+  "checked": 8,
+  "sources": {
+    "erasmus": {
+      "fetched": 1,
+      "published": 0,
+      "failed": 0
+    },
+    "hec": {
+      "fetched": 1,
+      "published": 0,
+      "failed": 0
+    },
+    "chevening": {
+      "fetched": 1,
+      "published": 0,
+      "failed": 1
+    },
+    "fulbright": {
+      "fetched": 1,
+      "published": 0,
+      "failed": 1
+    },
+    "daad": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "sindh-endowment": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "sindh-matric": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "turkiye": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    }
+  },
+  "providers": {
+    "groq": {
+      "calls": 6,
+      "errors": 0,
+      "cooldowns": 0,
+      "keys": {
+        "groq:1": {
+          "calls": 1,
+          "errors": 0,
+          "cooling": false
+        },
+        "groq:2": {
+          "calls": 1,
+          "errors": 0,
+          "cooling": false
+        },
+        "groq:3": {
+          "calls": 1,
+          "errors": 0,
+          "cooling": false
+        },
+        "groq:4": {
+          "calls": 1,
+          "errors": 0,
+          "cooling": false
+        },
+        "groq:5": {
+          "calls": 1,
+          "errors": 0,
+          "cooling": false
+        },
+        "groq:6": {
+          "calls": 1,
+          "errors": 0,
+          "cooling": false
+        }
+      }
+    }
+  },
+  "discovery": {
+    "rounds": [
+      {
+        "round": 1,
+        "queries": [
+          "UK Foreign, Commonwealth and Development Office scholarship",
+          "chevening.org scholarships",
+          "United States Educational Foundation in Pakistan scholarship",
+          "usefp.org scholarships",
+          "German Academic Exchange Service (DAAD) scholarship",
+          "daad.de scholarships"
+        ],
+        "fetched": 0,
+        "accepted": 0,
+        "gaps": [],
+        "stopReason": "no-signal"
+      }
+    ],
+    "fetched": 0,
+    "accepted": 0,
+    "queries": [
+      "UK Foreign, Commonwealth and Development Office scholarship",
+      "chevening.org scholarships",
+      "United States Educational Foundation in Pakistan scholarship",
+      "usefp.org scholarships",
+      "German Academic Exchange Service (DAAD) scholarship",
+      "daad.de scholarships",
+      "European Commission (Erasmus Mundus) scholarship",
+      "eacea.ec.europa.eu scholarships",
+      "ec.europa.eu scholarships",
+      "Higher Education Commission of Pakistan scholarship",
+      "hec.gov.pk scholarships",
+      "Government of Sindh scholarship",
+      "sindh.gov.pk scholarships",
+      "Türkiye Bursları scholarship",
+      "turkiyeburslari.gov.tr scholarships",
+      "Punjab government scholarship",
+      "Balochistan higher education scholarship",
+      "Pakistan merit based scholarship",
+      "Women’s education scholarship Pakistan",
+      "Khyber Pakhtunkhwa scholarship program",
+      "Gilgit Baltistan student scholarship",
+      "World Bank scholarship Pakistan",
+      "British Council scholarships Pakistan"
+    ],
+    "stopReason": "no-signal",
+    "errors": [
+      "https://www.daad.de/sitemap.xml: terminated"
+    ]
+  }
+}
