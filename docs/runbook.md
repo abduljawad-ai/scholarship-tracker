@@ -267,6 +267,12 @@ workflow again; it picks up where it stopped. Do not delete
 `pipeline/state.json` to "fix" a pause — that re-fetches and re-spends model
 calls.
 
+A short rate limit is not a pause. The router reads `Retry-After` or the
+provider's "try again in 9s" message, waits it out (up to 30 seconds, twice),
+and retries the same model. A provider is cooled down only when the wait is
+longer than that or the retries fail. Monitor sources are checked before
+extract sources, so a provider outage never blocks the free hash checks.
+
 ### Roll back a bad data commit
 
 1. Find the commit that changed `src/data/programs/`.

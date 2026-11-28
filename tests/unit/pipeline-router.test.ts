@@ -3,6 +3,7 @@ import { loadConfig } from '../../scripts/pipeline/config'
 import { ProvidersExhaustedError, createRouter } from '../../scripts/pipeline/router'
 import { emptyState, createMemoryStore, recordProviderCall, setProviderCooldown } from '../../scripts/pipeline/state'
 import type { FetchLike } from '../../scripts/pipeline/http'
+import { parseRetryHint } from '../../scripts/pipeline/http'
 import type { AiRequest, PipelineState } from '../../scripts/pipeline/types'
 
 const NOW = new Date('2026-11-27T06:00:00.000Z') // 11:00 in Pakistan
@@ -46,13 +47,15 @@ function fixture(options: FixtureOptions = {}) {
       ? (options.groq ?? (() => groqAnswer('from groq')))()
       : geminiAnswer('from gemini'),
   )
+  const sleep = vi.fn(async () => {})
   const router = createRouter({
     config,
     store,
     fetchImpl,
     now: () => NOW,
+    sleep,
   })
-  return { router, persist, getState: () => store.get(), fetchImpl }
+  return { router, persist, sleep, getState: () => store.get(), fetchImpl }
 }
 
 test('the first configured provider in the task order is used', async () => {
@@ -138,4 +141,73 @@ test('a provider request error falls through without a cooldown', async () => {
 
   expect(response.providerId).toBe('gemini')
   expect(getState().providers.groq?.cooldownUntil ?? null).toBeNull()
+})
+
+test('a short rate limit is waited out and the same provider retries', async () => {
+  let call = 0
+  const { router, sleep, getState } = fixture({
+    groq: () => {
+      call += 1
+      return call === 1
+        ? jsonResponse({ error: { message: 'rate limit exceeded' } }, 429, {
+            'retry-after': '1',
+          })
+        : groqAnswer('from groq')
+    },
+  })
+
+  const response = await router.complete(REQUEST)
+
+  expect(response.providerId).toBe('groq')
+  expect(response.text).toBe('from groq')
+  expect(sleep).toHaveBeenCalledWith(1250)
+  expect(getState().providers.groq?.cooldownUntil ?? null).toBeNull()
+})
+
+test('retry hints parse seconds, minutes, and millis', () => {
+  expect(parseRetryHint('Please try again in 9.17s.')).toBe(9170)
+  expect(parseRetryHint('retry in 1m30s')).toBe(90_000)
+  expect(parseRetryHint('available in 250ms')).toBe(250)
+  expect(parseRetryHint('rate limit exceeded')).toBeNull()
+  expect(parseRetryHint(null)).toBeNull()
+})
+
+test('the retry hint in the message is used when the header is missing', async () => {
+  let call = 0
+  const { router, sleep } = fixture({
+    groq: () => {
+      call += 1
+      return call === 1
+        ? jsonResponse(
+            {
+              error: {
+                message:
+                  'Rate limit reached for model `openai/gpt-oss-120b`. Please try again in 9.17s.',
+              },
+            },
+            429,
+          )
+        : groqAnswer('from groq')
+    },
+  })
+
+  const response = await router.complete(REQUEST)
+
+  expect(response.providerId).toBe('groq')
+  expect(sleep).toHaveBeenCalledWith(9420)
+})
+
+test('a rate limit that outlasts the retries cools down and falls through', async () => {
+  const { router, sleep, getState } = fixture({
+    groq: () =>
+      jsonResponse({ error: { message: 'rate limit exceeded' } }, 429, {
+        'retry-after': '2',
+      }),
+  })
+
+  const response = await router.complete(REQUEST)
+
+  expect(response.providerId).toBe('gemini')
+  expect(sleep).toHaveBeenCalledTimes(2)
+  expect(getState().providers.groq?.cooldownUntil).toBe('2026-11-27T06:00:02.000Z')
 })

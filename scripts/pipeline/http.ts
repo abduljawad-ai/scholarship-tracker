@@ -42,6 +42,33 @@ export function parseRetryAfter(value: string | null, now: number = Date.now()):
   return Math.max(0, date - now)
 }
 
+/**
+ * Some providers put the wait in the message instead of a Retry-After header.
+ * Groq, for example, says "Please try again in 9.1725s". Reading it keeps a
+ * one-minute quota from becoming a fifteen-minute outage.
+ */
+export function parseRetryHint(message: string | null): number | null {
+  if (!message) return null
+
+  const match = /(?:try again|retry|available) in\s+([\d.]+\s*(?:ms|s|m|h)?(?:\s*[\d.]+\s*(?:ms|s|m|h))?)/i.exec(
+    message,
+  )
+  if (match === null) return null
+
+  let total = 0
+  let found = false
+  for (const part of match[1].matchAll(/([\d.]+)\s*(ms|s|m|h)?/gi)) {
+    const amount = Number(part[1])
+    if (!Number.isFinite(amount) || amount < 0) continue
+    found = true
+    const unit = (part[2] ?? "s").toLowerCase()
+    const factor = unit === "ms" ? 1 : unit === "m" ? 60_000 : unit === "h" ? 3_600_000 : 1000
+    total += amount * factor
+  }
+
+  return found ? Math.round(total) : null
+}
+
 function extractErrorMessage(body: unknown): string | null {
   if (typeof body !== "object" || body === null) return null
   const record = body as Record<string, unknown>
@@ -107,7 +134,10 @@ export async function postJson(
     throw new ProviderAuthError(message)
   }
   if (response.status === 429 || /RESOURCE_EXHAUSTED|quota|rate limit/i.test(message)) {
-    throw new ProviderQuotaError(message, parseRetryAfter(response.headers.get("retry-after")))
+    throw new ProviderQuotaError(
+      message,
+      parseRetryAfter(response.headers.get("retry-after")) ?? parseRetryHint(message),
+    )
   }
   throw new ProviderRequestError(message, response.status)
 }
