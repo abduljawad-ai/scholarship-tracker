@@ -997,9 +997,9 @@ a:hover {
   line-height: var(--leading-sm);
 }
 
-/* A neutral caveat: the listing never claims eligibility without the
-   reader's own level, marks, and documents. */
-.eligibility-caveat {
+/* A neutral caveat: funding, eligibility, and listings never claim a fact
+   without a quote. */
+.trust-caveat {
   margin: var(--space-4) 0 0;
   padding: var(--space-3) var(--space-4);
   border-left: 3px solid var(--color-border);

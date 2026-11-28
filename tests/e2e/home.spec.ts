@@ -29,6 +29,16 @@ test('filters by country', async ({ page }) => {
   await expect(page.getByTestId('card-daad-epos')).toBeVisible()
 })
 
+test('a card never states unconfirmed funding as a fact', async ({ page }) => {
+  await page.goto('/')
+  await expect(
+    page.getByTestId('card-daad-epos').getByText('Funding unconfirmed'),
+  ).toBeVisible()
+  await expect(
+    page.getByTestId('card-daad-epos').getByText(/^Stipend$/),
+  ).toHaveCount(0)
+})
+
 test('current level maps the study-level filter to the next stage', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel(/i'm currently in/i).selectOption('matric')

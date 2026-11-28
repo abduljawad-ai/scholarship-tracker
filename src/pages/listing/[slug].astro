@@ -45,10 +45,6 @@ function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
-function dateOrNot(date: string | null): string {
-  return date === null ? 'Not listed' : formatDate(date)
-}
-
 function isClosed(cycle: Cycle): boolean {
   return cycle.status === 'closed' || cycle.status === 'archived'
 }
@@ -61,6 +57,34 @@ function needsCheck(cycle: Cycle): boolean {
     cycle.confidence < 0.8 ||
     Object.values(cycle.verification).some((status) => status !== 'verified')
   )
+}
+
+/**
+ * A section is published only when the cycle carries a quote for it. The
+ * pipeline adds evidence for the facts it extracts; program-level funding and
+ * eligibility stay hidden until a human curates a quote.
+ */
+function hasEvidence(cycle: Cycle, field: string): boolean {
+  return cycle.evidence.some(
+    (item) => item.field === field || item.field.startsWith(`${field}.`),
+  )
+}
+
+function dateOrUnconfirmed(
+  cycle: Cycle,
+  field: 'opens' | 'resultsDate' | 'studyStart',
+): string {
+  const value = cycle.dates[field]
+  if (value === null) return 'Not listed'
+  return hasEvidence(cycle, field) ? formatDate(value) : 'Not confirmed'
+}
+
+function evidencedDateTime(
+  cycle: Cycle,
+  field: 'opens' | 'resultsDate' | 'studyStart',
+): string | undefined {
+  const value = cycle.dates[field]
+  return value !== null && hasEvidence(cycle, field) ? value : undefined
 }
 
 function applyReason(cycle: Cycle): string {
@@ -197,11 +221,20 @@ const description = `${program.title} at ${program.provider} in ${program.countr
     const slipNote =
       !closed && !deadlineVerified ? 'Check official page' : null
 
+    const fundingSourced = hasEvidence(cycle, 'funding')
+    const eligibilitySourced = hasEvidence(cycle, 'eligibility')
+    const guideSteps = hasEvidence(cycle, 'guide.steps') ? program.guide.steps : []
+    const guideDocuments = hasEvidence(cycle, 'guide.documents')
+      ? program.guide.documents
+      : []
+    const guideTips = hasEvidence(cycle, 'guide.tips') ? program.guide.tips : []
+    const primarySourceUrl = cycle.sources[0]?.url ?? program.officialUrl
+
     const timeline: TimelineItem[] = [
       {
         label: 'Opens',
-        value: dateOrNot(cycle.dates.opens),
-        dateTime: cycle.dates.opens ?? undefined,
+        value: dateOrUnconfirmed(cycle, 'opens'),
+        dateTime: evidencedDateTime(cycle, 'opens'),
       },
       {
         label: 'Deadline',
@@ -210,13 +243,13 @@ const description = `${program.title} at ${program.provider} in ${program.countr
       },
       {
         label: 'Results',
-        value: dateOrNot(cycle.dates.resultsDate),
-        dateTime: cycle.dates.resultsDate ?? undefined,
+        value: dateOrUnconfirmed(cycle, 'resultsDate'),
+        dateTime: evidencedDateTime(cycle, 'resultsDate'),
       },
       {
         label: 'Study start',
-        value: dateOrNot(cycle.dates.studyStart),
-        dateTime: cycle.dates.studyStart ?? undefined,
+        value: dateOrUnconfirmed(cycle, 'studyStart'),
+        dateTime: evidencedDateTime(cycle, 'studyStart'),
       },
     ]
 
@@ -310,74 +343,106 @@ const description = `${program.title} at ${program.provider} in ${program.countr
           <div class="dossier__main">
             <GuideSection
               panelId={panelId}
-              steps={program.guide.steps}
-              documents={program.guide.documents}
+              steps={guideSteps}
+              documents={guideDocuments}
               timeline={timeline}
-              tips={program.guide.tips}
+              tips={guideTips}
             />
 
             <section class="detail-section" aria-labelledby={`${panelId}-funding-title`}>
               <h2 id={`${panelId}-funding-title`}>Funding</h2>
-              <FundingBadge type={program.funding.type} status={cycle.verification.funding} />
-              <dl class="detail-facts">
-                <div>
-                  <dt>Tuition</dt>
-                  <dd>
-                    {program.funding.tuitionCovered
-                      ? 'Tuition fees covered'
-                      : 'Tuition fees not covered'}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Monthly stipend</dt>
-                  <dd>{stipend ?? 'Not listed'}</dd>
-                </div>
-              </dl>
-              {program.funding.otherBenefits.length > 0 && (
+              {fundingSourced ? (
                 <>
-                  <h3>Other benefits</h3>
-                  <ul class="detail-list">
-                    {program.funding.otherBenefits.map((benefit) => <li>{benefit}</li>)}
-                  </ul>
+                  <FundingBadge
+                    type={program.funding.type}
+                    status={cycle.verification.funding}
+                  />
+                  <dl class="detail-facts">
+                    <div>
+                      <dt>Tuition</dt>
+                      <dd>
+                        {program.funding.tuitionCovered
+                          ? 'Tuition fees covered'
+                          : 'Tuition fees not covered'}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Monthly stipend</dt>
+                      <dd>{stipend ?? 'Not listed'}</dd>
+                    </div>
+                  </dl>
+                  {program.funding.otherBenefits.length > 0 && (
+                    <>
+                      <h3>Other benefits</h3>
+                      <ul class="detail-list">
+                        {program.funding.otherBenefits.map((benefit) => <li>{benefit}</li>)}
+                      </ul>
+                    </>
+                  )}
                 </>
+              ) : (
+                <p class="trust-caveat">
+                  Funding details for this cycle have not been confirmed from the official
+                  page.{' '}
+                  <a href={primarySourceUrl} rel="noopener noreferrer">
+                    Check the official page
+                  </a>
+                  .
+                </p>
               )}
             </section>
 
             <section class="detail-section" aria-labelledby={`${panelId}-eligibility-title`}>
               <h2 id={`${panelId}-eligibility-title`}>Eligibility</h2>
-              <VerificationBadge label="Eligibility" status={cycle.verification.eligibility} />
-              <dl class="detail-facts">
-                <div>
-                  <dt>Nationalities</dt>
-                  <dd>{nationalities}</dd>
-                </div>
-                <div>
-                  <dt>Maximum age</dt>
-                  <dd>{maxAge}</dd>
-                </div>
-                <div>
-                  <dt>Minimum degree</dt>
-                  <dd>{minDegree}</dd>
-                </div>
-                <div>
-                  <dt>Minimum marks</dt>
-                  <dd>{program.eligibility.minMarks ?? 'Not listed'}</dd>
-                </div>
-                <div>
-                  <dt>English test</dt>
-                  <dd>{program.eligibility.englishTest ?? 'Not listed'}</dd>
-                </div>
-                <div>
-                  <dt>Experience</dt>
-                  <dd>{experience}</dd>
-                </div>
-              </dl>
-              {program.eligibility.other.length > 0 && (
-                <ul class="detail-list">
-                  {program.eligibility.other.map((rule) => <li>{rule}</li>)}
-                </ul>
+              {eligibilitySourced ? (
+                <>
+                  <VerificationBadge
+                    label="Eligibility"
+                    status={cycle.verification.eligibility}
+                  />
+                  <dl class="detail-facts">
+                    <div>
+                      <dt>Nationalities</dt>
+                      <dd>{nationalities}</dd>
+                    </div>
+                    <div>
+                      <dt>Maximum age</dt>
+                      <dd>{maxAge}</dd>
+                    </div>
+                    <div>
+                      <dt>Minimum degree</dt>
+                      <dd>{minDegree}</dd>
+                    </div>
+                    <div>
+                      <dt>Minimum marks</dt>
+                      <dd>{program.eligibility.minMarks ?? 'Not listed'}</dd>
+                    </div>
+                    <div>
+                      <dt>English test</dt>
+                      <dd>{program.eligibility.englishTest ?? 'Not listed'}</dd>
+                    </div>
+                    <div>
+                      <dt>Experience</dt>
+                      <dd>{experience}</dd>
+                    </div>
+                  </dl>
+                  {program.eligibility.other.length > 0 && (
+                    <ul class="detail-list">
+                      {program.eligibility.other.map((rule) => <li>{rule}</li>)}
+                    </ul>
+                  )}
+                  <EligibilityNote />
+                </>
+              ) : (
+                <p class="trust-caveat">
+                  Eligibility details for this cycle have not been confirmed from the
+                  official page.{' '}
+                  <a href={primarySourceUrl} rel="noopener noreferrer">
+                    Check the official page
+                  </a>
+                  .
+                </p>
               )}
-              <EligibilityNote />
             </section>
 
             <section class="detail-section" aria-labelledby={`${panelId}-sources-title`}>

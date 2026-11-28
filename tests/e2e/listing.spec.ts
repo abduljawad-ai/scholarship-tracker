@@ -15,7 +15,18 @@ test('a closed cycle shows no Apply button', async ({ page }) => {
 test('a listing never claims the reader is likely eligible', async ({ page }) => {
   await page.goto('/listing/chevening-pakistan/')
   await expect(page.getByText(/likely eligible/i)).toHaveCount(0)
-  await expect(page.getByText(/Eligibility is decided by the provider/i)).toBeVisible()
+  await expect(
+    page.getByText(/Eligibility details for this cycle have not been confirmed/i),
+  ).toBeVisible()
+})
+
+test('unconfirmed funding is not rendered as an amount', async ({ page }) => {
+  await page.goto('/listing/chevening-pakistan/')
+  await expect(
+    page.getByText(/Funding details for this cycle have not been confirmed/i),
+  ).toBeVisible()
+  await expect(page.getByText(/£1,800/)).toHaveCount(0)
+  await expect(page.getByText(/Thesis grant/)).toHaveCount(0)
 })
 
 test('guide, documents, and sources render', async ({ page }) => {

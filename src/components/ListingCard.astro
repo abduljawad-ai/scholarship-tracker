@@ -35,7 +35,11 @@ const stampText = archived ? 'Archived' : verifiedDeadline ? 'Verified' : 'Provi
         {entry.fundedLevels.map((level) => (
           <li class="badge">{studyLevelLabel(level)}</li>
         ))}
-        <li class="badge badge--funding">{fundingLabel(entry.fundingType)}</li>
+        {entry.fundingVerified ? (
+          <li class="badge badge--funding">{fundingLabel(entry.fundingType)}</li>
+        ) : (
+          <li class="badge">Funding unconfirmed</li>
+        )}
         <li class="badge">{entry.country}</li>
       </ul>
 

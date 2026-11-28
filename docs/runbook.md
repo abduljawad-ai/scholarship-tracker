@@ -153,7 +153,7 @@ Expected results:
 - `npm test`: 26 files, 225 tests passed
 - `npm run eval`: 4 golden fixtures passed
 - `npm run build`: 14 pages, sitemap created
-- `npm run test:e2e`: 65 tests passed, including design checks
+- `npm run test:e2e`: 67 tests passed, including design checks
 - `npm run design:shots`: 27 screenshots at 360/768/1440, 1024 px overflow checks, and dark mode
 - Local preview: home, listing, archive, about, My Applications, sitemap, and robots
   returned 200; an unknown path returned 404; the demo-data banner was visible
@@ -219,6 +219,19 @@ Every entry in `pipeline/sources.json` has a `mode`:
 
 Use `monitor` rather than guessing a cycle from prose. A monitor source keeps its
 last curated cycle in `src/data/` and never invents a deadline.
+
+### Evidence gates the listing
+
+The listing publishes a funding or eligibility section only when the cycle has a
+`funding.*` or `eligibility.*` evidence quote. Without one it shows a neutral
+"not confirmed" panel and links to the official page. Cards show
+"Funding unconfirmed" instead of a funding label.
+
+The robot does not extract program-level funding or eligibility, so those
+sections stay hidden until a human adds a quote (Plan 3 curation). This is
+intentional: the site must never publish an unsourced fact. A curated entry
+survives later runs because `mergeEvidence` preserves fields the extraction does
+not produce.
 
 ### Review queue
 
