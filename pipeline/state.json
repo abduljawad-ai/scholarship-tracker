@@ -3,7 +3,7 @@
   "run": {
     "runId": "2026-11-28T07-57-06-228Z",
     "startedAt": "2026-11-28T07:57:06.228Z",
-    "status": "paused",
+    "status": "complete",
     "items": {
       "chevening::https://www.chevening.org/scholarship/pakistan/": {
         "state": "published",
@@ -20,11 +20,46 @@
         "updatedAt": "2026-11-28T07:57:06.228Z"
       },
       "daad::https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777": {
-        "state": "pending",
+        "state": "published",
         "attempts": 0,
-        "hash": null,
-        "lastError": "Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01kak7d02pf3ptjcaav76s83x9` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 5279, Requested 3944. Please try again in 9.1725s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing",
-        "updatedAt": "2026-11-28T07:57:06.228Z"
+        "hash": "b9efbd72b8a163e14442621f1c450c8853cde7c6f408dbef44e5ffdf75314692",
+        "lastError": null,
+        "updatedAt": "2026-11-28T08:05:25.886Z"
+      },
+      "erasmus::https://erasmus-plus.ec.europa.eu/opportunities/individuals/students/erasmus-mundus-joint-masters": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "1cc7dbe4a59c751cbf0e8d11772e22329e5948940ad4275412bb56d74d1407c3",
+        "lastError": null,
+        "updatedAt": "2026-11-28T08:05:25.886Z"
+      },
+      "hec::https://www.hec.gov.pk/english/scholarshipsgrants/NBS/Pages/default.aspx": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "5680a63c92f34a89e15f1f5085b2ec69b86d128f2215896c8849c7610a194930",
+        "lastError": null,
+        "updatedAt": "2026-11-28T08:05:25.886Z"
+      },
+      "sindh-endowment::https://seef.sindh.gov.pk/news/apply-online-seef-scholarship-program-2026": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "2e93615346185118f1abf1261f6c30723eeaa301ef1e285b9f7964ad766d9b25",
+        "lastError": null,
+        "updatedAt": "2026-11-28T08:05:25.886Z"
+      },
+      "sindh-matric::https://www.sef.org.pk/scholarship": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "ba862cdd5790fda62ffced1672abd3270c40106d858b4dc9a4be1dd59ff5a28e",
+        "lastError": null,
+        "updatedAt": "2026-11-28T08:05:25.886Z"
+      },
+      "turkiye::https://www.turkiyeburslari.gov.tr/announcements/turkiye-scholarships-2026-applications-121": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "4c5a138cb4a0689fe1a67a0f8c7204acb639f9fe7945b59670461097ad9b97e6",
+        "lastError": null,
+        "updatedAt": "2026-11-28T08:05:25.886Z"
       }
     }
   },
@@ -40,6 +75,42 @@
       "textLength": 7303,
       "lastFetchedAt": "2026-11-28T07:57:06.228Z",
       "failures": 0
+    },
+    "erasmus::https://erasmus-plus.ec.europa.eu/opportunities/individuals/students/erasmus-mundus-joint-masters": {
+      "hash": "1cc7dbe4a59c751cbf0e8d11772e22329e5948940ad4275412bb56d74d1407c3",
+      "textLength": 5635,
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0
+    },
+    "hec::https://www.hec.gov.pk/english/scholarshipsgrants/NBS/Pages/default.aspx": {
+      "hash": "5680a63c92f34a89e15f1f5085b2ec69b86d128f2215896c8849c7610a194930",
+      "textLength": 1352,
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0
+    },
+    "daad::https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777": {
+      "hash": "b9efbd72b8a163e14442621f1c450c8853cde7c6f408dbef44e5ffdf75314692",
+      "textLength": 11655,
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0
+    },
+    "sindh-endowment::https://seef.sindh.gov.pk/news/apply-online-seef-scholarship-program-2026": {
+      "hash": "2e93615346185118f1abf1261f6c30723eeaa301ef1e285b9f7964ad766d9b25",
+      "textLength": 2932,
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0
+    },
+    "sindh-matric::https://www.sef.org.pk/scholarship": {
+      "hash": "ba862cdd5790fda62ffced1672abd3270c40106d858b4dc9a4be1dd59ff5a28e",
+      "textLength": 3951,
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0
+    },
+    "turkiye::https://www.turkiyeburslari.gov.tr/announcements/turkiye-scholarships-2026-applications-121": {
+      "hash": "4c5a138cb4a0689fe1a67a0f8c7204acb639f9fe7945b59670461097ad9b97e6",
+      "textLength": 3132,
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0
     }
   },
   "sources": {
@@ -54,13 +125,300 @@
       "failures": 0,
       "retired": false,
       "nextEligibleAt": null
+    },
+    "erasmus": {
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0,
+      "retired": false,
+      "nextEligibleAt": null
+    },
+    "hec": {
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0,
+      "retired": false,
+      "nextEligibleAt": null
+    },
+    "daad": {
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0,
+      "retired": false,
+      "nextEligibleAt": null
+    },
+    "sindh-endowment": {
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0,
+      "retired": false,
+      "nextEligibleAt": null
+    },
+    "sindh-matric": {
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0,
+      "retired": false,
+      "nextEligibleAt": null
+    },
+    "turkiye": {
+      "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+      "failures": 0,
+      "retired": false,
+      "nextEligibleAt": null
     }
   },
-  "providers": {},
-  "discovery": {
-    "seenUrls": {},
-    "queries": [],
-    "hostHealth": {}
+  "providers": {
+    "groq": {
+      "callsByDay": {
+        "2026-11-28": 1
+      },
+      "cooldownUntil": null,
+      "lastError": null
+    }
   },
-  "lastSuccessfulRun": null
+  "discovery": {
+    "seenUrls": {
+      "https://www.daad.de/en/studying-in-germany/scholarships/daad-scholarships": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "e0c51608a73a7d6ccb66e677ee50a617a0c290b89bab357d3d5058727bddb930"
+      },
+      "https://www.daad.de/en/report-an-accessibility-issue/?barrierUrl=https://www.daad.de/en/studying-in-germany/scholarships": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "40545303b7a6e561da3b7eb6e8e774295d2f43e4a45894b1b7e6e28cb4f095a4"
+      },
+      "https://www.chevening.org/sids-chevening-scholarship": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "7a575383ccb25e4e7eb5336abd123241e5189e1695a79f6df9856cdf9fa297f5"
+      },
+      "https://www.chevening.org/asean-chevening-scholarship": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "00fb4158852e828459e7bc1942cf495e0dbd741d1ccc20b36760de00281781e8"
+      },
+      "https://www.daad.de/en/studying-in-germany/scholarships/information-for-scholarship-applicants": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "731915f935306f567462aa0ccaa721c84481fe70f6c19ff38732abf187f25c05"
+      },
+      "https://www.daad.de/en/studying-in-germany/scholarships": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "3f7b65cc29150da2829f2b46946ea8205c29f075fc01e2763d6e901d99b10bbb"
+      },
+      "https://www.daad.de/en/the-daad/support-for-scholarship-holders-with-a-disability-or-chronic-illness": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "267f054be12420c0ec3a17942770edd58f55660f60b77ada5a9a144e435a6f72"
+      },
+      "https://www.daad.de/en/studying-in-germany/scholarships/funding-options": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "a7bfc4b29ceada455e14c018290f76caa76b52bea8a9ac1a4f07db7407e748c1"
+      },
+      "https://www.turkiyeburslari.gov.tr/announcements/ytb-islamic-development-bank-isdb-joint-scholarship-program-2026-applicaiton-period-122": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "4a3a8d2d38c0fba627d7724d72e8a0dc20879934f3c3148c409b25d81433ece7"
+      },
+      "https://www.chevening.org/who-can-apply-for-a-chevening-sids-scholarship": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "ac9e3c9fca5dd0551f3e2f70e26b70bf06b58a2558f8f2f44d5738c37d4aef2e"
+      },
+      "https://www.chevening.org/who-can-apply-for-a-chevening-asean-scholarship": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "9b46800ab2e9433271352b467fed82c50c5bc9f41f3803b2c2733d1854af30a3"
+      },
+      "https://www.chevening.org/sids-chevening-scholarship/who-can-apply-for-a-chevening-sids-scholarship": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "ac9e3c9fca5dd0551f3e2f70e26b70bf06b58a2558f8f2f44d5738c37d4aef2e"
+      },
+      "https://www.chevening.org/asean-chevening-scholarship/who-can-apply-for-a-chevening-asean-scholarship": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "9b46800ab2e9433271352b467fed82c50c5bc9f41f3803b2c2733d1854af30a3"
+      },
+      "https://www.chevening.org/scholarships": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "447bedbaaed43a6d5b33f946170d6fe369825153989d2f7b6fb7c262a07c6fab"
+      },
+      "https://www.chevening.org/scholarships/why-study-in-the-uk": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "b08a3e7e5a45bd075ec35042314a05d5cd3ae2ed3f5e9078eefb992fe08d4c2d"
+      },
+      "https://www.chevening.org/scholarships/who-can-apply": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "eb8079a342e147f348823dd4b076d27a79786c5bddb306266fab339f13c21bca"
+      },
+      "https://www.chevening.org/scholarships/application-timeline": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "5353ecbe76bb58639e6121fe8fa70598b93f9f636a51f80b659044f327e57dd6"
+      },
+      "https://www.chevening.org/fellowships/find-a-programme": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "d4bc9c0d6dc6aa1448727f6e9a38b0e8cab2d473990960a023fe23200cb0b473"
+      },
+      "https://www.chevening.org/scholarships/who-can-apply/work-experience": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "15d7d9de6a701b4daaf6824359841088bb45cfe93ebc7c6696b35bf64ef2c778"
+      },
+      "https://www.daad.de/en/studying-in-germany/scholarships/music-art": {
+        "firstSeenAt": "2026-11-28T08:05:25.886Z",
+        "status": 200,
+        "contentHash": "5f89b7bb1c67e29424514220037cff7888359b27b107344b5da3c050acfe327b"
+      }
+    },
+    "queries": [
+      {
+        "id": "seed-1",
+        "text": "UK Foreign, Commonwealth and Development Office scholarship",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-2",
+        "text": "chevening.org scholarships",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-3",
+        "text": "United States Educational Foundation in Pakistan scholarship",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-4",
+        "text": "usefp.org scholarships",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-5",
+        "text": "German Academic Exchange Service (DAAD) scholarship",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-6",
+        "text": "daad.de scholarships",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-7",
+        "text": "European Commission (Erasmus Mundus) scholarship",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-8",
+        "text": "eacea.ec.europa.eu scholarships",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-9",
+        "text": "ec.europa.eu scholarships",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-10",
+        "text": "Higher Education Commission of Pakistan scholarship",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-11",
+        "text": "hec.gov.pk scholarships",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-12",
+        "text": "Government of Sindh scholarship",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-13",
+        "text": "sindh.gov.pk scholarships",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-14",
+        "text": "Türkiye Bursları scholarship",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      },
+      {
+        "id": "seed-15",
+        "text": "turkiyeburslari.gov.tr scholarships",
+        "round": 1,
+        "origin": "seed",
+        "createdAt": "2026-11-28T08:05:25.886Z"
+      }
+    ],
+    "hostHealth": {
+      "www.chevening.org": {
+        "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+        "failures": 0,
+        "nextEligibleAt": null
+      },
+      "www.usefp.org": {
+        "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+        "failures": 0,
+        "nextEligibleAt": null
+      },
+      "www.daad.de": {
+        "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+        "failures": 0,
+        "nextEligibleAt": null
+      },
+      "erasmus-plus.ec.europa.eu": {
+        "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+        "failures": 0,
+        "nextEligibleAt": null
+      },
+      "www.hec.gov.pk": {
+        "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+        "failures": 0,
+        "nextEligibleAt": null
+      },
+      "seef.sindh.gov.pk": {
+        "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+        "failures": 0,
+        "nextEligibleAt": null
+      },
+      "www.turkiyeburslari.gov.tr": {
+        "lastFetchedAt": "2026-11-28T08:05:25.886Z",
+        "failures": 0,
+        "nextEligibleAt": null
+      }
+    }
+  },
+  "lastSuccessfulRun": "2026-11-28T08:05:25.886Z"
 }

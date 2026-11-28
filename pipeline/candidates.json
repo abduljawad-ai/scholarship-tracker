@@ -1,4 +1,104 @@
 {
   "version": 1,
-  "candidates": []
+  "candidates": [
+    {
+      "candidateId": "chevening-sids-scholarship-2026",
+      "title": "Chevening SIDS Scholarship",
+      "provider": "Chevening",
+      "country": "United Kingdom",
+      "officialUrl": "https://www.chevening.org/sids-chevening-scholarship/",
+      "deadline": null,
+      "applyUrl": null,
+      "evidence": [
+        {
+          "field": "title",
+          "quote": "Chevening SIDS Scholarship",
+          "sourceUrl": "https://www.chevening.org/sids-chevening-scholarship/"
+        },
+        {
+          "field": "provider",
+          "quote": "Chevening SIDS Scholarship | Chevening",
+          "sourceUrl": "https://www.chevening.org/sids-chevening-scholarship/"
+        },
+        {
+          "field": "country",
+          "quote": "pursue a one-year master’s degree in the UK",
+          "sourceUrl": "https://www.chevening.org/sids-chevening-scholarship/"
+        }
+      ],
+      "sourceId": "chevening",
+      "discoveredAt": "2026-11-28T08:05:25.886Z",
+      "status": "pending-review",
+      "foundByQuery": "chevening.org scholarships",
+      "discoveredVia": "sitemap",
+      "firstSeenAt": "2026-11-28T08:05:25.886Z",
+      "discoveryScore": 55
+    },
+    {
+      "candidateId": "chevening-asean-scholarship-2026",
+      "title": "Chevening ASEAN Scholarship",
+      "provider": "Chevening",
+      "country": "United Kingdom",
+      "officialUrl": "https://www.chevening.org/asean-chevening-scholarship/",
+      "deadline": null,
+      "applyUrl": null,
+      "evidence": [
+        {
+          "field": "title",
+          "quote": "Chevening ASEAN Scholarship",
+          "sourceUrl": "https://www.chevening.org/asean-chevening-scholarship/"
+        },
+        {
+          "field": "provider",
+          "quote": "Chevening ASEAN Scholarship | Chevening",
+          "sourceUrl": "https://www.chevening.org/asean-chevening-scholarship/"
+        },
+        {
+          "field": "country",
+          "quote": "pursue a one-year master’s degree in the UK",
+          "sourceUrl": "https://www.chevening.org/asean-chevening-scholarship/"
+        }
+      ],
+      "sourceId": "chevening",
+      "discoveredAt": "2026-11-28T08:05:25.886Z",
+      "status": "pending-review",
+      "foundByQuery": "chevening.org scholarships",
+      "discoveredVia": "sitemap",
+      "firstSeenAt": "2026-11-28T08:05:25.886Z",
+      "discoveryScore": 55
+    },
+    {
+      "candidateId": "ytb-islamic-development-bank-isdb-joint-scholarship-program--2026",
+      "title": "YTB – Islamic Development Bank (ISDB) Joint Scholarship Program 2026",
+      "provider": "Presidency for Turks Abroad and Related Communities (YTB) and Islamic Development Bank (IsDB)",
+      "country": "Türkiye",
+      "officialUrl": "https://www.turkiyeburslari.gov.tr/announcements/ytb-islamic-development-bank-isdb-joint-scholarship-program-2026-applicaiton-period-122",
+      "deadline": null,
+      "applyUrl": null,
+      "evidence": [
+        {
+          "field": "title",
+          "quote": "YTB – Islamic Development Bank (ISDB) Joint Scholarship Program 2026",
+          "sourceUrl": "https://www.turkiyeburslari.gov.tr/announcements/ytb-islamic-development-bank-isdb-joint-scholarship-program-2026-applicaiton-period-122"
+        },
+        {
+          "field": "provider",
+          "quote": "co-funded by the Presidency for Turks Abroad and Related Communities (YTB) and the Islamic Development Bank (IsDB)",
+          "sourceUrl": "https://www.turkiyeburslari.gov.tr/announcements/ytb-islamic-development-bank-isdb-joint-scholarship-program-2026-applicaiton-period-122"
+        },
+        {
+          "field": "country",
+          "quote": "prestigious universities in Türkiye",
+          "sourceUrl": "https://www.turkiyeburslari.gov.tr/announcements/ytb-islamic-development-bank-isdb-joint-scholarship-program-2026-applicaiton-period-122"
+        }
+      ],
+      "sourceId": "turkiye",
+      "discoveredAt": "2026-11-28T08:05:25.886Z",
+      "status": "pending-review",
+      "foundByQuery": "UK Foreign, Commonwealth and Development Office scholarship",
+      "discoveredVia": "index",
+      "firstSeenAt": "2026-11-28T08:05:25.886Z",
+      "discoveryScore": 51
+    }
+  ]
 }

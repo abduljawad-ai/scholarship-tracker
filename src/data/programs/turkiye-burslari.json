@@ -1,9 +1,9 @@
 {
   "programId": "turkiye-burslari",
-  "title": "T\u00fcrkiye Burslar\u0131 (T\u00fcrkiye Scholarships)",
+  "title": "Türkiye Bursları (Türkiye Scholarships)",
   "provider": "Presidency for Turks Abroad and Related Communities (YTB)",
   "providerType": "gov",
-  "country": "T\u00fcrkiye",
+  "country": "Türkiye",
   "officialUrl": "https://www.turkiyeburslari.gov.tr/announcements/turkiye-scholarships-2026-applications-121",
   "fundedLevels": [
     "bachelor"
@@ -78,12 +78,12 @@
       "evidence": [
         {
           "field": "opens",
-          "quote": "Application Dates: 10 January \u2013 20 February 2026",
+          "quote": "Application Dates: 10 January – 20 February 2026",
           "sourceUrl": "https://www.turkiyeburslari.gov.tr/announcements/turkiye-scholarships-2026-applications-121"
         },
         {
           "field": "deadline",
-          "quote": "Application Dates: 10 January \u2013 20 February 2026",
+          "quote": "Application Dates: 10 January – 20 February 2026",
           "sourceUrl": "https://www.turkiyeburslari.gov.tr/announcements/turkiye-scholarships-2026-applications-121"
         }
       ],
@@ -91,5 +91,5 @@
     }
   ],
   "firstSeen": "2026-11-19T00:00:00.000Z",
-  "lastUpdated": "2026-11-28T03:45:34.520Z"
+  "lastUpdated": "2026-11-28T08:05:25.886Z"
 }

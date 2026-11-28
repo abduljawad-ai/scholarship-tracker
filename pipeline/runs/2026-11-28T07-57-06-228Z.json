@@ -1,39 +1,105 @@
 {
   "runId": "2026-11-28T07-57-06-228Z",
-  "startedAt": "2026-11-28T07:57:06.228Z",
-  "finishedAt": "2026-11-28T07:57:22.293Z",
-  "status": "paused",
+  "startedAt": "2026-11-28T08:05:25.886Z",
+  "finishedAt": "2026-11-28T08:08:04.651Z",
+  "status": "complete",
   "published": [
-    "chevening-pakistan",
-    "fulbright-pakistan"
+    "daad-epos",
+    "sindh-endowment-fund",
+    "sindh-matric-scholarship",
+    "turkiye-burslari"
   ],
-  "unchanged": [],
+  "unchanged": [
+    "erasmus-mundus-joint-masters",
+    "hec-need-based"
+  ],
   "skipped": [],
   "failed": [],
-  "paused": [
-    "daad::https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777"
-  ],
+  "paused": [],
   "unhealthy": [],
   "review": [],
-  "candidates": 0,
-  "checked": 3,
+  "candidates": 3,
+  "checked": 6,
   "sources": {
-    "chevening": {
+    "erasmus": {
       "fetched": 1,
-      "published": 1,
+      "published": 0,
       "failed": 0
     },
-    "fulbright": {
+    "hec": {
       "fetched": 1,
-      "published": 1,
+      "published": 0,
       "failed": 0
     },
     "daad": {
       "fetched": 1,
-      "published": 0,
+      "published": 1,
+      "failed": 0
+    },
+    "sindh-endowment": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "sindh-matric": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "turkiye": {
+      "fetched": 1,
+      "published": 1,
       "failed": 0
     }
   },
-  "providers": {},
-  "discovery": null
+  "providers": {
+    "groq": {
+      "calls": 1,
+      "errors": 0,
+      "cooldowns": 0
+    }
+  },
+  "discovery": {
+    "rounds": [
+      {
+        "round": 1,
+        "queries": [
+          "UK Foreign, Commonwealth and Development Office scholarship",
+          "chevening.org scholarships",
+          "United States Educational Foundation in Pakistan scholarship",
+          "usefp.org scholarships",
+          "German Academic Exchange Service (DAAD) scholarship",
+          "daad.de scholarships"
+        ],
+        "fetched": 20,
+        "accepted": 3,
+        "gaps": [],
+        "stopReason": "no-signal"
+      }
+    ],
+    "fetched": 20,
+    "accepted": 3,
+    "queries": [
+      "UK Foreign, Commonwealth and Development Office scholarship",
+      "chevening.org scholarships",
+      "United States Educational Foundation in Pakistan scholarship",
+      "usefp.org scholarships",
+      "German Academic Exchange Service (DAAD) scholarship",
+      "daad.de scholarships",
+      "European Commission (Erasmus Mundus) scholarship",
+      "eacea.ec.europa.eu scholarships",
+      "ec.europa.eu scholarships",
+      "Higher Education Commission of Pakistan scholarship",
+      "hec.gov.pk scholarships",
+      "Government of Sindh scholarship",
+      "sindh.gov.pk scholarships",
+      "Türkiye Bursları scholarship",
+      "turkiyeburslari.gov.tr scholarships"
+    ],
+    "stopReason": "no-signal",
+    "errors": [
+      "Discovery classification failed: Request too large for model `openai/gpt-oss-120b` in organization `org_01kak7d02pf3ptjcaav76s83x9` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Requested 8895, please reduce your message size and try again. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing",
+      "Gap analysis failed: Failed to validate JSON. Please adjust your prompt. See 'failed_generation' for more details."
+    ]
+  }
 }

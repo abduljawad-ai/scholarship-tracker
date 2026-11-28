@@ -1,7 +1,7 @@
 {
   "programId": "sindh-matric-scholarship",
   "title": "Sindh Matric Scholarship",
-  "provider": "Government of Sindh \u2014 School Education and Literacy Department",
+  "provider": "Government of Sindh — School Education and Literacy Department",
   "providerType": "gov",
   "country": "Pakistan",
   "officialUrl": "https://www.sef.org.pk/scholarship",
@@ -84,5 +84,5 @@
     }
   ],
   "firstSeen": "2026-11-21T00:00:00.000Z",
-  "lastUpdated": "2026-11-28T03:43:07.609Z"
+  "lastUpdated": "2026-11-28T08:05:25.886Z"
 }
