@@ -32,23 +32,38 @@ export function loadConfig(
   const groqKeys: ProviderKeyConfig[] = []
   const seenGroqKeys = new Set<string>()
 
-  // Check numbered keys GROQ_API_KEY_1..GROQ_API_KEY_16
-  for (let i = 1; i <= 16; i++) {
-    const key = env[`GROQ_API_KEY_${i}`]
-    if (key && !seenGroqKeys.has(key)) {
-      groqKeys.push({ label: `groq:${i}`, apiKey: key })
-      seenGroqKeys.add(key)
+  const addGroqKey = (rawKey: string, preferredLabel?: string) => {
+    const trimmed = rawKey.trim()
+    if (!trimmed || seenGroqKeys.has(trimmed)) return
+    seenGroqKeys.add(trimmed)
+    const label = preferredLabel ?? `groq:${groqKeys.length + 1}`
+    groqKeys.push({ label, apiKey: trimmed })
+  }
+
+  // 1. Delimited list of keys in GROQ_API_KEYS (supports comma, semicolon, or newline separated keys)
+  if (env.GROQ_API_KEYS) {
+    for (const part of env.GROQ_API_KEYS.split(/[\r\n,;]+/)) {
+      addGroqKey(part)
     }
   }
 
-  // Check legacy GROQ_API_KEY
-  if (env.GROQ_API_KEY && !seenGroqKeys.has(env.GROQ_API_KEY)) {
-    if (groqKeys.length === 0) {
-      groqKeys.push({ label: "groq:1", apiKey: env.GROQ_API_KEY })
-    } else {
-      groqKeys.unshift({ label: "groq:default", apiKey: env.GROQ_API_KEY })
+  // 2. Scan all numbered keys GROQ_API_KEY_<number> dynamically with no upper limit
+  const numberedGroqIndices: number[] = []
+  for (const varName of Object.keys(env)) {
+    const match = /^GROQ_API_KEY_(\d+)$/.exec(varName)
+    if (match) {
+      numberedGroqIndices.push(parseInt(match[1]!, 10))
     }
-    seenGroqKeys.add(env.GROQ_API_KEY)
+  }
+  numberedGroqIndices.sort((a, b) => a - b)
+  for (const idx of numberedGroqIndices) {
+    const val = env[`GROQ_API_KEY_${idx}`]
+    if (val) addGroqKey(val, `groq:${idx}`)
+  }
+
+  // 3. Legacy single GROQ_API_KEY
+  if (env.GROQ_API_KEY) {
+    addGroqKey(env.GROQ_API_KEY, groqKeys.length === 0 ? "groq:1" : "groq:default")
   }
 
   if (groqKeys.length > 0) {
