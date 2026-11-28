@@ -46,6 +46,7 @@ function extractionFixture(): Extraction {
     cycles: [
       {
         label: '2027/28 intake',
+        status: null,
         dates: {
           opens: '2027-08-01',
           deadline: DEADLINE,
@@ -142,6 +143,7 @@ function source(overrides: Partial<SourceConfig> = {}): SourceConfig {
     indexUrls: [],
     discovery: false,
     archived: false,
+    mode: 'extract',
     ...overrides,
   }
 }
@@ -354,6 +356,35 @@ test('an unchanged run skips extraction and refreshes lastSuccessfulRun', async 
   expect(result.summary.status).toBe('complete')
   expect(result.summary.unchanged).toEqual(['example-program'])
   expect(readRunStatus(f)).toEqual({ mode: 'live', lastSuccessfulRun: LATER.toISOString() })
+})
+
+test('a monitor source records a change for review without extracting', async () => {
+  const f = fixture([source({ mode: 'monitor' })])
+  const store = createMemoryStore()
+  const first = fakeRouter()
+
+  const initial = await run(f, { store, router: first.router })
+
+  expect(first.complete).not.toHaveBeenCalled()
+  expect(initial.summary.status).toBe('complete')
+  expect(initial.summary.review).toEqual([])
+  expect(initial.summary.unchanged).toEqual(['example-program'])
+  expect(readProgram(f).cycles[0]!.dates.deadline).toBe('2027-11-03')
+
+  const changed = PAGE_HTML.replace('Example Scholarship 2027/28', 'Example Scholarship 2028/29')
+  const second = fakeRouter()
+  const result = await run(f, {
+    store,
+    router: second.router,
+    fetchImpl: fakeFetch(changed),
+    now: LATER,
+  })
+
+  expect(second.complete).not.toHaveBeenCalled()
+  expect(result.summary.status).toBe('complete')
+  expect(result.summary.review).toEqual([PAGE_URL])
+  expect(result.report.review[0]).toMatchObject({ sourceId: 'example', url: PAGE_URL })
+  expect(readProgram(f).cycles[0]!.dates.deadline).toBe('2027-11-03')
 })
 
 test('a failed item does not stop a good source but blocks live mode', async () => {
@@ -641,13 +672,16 @@ test('parseArgs reads defaults and flags and rejects unknown options', () => {
     sourceId: undefined,
     dryRun: false,
     live: false,
+    discovery: true,
   })
   expect(parseArgs(['--max-items', '5', '--source', 'chevening', '--dry-run', '--live'])).toEqual({
     maxItems: 5,
     sourceId: 'chevening',
     dryRun: true,
     live: true,
+    discovery: true,
   })
+  expect(parseArgs(['--no-discovery']).discovery).toBe(false)
   expect(() => parseArgs(['--unknown'])).toThrow()
   expect(() => parseArgs(['--max-items', '0'])).toThrow(/positive integer/)
 })

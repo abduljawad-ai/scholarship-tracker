@@ -28,6 +28,19 @@ test('loads a valid registry', () => {
   expect(sources[0].sourceId).toBe('chevening')
 })
 
+test('defaults mode to extract and accepts monitor', () => {
+  const monitor = { ...VALID_SOURCE, sourceId: 'monitor', mode: 'monitor' }
+  const sources = loadSources(registryFile([VALID_SOURCE, monitor]))
+
+  expect(sources[0]!.mode).toBe('extract')
+  expect(sources[1]!.mode).toBe('monitor')
+})
+
+test('rejects an unknown mode', () => {
+  const file = registryFile([{ ...VALID_SOURCE, mode: 'publish' }])
+  expect(() => loadSources(file)).toThrow()
+})
+
 test('rejects a duplicate sourceId', () => {
   const file = registryFile([VALID_SOURCE, VALID_SOURCE])
   expect(() => loadSources(file)).toThrow(/duplicate/i)

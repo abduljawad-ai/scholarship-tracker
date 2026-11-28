@@ -17,6 +17,7 @@ const SourceConfigSchema = z
     indexUrls: z.array(HttpsUrl),
     discovery: z.boolean(),
     archived: z.boolean(),
+    mode: z.enum(["extract", "monitor"]).default("extract"),
   })
   .strict()
 

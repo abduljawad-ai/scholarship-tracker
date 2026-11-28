@@ -4,12 +4,20 @@
   "provider": "UK Foreign, Commonwealth and Development Office",
   "providerType": "gov",
   "country": "United Kingdom",
-  "officialUrl": "https://www.chevening.org/",
-  "fundedLevels": ["master"],
-  "applicantStages": ["bachelor"],
-  "fields": ["All subjects"],
+  "officialUrl": "https://www.chevening.org/scholarship/pakistan/",
+  "fundedLevels": [
+    "master"
+  ],
+  "applicantStages": [
+    "bachelor"
+  ],
+  "fields": [
+    "All subjects"
+  ],
   "eligibility": {
-    "nationalities": ["PK"],
+    "nationalities": [
+      "PK"
+    ],
     "ageMax": null,
     "minDegree": "bachelor",
     "minMarks": "Upper second-class degree or equivalent (typically 65%+)",
@@ -33,77 +41,50 @@
     ]
   },
   "guide": {
-    "steps": [
-      "Create a Chevening account and register your interest",
-      "Choose up to four master's courses in the UK",
-      "Complete the online application form with the long-answer questions",
-      "Submit two reference letters",
-      "Attend an interview if shortlisted"
-    ],
-    "documents": [
-      "Passport or national ID copy",
-      "Degree certificates and transcripts",
-      "Two references",
-      "English language test result",
-      "Work experience evidence"
-    ],
-    "tips": [
-      "Start early — the application has several long-form questions",
-      "Align your course choices with your post-study career plan",
-      "Give referees plenty of notice before the deadline"
-    ],
-    "timeline": [
-      "Applications open: August 2027",
-      "Application deadline: November 2027",
-      "Interviews: February to April 2028",
-      "Results: July 2028",
-      "Studies begin: September 2028"
-    ]
+    "steps": [],
+    "documents": [],
+    "tips": [],
+    "timeline": []
   },
   "cycles": [
     {
       "cycleId": "2027",
-      "label": "2027/28 intake",
+      "label": "2027-2028",
       "dates": {
-        "opens": "2027-08-01",
-        "deadline": "2027-11-03",
-        "resultsDate": "2028-07-15",
-        "studyStart": "2028-09-18"
+        "opens": null,
+        "deadline": null,
+        "resultsDate": null,
+        "studyStart": null
       },
-      "status": "upcoming",
+      "status": "closed",
       "apply": {
-        "url": "https://www.chevening.org/scholarships/apply/",
-        "portalName": "Chevening online application portal",
-        "fee": "No application fee"
+        "url": null,
+        "portalName": null,
+        "fee": null
       },
       "verification": {
-        "deadline": "verified",
-        "applyUrl": "verified",
-        "funding": "verified",
-        "eligibility": "verified"
+        "deadline": "unverified",
+        "applyUrl": "unverified",
+        "funding": "unverified",
+        "eligibility": "unverified"
       },
       "sources": [
         {
-          "url": "https://www.chevening.org/scholarships/",
+          "url": "https://www.chevening.org/scholarship/pakistan/",
           "type": "official-page",
-          "lastVerified": "2026-11-20"
-        },
-        {
-          "url": "https://www.chevening.org/scholarships/apply/",
-          "type": "official-page",
-          "lastVerified": "2026-11-20"
+          "lastVerified": "2026-11-28"
         }
       ],
       "evidence": [
         {
-          "field": "deadline",
-          "quote": "Sample (demo data): the 2027/28 Chevening deadline is shown as 3 November 2027.",
-          "sourceUrl": "https://www.chevening.org/scholarships/"
+          "field": "status",
+          "quote": "Applications for 2027-2028 Chevening Scholarships are now closed.",
+          "sourceUrl": "https://www.chevening.org/scholarship/pakistan/"
         }
       ],
-      "confidence": 0.95
+      "confidence": 0
     }
   ],
   "firstSeen": "2026-11-18T00:00:00.000Z",
-  "lastUpdated": "2026-11-27T00:00:00.000Z"
+  "lastUpdated": "2026-11-28T03:36:12.478Z"
 }

@@ -79,9 +79,21 @@ test('a day embedded in a larger number does not match', () => {
   expect(quoteSupportsDate('13 November 2027', '2027-11-03')).toBe(false)
 })
 
-test('isPlausibleDeadline keeps deadlines within three years', () => {
+test('a date range with one year supports both ends', () => {
+  const quote = 'Application Dates: 10 January – 20 February 2026'
+  expect(quoteSupportsDate(quote, '2026-01-10')).toBe(true)
+  expect(quoteSupportsDate(quote, '2026-02-20')).toBe(true)
+  expect(quoteSupportsDate(quote, '2027-01-10')).toBe(false)
+})
+
+test('a range year that does not match is rejected', () => {
+  expect(quoteSupportsDate('10 January to 20 February 2027', '2026-01-10')).toBe(false)
+})
+
+test('isPlausibleDeadline keeps closed cycles and future deadlines', () => {
   expect(isPlausibleDeadline('2027-11-03', '2026-11-27')).toBe(true)
-  expect(isPlausibleDeadline('2026-11-26', '2026-11-27')).toBe(false)
+  expect(isPlausibleDeadline('2026-04-01', '2026-11-27')).toBe(true)
+  expect(isPlausibleDeadline('2023-01-01', '2026-11-27')).toBe(false)
   expect(isPlausibleDeadline('2030-01-01', '2026-11-27')).toBe(false)
 })
 

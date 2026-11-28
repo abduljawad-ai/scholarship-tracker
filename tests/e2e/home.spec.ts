@@ -35,8 +35,8 @@ test('current level maps the study-level filter to the next stage', async ({ pag
   await expect(page.getByLabel(/study level/i)).toHaveValue('intermediate')
 })
 
-test('unverified deadlines are never rendered as dates', async ({ page }) => {
-  await page.goto('/')
-  const fulbright = page.getByTestId('card-fulbright-pakistan')
-  await expect(fulbright).toContainText(/not confirmed/i)
+test('an unverified deadline is never rendered as a date', async ({ page }) => {
+  await page.goto('/listing/fulbright-pakistan/')
+  await expect(page.getByText(/Deadline not confirmed/i)).toBeVisible()
+  await expect(page.locator('time[datetime="2026-04-01"]')).toHaveCount(0)
 })

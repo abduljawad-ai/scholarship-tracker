@@ -4,8 +4,8 @@ interface Props {
 }
 
 const {
-  note = 'Likely eligible — based on level, nationality and age. Check the marks and English requirements below.',
+  note = 'Eligibility is decided by the provider. Check your level, nationality, age, marks and English test against the requirements above.',
 } = Astro.props
 ---
 
-<p class="eligible-note">{note}</p>
+<p class="eligibility-caveat">{note}</p>

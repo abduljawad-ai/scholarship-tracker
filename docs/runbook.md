@@ -123,6 +123,7 @@ Run these from a clean checkout:
 npm ci
 npm run typecheck
 npm test
+npm run eval
 npm run build
 npm run test:e2e
 npm run design:shots
@@ -132,9 +133,10 @@ Expected results:
 
 - [ ] `npm run typecheck` — 0 errors, 0 warnings
 - [ ] `npm test` — all unit tests pass
+- [ ] `npm run eval` — 4 golden fixtures pass
 - [ ] `npm run build` — succeeds, writes `dist/`, creates `sitemap-index.xml`
 - [ ] `npm run test:e2e` — all Playwright tests pass on the dedicated port 4322
-- [ ] `npm run design:shots` — 12 screenshots at 360/768/1440 plus 1024 px overflow checks
+- [ ] `npm run design:shots` — 27 screenshots at 360/768/1440, 1024 px overflow checks, and dark mode
 - [ ] `npm run preview -- --port 4321` — `/` shows the demo-data banner and cards
 - [ ] `/listing/chevening-pakistan/` — sources, last-verified dates, and Apply rules render
 - [ ] `/archive/` — only closed cycles, `Closed` badge, no Apply buttons
@@ -145,13 +147,14 @@ Expected results:
 - [ ] 375 px wide — no horizontal scroll; axe reports no serious or critical issues
 - [ ] Browser console — no errors
 
-### Local check recorded on 2026-11-27
+### Local check recorded on 2026-11-28
 
-- `npm run typecheck`: 0 errors, 0 warnings
-- `npm test`: 55 tests passed
+- `npm run typecheck`: 0 errors, 0 warnings (99 files)
+- `npm test`: 26 files, 225 tests passed
+- `npm run eval`: 4 golden fixtures passed
 - `npm run build`: 14 pages, sitemap created
-- `npm run test:e2e`: 53 tests passed, including 16 design checks
-- `npm run design:shots`: 12 screenshots at 360/768/1440 plus 1024 px overflow checks
+- `npm run test:e2e`: 65 tests passed, including design checks
+- `npm run design:shots`: 27 screenshots at 360/768/1440, 1024 px overflow checks, and dark mode
 - Local preview: home, listing, archive, about, My Applications, sitemap, and robots
   returned 200; an unknown path returned 404; the demo-data banner was visible
 - Cloudflare deployment: **not performed here** — the owner completes the one-time
@@ -197,12 +200,38 @@ publish data.
    `CLOUDFLARE_MODEL`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`. See
    `.env.example`. With no secrets the run exits 0 and changes nothing.
 2. Set **Settings → Actions → General → Workflow permissions → Read and write**.
-   Without this the robot cannot push its data commit.
+   The workflow requests `contents: write`; a repository or organization policy
+   that caps workflow permissions at read-only will still block the data commit.
 3. Run the workflow once by hand and confirm it commits. Only then is the site
    allowed to leave demo mode.
 
 GitHub emails the repository owner when a scheduled workflow fails, so no extra
 alert service is needed.
+
+### Source modes
+
+Every entry in `pipeline/sources.json` has a `mode`:
+
+| Mode | Use it for | What the robot does |
+| --- | --- | --- |
+| `extract` | A page with a machine-readable cycle (dates, apply link, guide) | Reads the page, verifies the facts with a second model, and publishes to `src/data/programs/` |
+| `monitor` | An official page with no reliable cycle structure | Fetches and hashes the page only. A change adds a **review needed** item; nothing is published |
+
+Use `monitor` rather than guessing a cycle from prose. A monitor source keeps its
+last curated cycle in `src/data/` and never invents a deadline.
+
+### Review queue
+
+Monitor sources and suspicious changes are not published. They appear in the run
+report (`pipeline/runs/<runId>.json` under `review`, and the `### Review needed`
+section of `pipeline/runs/<runId>.md`). To clear an item:
+
+1. Open the official page and confirm what changed.
+2. Update the program JSON and `lastVerified` date by hand, or change the source
+   to `extract` once the page has a stable cycle structure.
+3. Re-run the pipeline. The new hash is recorded, so the item does not repeat.
+
+Review items are a signal, not an error: a clean run can still need review.
 
 ### State values
 
@@ -240,6 +269,31 @@ New scholarships are never published automatically. Discovery writes
 each candidate, adds it to `pipeline/sources.json` and `src/data/programs/`,
 and only then does it appear on the site.
 
+Discovery runs after the checks, with hard budgets: 3 rounds, 6 queries per
+round, 40 page fetches, 10 accepted candidates per run, and a 35-minute soft
+stop. It only writes `pipeline/candidates.json` and `pipeline/state.json`; it
+never touches `src/data/programs/`.
+
+To run maintenance without discovery (for example after editing a source):
+
+```bash
+npm run pipeline -- --no-discovery
+```
+
+### Annual source URL curation
+
+Official program pages move with each intake (for example a `.../2026` news
+page). Before an intake opens:
+
+1. Open the provider's scholarship index and find the current program page.
+2. Update `pageUrls` for that source in `pipeline/sources.json`. Keep
+   `sourceId` and `programId` stable; they are the identity used by saved
+   tracker entries.
+3. Keep the old cycle in the program JSON. Add the new cycle; never overwrite
+   history.
+4. Run `npm run pipeline -- --source <sourceId> --no-discovery` and confirm the
+   new cycle, its evidence, and its verification labels.
+
 ### When the site leaves demo mode
 
 `src/data/run-status.json` flips to `live` only when a real run checked at
@@ -261,3 +315,4 @@ run. Until then the banner stays. Never set `mode: "live"` by hand.
 | Workflow runs but changes nothing | No provider secrets are set, so the pipeline exits 0 by design. Add at least one key. |
 | A run is stuck on `running` | Re-run the workflow; it resumes from the checkpoint. Do not delete `pipeline/state.json`. |
 | The same page is checked every day | Its content hash changed, or extraction failed validation. Read `pipeline/runs/` for the reason. |
+| A monitor source reports “Review needed” | The official page changed. Confirm the new cycle by hand, update the program JSON, then re-run. If the page keeps changing (news banners, cookie notices), move the source to `extract` once its cycle structure is stable. |

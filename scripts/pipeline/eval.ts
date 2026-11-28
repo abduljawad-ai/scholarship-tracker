@@ -118,7 +118,9 @@ function checkExtract(entry: EvalCase, root: string, sources: SourceConfig[]): s
   }
 
   const merged = mergeExtraction(
-    parseProgram(JSON.parse(readFileSync(programPath, "utf8"))),
+    // The eval checks the fixture's effect, not the live published cycles.
+    // Start from the program's identity and guide, with no cycles.
+    { ...parseProgram(JSON.parse(readFileSync(programPath, "utf8"))), cycles: [] },
     extraction,
     source,
     {

@@ -6,9 +6,16 @@ test('unverified apply link means no Apply button', async ({ page }) => {
   await expect(page.getByText(/check official page/i).first()).toBeVisible()
 })
 
-test('verified apply link shows the Apply button', async ({ page }) => {
+test('a closed cycle shows no Apply button', async ({ page }) => {
   await page.goto('/listing/chevening-pakistan/')
-  await expect(page.getByRole('link', { name: /^Apply/i })).toHaveAttribute('href', /^https:/)
+  await expect(page.getByRole('link', { name: /^Apply/i })).toHaveCount(0)
+  await expect(page.getByText(/Applications are closed for this cycle/i)).toBeVisible()
+})
+
+test('a listing never claims the reader is likely eligible', async ({ page }) => {
+  await page.goto('/listing/chevening-pakistan/')
+  await expect(page.getByText(/likely eligible/i)).toHaveCount(0)
+  await expect(page.getByText(/Eligibility is decided by the provider/i)).toBeVisible()
 })
 
 test('guide, documents, and sources render', async ({ page }) => {
@@ -33,8 +40,10 @@ test('archived-only program page shows a closed cycle and no Apply button', asyn
 
 test('share link is hydrated in every cycle panel', async ({ page }) => {
   await page.goto('/listing/erasmus-mundus-joint-masters/')
+  const panels = page.locator('[data-cycle-panel]')
+  const panelCount = await panels.count()
   const links = page.locator('[data-share-link]')
-  await expect(links).toHaveCount(2)
+  await expect(links).toHaveCount(panelCount)
   const hrefs = await links.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href') ?? ''))
   for (const href of hrefs) {
     expect(href).toMatch(/^https:\/\/wa\.me\/\?text=/)

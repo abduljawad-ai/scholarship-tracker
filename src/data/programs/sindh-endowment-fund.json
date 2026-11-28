@@ -1,15 +1,25 @@
 {
   "programId": "sindh-endowment-fund",
   "title": "Sindh Endowment Fund Scholarship",
-  "provider": "Government of Sindh — Higher Education Department",
+  "provider": "Government of Sindh \u2014 Higher Education Department",
   "providerType": "gov",
   "country": "Pakistan",
-  "officialUrl": "https://www.sindh.gov.pk/",
-  "fundedLevels": ["bachelor", "master"],
-  "applicantStages": ["intermediate", "bachelor"],
-  "fields": ["All fields at approved institutions in Sindh"],
+  "officialUrl": "https://seef.sindh.gov.pk/news/apply-online-seef-scholarship-program-2026",
+  "fundedLevels": [
+    "bachelor",
+    "master"
+  ],
+  "applicantStages": [
+    "intermediate",
+    "bachelor"
+  ],
+  "fields": [
+    "All fields at approved institutions in Sindh"
+  ],
   "eligibility": {
-    "nationalities": ["PK"],
+    "nationalities": [
+      "PK"
+    ],
     "ageMax": 35,
     "minDegree": "intermediate",
     "minMarks": "Minimum 60% marks in the last qualifying examination",
@@ -31,71 +41,50 @@
     ]
   },
   "guide": {
-    "steps": [
-      "Download the endowment fund application form from the department portal",
-      "Complete the form and get it endorsed by your institution",
-      "Attach domicile, academic records and the fee challan",
-      "Submit the form before the announced deadline",
-      "Track the merit list published by the department"
-    ],
-    "documents": [
-      "CNIC or B-Form",
-      "Domicile certificate",
-      "Intermediate or previous degree transcripts",
-      "Institution admission or enrolment letter",
-      "Income affidavit"
-    ],
-    "tips": [
-      "Apply through your institution — direct applications are not accepted",
-      "Keep photocopies of everything you submit",
-      "Check the portal regularly for the merit list"
-    ],
-    "timeline": [
-      "Applications open: March 2027",
-      "Deadline: May 2027",
-      "Merit list: September 2027",
-      "Award disbursement: October 2027"
-    ]
+    "steps": [],
+    "documents": [],
+    "tips": [],
+    "timeline": []
   },
   "cycles": [
     {
-      "cycleId": "2027",
-      "label": "2027 intake",
+      "cycleId": "2026",
+      "label": "2026",
       "dates": {
-        "opens": "2027-03-01",
-        "deadline": "2027-05-31",
-        "resultsDate": "2027-09-30",
-        "studyStart": "2027-10-01"
+        "opens": null,
+        "deadline": "2026-08-31",
+        "resultsDate": null,
+        "studyStart": null
       },
-      "status": "upcoming",
+      "status": "closed",
       "apply": {
-        "url": "https://www.sindh.gov.pk/",
-        "portalName": "Sindh Endowment Fund application form",
-        "fee": "No application fee"
+        "url": null,
+        "portalName": null,
+        "fee": null
       },
       "verification": {
         "deadline": "provisional",
         "applyUrl": "unverified",
-        "funding": "provisional",
-        "eligibility": "provisional"
+        "funding": "unverified",
+        "eligibility": "unverified"
       },
       "sources": [
         {
-          "url": "https://www.sindh.gov.pk/",
+          "url": "https://seef.sindh.gov.pk/news/apply-online-seef-scholarship-program-2026",
           "type": "official-page",
-          "lastVerified": "2026-11-25"
+          "lastVerified": "2026-11-28"
         }
       ],
       "evidence": [
         {
-          "field": "applyUrl",
-          "quote": "Sample (demo data): the application link is listed but has not been opened or re-confirmed, so it is marked unverified.",
-          "sourceUrl": "https://www.sindh.gov.pk/"
+          "field": "deadline",
+          "quote": "The last date to apply for the Sindh Education Endowment Fund Scholarship is 31st August 2026.",
+          "sourceUrl": "https://seef.sindh.gov.pk/news/apply-online-seef-scholarship-program-2026"
         }
       ],
-      "confidence": 0.6
+      "confidence": 0
     }
   ],
   "firstSeen": "2026-11-20T00:00:00.000Z",
-  "lastUpdated": "2026-11-27T00:00:00.000Z"
+  "lastUpdated": "2026-11-28T03:42:47.519Z"
 }

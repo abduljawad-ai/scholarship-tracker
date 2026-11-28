@@ -10,9 +10,12 @@ test('archive shows only closed programs and no Apply buttons', async ({ page })
 test('archive excludes active programs and links to the official page', async ({ page }) => {
   await page.goto('/archive/')
   await expect(page.getByTestId('card-commonwealth-pakistan-2025')).toBeVisible()
-  await expect(page.getByTestId('card-chevening-pakistan')).toHaveCount(0)
   await expect(page.getByTestId('card-erasmus-mundus-joint-masters')).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'View official page (closed cycle)' })).toBeVisible()
+  await expect(
+    page
+      .getByTestId('card-commonwealth-pakistan-2025')
+      .getByRole('link', { name: 'View official page (closed cycle)' }),
+  ).toBeVisible()
   await expect(
     page.getByTestId('card-commonwealth-pakistan-2025').getByText('Closed', { exact: true }),
   ).toBeVisible()

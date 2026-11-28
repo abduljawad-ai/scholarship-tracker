@@ -8,12 +8,19 @@ Do not use outside knowledge. Never guess or infer a value.
 - If the page does not state a value, return `null`. Do not fill gaps from memory.
 - Dates are ISO `YYYY-MM-DD`. If the page gives only a month or a year, return `null`.
 - One cycle per intake. Use the intake label exactly as the page writes it.
+  A year or year range attached to the application deadlines (for example
+  "application deadlines 2027/2028") is the intake label. If the page does
+  not name the intake, return `null` for `label`.
+- `status` is `open`, `upcoming`, or `closed` only when the page says so in
+  words (for example "Applications are closed"). Quote that sentence as
+  `status` evidence. If the page gives dates, return `null` for `status` and
+  let the dates decide. Never infer a status from a season or a guess.
 - `pageKind` is `program` for one scholarship page, `index` for a list of links,
   `unknown` for anything else (news, about, contact).
 - Every non-null date and the apply URL needs an evidence entry whose `field`
   matches and whose `quote` is an exact sentence from the page.
 - Evidence fields: `opens`, `deadline`, `resultsDate`, `studyStart`, `applyUrl`,
-  `guide.steps`, `guide.documents`, `guide.tips`, `guide.timeline`.
+  `status`, `guide.steps`, `guide.documents`, `guide.tips`, `guide.timeline`.
 - If a guide list is non-empty, include at least one evidence entry with that
   guide field. Quote the sentence the item comes from.
 - `sourceUrl` is the page URL exactly as given below.
@@ -29,6 +36,7 @@ Do not use outside knowledge. Never guess or infer a value.
   "cycles": [
     {
       "label": "2027/28 intake",
+      "status": null,
       "dates": {
         "opens": "2027-08-01",
         "deadline": "2027-11-03",

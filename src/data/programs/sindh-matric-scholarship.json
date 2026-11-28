@@ -1,15 +1,24 @@
 {
   "programId": "sindh-matric-scholarship",
   "title": "Sindh Matric Scholarship",
-  "provider": "Government of Sindh — School Education and Literacy Department",
+  "provider": "Government of Sindh \u2014 School Education and Literacy Department",
   "providerType": "gov",
   "country": "Pakistan",
-  "officialUrl": "https://www.sindh.gov.pk/",
-  "fundedLevels": ["matric"],
-  "applicantStages": ["matric"],
-  "fields": ["Science", "General"],
+  "officialUrl": "https://www.sef.org.pk/scholarship",
+  "fundedLevels": [
+    "matric"
+  ],
+  "applicantStages": [
+    "matric"
+  ],
+  "fields": [
+    "Science",
+    "General"
+  ],
   "eligibility": {
-    "nationalities": ["PK"],
+    "nationalities": [
+      "PK"
+    ],
     "ageMax": 19,
     "minDegree": null,
     "minMarks": "Minimum 60% marks in the previous annual examination",
@@ -30,71 +39,50 @@
     ]
   },
   "guide": {
-    "steps": [
-      "Collect the scholarship form from your school's headmaster",
-      "Fill in the student and guardian details",
-      "Attach the previous annual examination result and B-Form copy",
-      "Submit the form to the school before the deadline",
-      "Await the district education office's approval list"
-    ],
-    "documents": [
-      "B-Form or CNIC",
-      "Previous annual examination result card",
-      "School enrolment or attendance record",
-      "Domicile certificate",
-      "Guardian's income declaration"
-    ],
-    "tips": [
-      "Apply through your school — the headmaster forwards the forms",
-      "Attendance records must be stamped by the school",
-      "Keep the original result card safe; only copies are submitted"
-    ],
-    "timeline": [
-      "Forms available: April 2027",
-      "Deadline at schools: June 2027",
-      "District approval list: September 2027",
-      "Stipend starts: October 2027"
-    ]
+    "steps": [],
+    "documents": [],
+    "tips": [],
+    "timeline": []
   },
   "cycles": [
     {
-      "cycleId": "2027",
-      "label": "2027/28 session",
+      "cycleId": "2026",
+      "label": "2026 application cycle",
       "dates": {
-        "opens": "2027-04-01",
-        "deadline": "2027-06-30",
-        "resultsDate": "2027-09-15",
-        "studyStart": "2027-10-01"
+        "opens": null,
+        "deadline": "2026-02-25",
+        "resultsDate": null,
+        "studyStart": null
       },
-      "status": "upcoming",
+      "status": "closed",
       "apply": {
         "url": null,
-        "portalName": "Through the school headmaster or district education office",
-        "fee": "No application fee"
+        "portalName": null,
+        "fee": null
       },
       "verification": {
         "deadline": "provisional",
         "applyUrl": "unverified",
-        "funding": "provisional",
-        "eligibility": "provisional"
+        "funding": "unverified",
+        "eligibility": "unverified"
       },
       "sources": [
         {
-          "url": "https://www.sindh.gov.pk/",
+          "url": "https://www.sef.org.pk/scholarship",
           "type": "official-page",
-          "lastVerified": "2026-11-26"
+          "lastVerified": "2026-11-28"
         }
       ],
       "evidence": [
         {
-          "field": "fundedLevels",
-          "quote": "Sample (demo data): the programme is listed as a matric-level stipend for students in Sindh.",
-          "sourceUrl": "https://www.sindh.gov.pk/"
+          "field": "deadline",
+          "quote": "Last Date to Apply: 25 February 2026",
+          "sourceUrl": "https://www.sef.org.pk/scholarship"
         }
       ],
-      "confidence": 0.6
+      "confidence": 0
     }
   ],
   "firstSeen": "2026-11-21T00:00:00.000Z",
-  "lastUpdated": "2026-11-26T00:00:00.000Z"
+  "lastUpdated": "2026-11-28T03:43:07.609Z"
 }

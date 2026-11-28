@@ -24,6 +24,7 @@ const SOURCE: SourceConfig = {
   indexUrls: [],
   discovery: false,
   archived: false,
+  mode: 'extract',
 }
 
 function baseProgram(): Program {
@@ -89,6 +90,7 @@ function baseProgram(): Program {
 function baseExtraction(overrides: Partial<Extraction['cycles'][number]> = {}): Extraction {
   const cycle = {
     label: '2027/28 intake',
+    status: null,
     dates: {
       opens: '2027-08-01',
       deadline: '2027-12-01',
@@ -120,6 +122,61 @@ test('cycleIdFromLabel prefers the first year in the label', () => {
   expect(cycleIdFromLabel('2027/28 intake', null)).toBe('2027')
   expect(cycleIdFromLabel('Intake 2028-29', null)).toBe('2028')
   expect(cycleIdFromLabel('Autumn intake', '2029-01-01')).toBe('2029')
+  expect(cycleIdFromLabel(null, '2026-04-01')).toBe('2026')
+  expect(cycleIdFromLabel(null, null)).toBe('current')
+})
+
+test('a null label derives a readable cycle label from the deadline year', () => {
+  const extraction = baseExtraction({
+    label: null,
+    dates: {
+      opens: null,
+      deadline: '2026-04-01',
+      resultsDate: null,
+      studyStart: null,
+    },
+    apply: { url: null, portalName: null, fee: null },
+  })
+
+  const merged = mergeExtraction(baseProgram(), extraction, SOURCE, options())
+  const created = merged.cycles.find((cycle) => cycle.cycleId === '2026')
+
+  expect(created).toBeDefined()
+  expect(created!.label).toBe('2026 application cycle')
+})
+
+test('an explicit closed status applies when the page has no dates', () => {
+  const extraction = baseExtraction({
+    label: '2028-2029',
+    status: 'closed',
+    dates: {
+      opens: null,
+      deadline: null,
+      resultsDate: null,
+      studyStart: null,
+    },
+    apply: { url: null, portalName: null, fee: null },
+    evidence: [
+      { field: 'status', quote: 'Applications are now closed.', sourceUrl: PAGE_URL },
+    ],
+  })
+
+  const merged = mergeExtraction(baseProgram(), extraction, SOURCE, options())
+  const created = merged.cycles.find((cycle) => cycle.cycleId === '2028')
+
+  expect(created).toBeDefined()
+  expect(created!.status).toBe('closed')
+  expect(created!.dates.deadline).toBeNull()
+  expect(created!.apply.url).toBeNull()
+})
+
+test('dates win over an explicit status when both are present', () => {
+  const extraction = baseExtraction({ status: 'closed' })
+
+  const merged = mergeExtraction(baseProgram(), extraction, SOURCE, options())
+  const cycle = merged.cycles.find((entry) => entry.cycleId === '2027')
+
+  expect(cycle!.status).toBe('upcoming')
 })
 
 test('a new cycle is appended and existing cycles are untouched', () => {

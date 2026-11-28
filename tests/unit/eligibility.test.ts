@@ -1,12 +1,14 @@
 import { expect, test } from 'vitest'
 import { evaluateEligibility, stagesForCurrentLevel } from '../../src/lib/eligibility'
-import { loadPrograms, nextCycle } from '../../src/lib/data'
+import { loadPrograms } from '../../src/lib/data'
 
 const programs = loadPrograms()
 const chevening = programs.find(p => p.programId === 'chevening-pakistan')!
-const cheveningCycle = nextCycle(chevening)!
 const turkiye = programs.find(p => p.programId === 'turkiye-burslari')!
-const turkiyeCycle = turkiye.cycles.find(c => c.status === 'upcoming')!
+// Eligibility is status-driven. These tests exercise the level and rule
+// checks, so give each program an open cycle regardless of the live status.
+const cheveningCycle = { ...chevening.cycles[0]!, status: 'upcoming' as const }
+const turkiyeCycle = { ...turkiye.cycles[0]!, status: 'upcoming' as const }
 
 test('matric students look at intermediate programs', () => {
   expect(stagesForCurrentLevel('matric')).toEqual(['intermediate'])

@@ -16,6 +16,13 @@ export type ItemState =
   | 'failed'
   | 'dead'
 
+/**
+ * `extract` reads facts and publishes them. `monitor` only watches the page
+ * hash and asks a human to review a change; use it for official pages that do
+ * not publish a machine-readable cycle.
+ */
+export type SourceMode = 'extract' | 'monitor'
+
 export interface SourceConfig {
   sourceId: string
   programId: string | null
@@ -25,6 +32,7 @@ export interface SourceConfig {
   indexUrls: string[]
   discovery: boolean
   archived: boolean
+  mode: SourceMode
 }
 
 export interface PageSnapshot {
@@ -45,7 +53,10 @@ export interface EvidenceFact {
 }
 
 export interface ExtractedCycle {
-  label: string
+  /** Null when the page does not name the intake; the publisher derives a label. */
+  label: string | null
+  /** Explicit page state in words. Dates win when the page also gives them. */
+  status: 'open' | 'upcoming' | 'closed' | null
   dates: {
     opens: string | null
     deadline: string | null
@@ -244,6 +255,8 @@ export interface RunReport {
   failed: { item: string; error: string }[]
   paused: string[]
   unhealthy: string[]
+  /** Monitor-only sources whose page changed; a human must review them. */
+  review: { sourceId: string; url: string; reason: string }[]
   candidates: number
   checked: number
   sources: Record<string, { fetched: number; published: number; failed: number }>
@@ -259,6 +272,7 @@ export interface RunSummary {
   failed: string[]
   paused: string[]
   unhealthy: string[]
+  review: string[]
   candidates: number
   checked: number
 }

@@ -3,6 +3,9 @@ import { defineConfig } from '@playwright/test'
 export default defineConfig({
   testDir: 'tests/e2e',
   reporter: 'list',
+  // Two workers keep peak Chromium memory inside a 7 GB runner. With the
+  // default (half the cores) axe scans can crash a tab on a busy machine.
+  workers: 2,
   use: {
     baseURL: 'http://localhost:4322',
   },
