@@ -1,38 +1,10 @@
 {
   "version": 1,
   "run": {
-    "runId": "2026-11-28T10-11-53-933Z",
-    "startedAt": "2026-11-28T10:11:53.933Z",
+    "runId": "2026-11-28T10-19-07-770Z",
+    "startedAt": "2026-11-28T10:19:07.770Z",
     "status": "complete",
     "items": {
-      "erasmus::https://erasmus-plus.ec.europa.eu/opportunities/individuals/students/erasmus-mundus-joint-masters": {
-        "state": "published",
-        "attempts": 0,
-        "hash": "1cc7dbe4a59c751cbf0e8d11772e22329e5948940ad4275412bb56d74d1407c3",
-        "lastError": null,
-        "updatedAt": "2026-11-28T10:11:53.933Z"
-      },
-      "hec::https://www.hec.gov.pk/english/scholarshipsgrants/NBS/Pages/default.aspx": {
-        "state": "published",
-        "attempts": 0,
-        "hash": "5680a63c92f34a89e15f1f5085b2ec69b86d128f2215896c8849c7610a194930",
-        "lastError": null,
-        "updatedAt": "2026-11-28T10:11:53.933Z"
-      },
-      "chevening::https://www.chevening.org/scholarship/pakistan/": {
-        "state": "published",
-        "attempts": 0,
-        "hash": "1d24d2c14bed0eaba8011e76f43134f6e192d51e063b3190593da6ab6fd5a9db",
-        "lastError": null,
-        "updatedAt": "2026-11-28T10:11:53.933Z"
-      },
-      "fulbright::https://www.usefp.org/scholarships/fulbright-degree.cfm": {
-        "state": "published",
-        "attempts": 0,
-        "hash": "b10780d329bb38650d46f7ec081c4405935faed6a77823975db487d580e598b6",
-        "lastError": null,
-        "updatedAt": "2026-11-28T10:11:53.933Z"
-      },
       "daad::https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777": {
         "state": "failed",
         "attempts": 1,
@@ -40,26 +12,54 @@
         "lastError": "HTTP 403 for https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777",
         "updatedAt": "2026-11-28T10:11:53.933Z"
       },
+      "erasmus::https://erasmus-plus.ec.europa.eu/opportunities/individuals/students/erasmus-mundus-joint-masters": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "1cc7dbe4a59c751cbf0e8d11772e22329e5948940ad4275412bb56d74d1407c3",
+        "lastError": null,
+        "updatedAt": "2026-11-28T10:19:07.770Z"
+      },
+      "hec::https://www.hec.gov.pk/english/scholarshipsgrants/NBS/Pages/default.aspx": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "5680a63c92f34a89e15f1f5085b2ec69b86d128f2215896c8849c7610a194930",
+        "lastError": null,
+        "updatedAt": "2026-11-28T10:19:07.770Z"
+      },
+      "chevening::https://www.chevening.org/scholarship/pakistan/": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "1d24d2c14bed0eaba8011e76f43134f6e192d51e063b3190593da6ab6fd5a9db",
+        "lastError": null,
+        "updatedAt": "2026-11-28T10:19:07.770Z"
+      },
+      "fulbright::https://www.usefp.org/scholarships/fulbright-degree.cfm": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "b10780d329bb38650d46f7ec081c4405935faed6a77823975db487d580e598b6",
+        "lastError": null,
+        "updatedAt": "2026-11-28T10:19:07.770Z"
+      },
       "sindh-endowment::https://seef.sindh.gov.pk/news/apply-online-seef-scholarship-program-2026": {
         "state": "published",
         "attempts": 0,
         "hash": "2e93615346185118f1abf1261f6c30723eeaa301ef1e285b9f7964ad766d9b25",
         "lastError": null,
-        "updatedAt": "2026-11-28T10:11:53.933Z"
+        "updatedAt": "2026-11-28T10:19:07.770Z"
       },
       "sindh-matric::https://www.sef.org.pk/scholarship": {
         "state": "published",
         "attempts": 0,
-        "hash": "897bceb635e6a95d8a9f6d3a245e9fc6175118153b93d1b927ae735803e2e809",
+        "hash": "6e0f65bd086a5c34d056f8bb3d9be769e4648c96ff4bac21f86bb80fe9911b46",
         "lastError": null,
-        "updatedAt": "2026-11-28T10:11:53.933Z"
+        "updatedAt": "2026-11-28T10:19:07.770Z"
       },
       "turkiye::https://www.turkiyeburslari.gov.tr/announcements/turkiye-scholarships-2026-applications-121": {
         "state": "published",
         "attempts": 0,
         "hash": "4c5a138cb4a0689fe1a67a0f8c7204acb639f9fe7945b59670461097ad9b97e6",
         "lastError": null,
-        "updatedAt": "2026-11-28T10:11:53.933Z"
+        "updatedAt": "2026-11-28T10:19:07.770Z"
       }
     }
   },
@@ -67,25 +67,25 @@
     "chevening::https://www.chevening.org/scholarship/pakistan/": {
       "hash": "1d24d2c14bed0eaba8011e76f43134f6e192d51e063b3190593da6ab6fd5a9db",
       "textLength": 5471,
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0
     },
     "fulbright::https://www.usefp.org/scholarships/fulbright-degree.cfm": {
       "hash": "b10780d329bb38650d46f7ec081c4405935faed6a77823975db487d580e598b6",
       "textLength": 7303,
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0
     },
     "erasmus::https://erasmus-plus.ec.europa.eu/opportunities/individuals/students/erasmus-mundus-joint-masters": {
       "hash": "1cc7dbe4a59c751cbf0e8d11772e22329e5948940ad4275412bb56d74d1407c3",
       "textLength": 5635,
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0
     },
     "hec::https://www.hec.gov.pk/english/scholarshipsgrants/NBS/Pages/default.aspx": {
       "hash": "5680a63c92f34a89e15f1f5085b2ec69b86d128f2215896c8849c7610a194930",
       "textLength": 1352,
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0
     },
     "daad::https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777": {
@@ -97,43 +97,43 @@
     "sindh-endowment::https://seef.sindh.gov.pk/news/apply-online-seef-scholarship-program-2026": {
       "hash": "2e93615346185118f1abf1261f6c30723eeaa301ef1e285b9f7964ad766d9b25",
       "textLength": 2932,
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0
     },
     "sindh-matric::https://www.sef.org.pk/scholarship": {
-      "hash": "897bceb635e6a95d8a9f6d3a245e9fc6175118153b93d1b927ae735803e2e809",
+      "hash": "6e0f65bd086a5c34d056f8bb3d9be769e4648c96ff4bac21f86bb80fe9911b46",
       "textLength": 3951,
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0
     },
     "turkiye::https://www.turkiyeburslari.gov.tr/announcements/turkiye-scholarships-2026-applications-121": {
       "hash": "4c5a138cb4a0689fe1a67a0f8c7204acb639f9fe7945b59670461097ad9b97e6",
       "textLength": 3132,
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0
     }
   },
   "sources": {
     "chevening": {
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0,
       "retired": false,
       "nextEligibleAt": null
     },
     "fulbright": {
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0,
       "retired": false,
       "nextEligibleAt": null
     },
     "erasmus": {
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0,
       "retired": false,
       "nextEligibleAt": null
     },
     "hec": {
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0,
       "retired": false,
       "nextEligibleAt": null
@@ -145,19 +145,19 @@
       "nextEligibleAt": "2026-11-28T10:41:53.933Z"
     },
     "sindh-endowment": {
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0,
       "retired": false,
       "nextEligibleAt": null
     },
     "sindh-matric": {
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0,
       "retired": false,
       "nextEligibleAt": null
     },
     "turkiye": {
-      "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+      "lastFetchedAt": "2026-11-28T10:19:07.770Z",
       "failures": 0,
       "retired": false,
       "nextEligibleAt": null
@@ -628,12 +628,12 @@
     ],
     "hostHealth": {
       "www.chevening.org": {
-        "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+        "lastFetchedAt": "2026-11-28T10:19:07.770Z",
         "failures": 0,
         "nextEligibleAt": null
       },
       "www.usefp.org": {
-        "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+        "lastFetchedAt": "2026-11-28T10:19:07.770Z",
         "failures": 0,
         "nextEligibleAt": null
       },
@@ -643,22 +643,22 @@
         "nextEligibleAt": "2026-11-28T10:24:21.454Z"
       },
       "erasmus-plus.ec.europa.eu": {
-        "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+        "lastFetchedAt": "2026-11-28T10:19:07.770Z",
         "failures": 0,
         "nextEligibleAt": null
       },
       "www.hec.gov.pk": {
-        "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+        "lastFetchedAt": "2026-11-28T10:19:07.770Z",
         "failures": 0,
         "nextEligibleAt": null
       },
       "seef.sindh.gov.pk": {
-        "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+        "lastFetchedAt": "2026-11-28T10:19:07.770Z",
         "failures": 0,
         "nextEligibleAt": null
       },
       "www.turkiyeburslari.gov.tr": {
-        "lastFetchedAt": "2026-11-28T10:11:53.933Z",
+        "lastFetchedAt": "2026-11-28T10:19:07.770Z",
         "failures": 0,
         "nextEligibleAt": null
       },
@@ -674,5 +674,5 @@
       }
     }
   },
-  "lastSuccessfulRun": "2026-11-28T09:54:21.454Z"
+  "lastSuccessfulRun": "2026-11-28T10:19:07.770Z"
 }
