@@ -393,6 +393,13 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
     }
   }
 
+  // Monitor sources need no AI provider. Check them first so a provider outage
+  // still updates hashes and flags a review instead of skipping the free work.
+  queue.sort(
+    (a, b) =>
+      Number(a.source.mode !== "monitor") - Number(b.source.mode !== "monitor"),
+  )
+
   try {
     for (const { source, url } of queue) {
       if (processed >= maxItems) break

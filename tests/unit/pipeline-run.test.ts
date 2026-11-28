@@ -358,6 +358,27 @@ test('an unchanged run skips extraction and refreshes lastSuccessfulRun', async 
   expect(readRunStatus(f)).toEqual({ mode: 'live', lastSuccessfulRun: LATER.toISOString() })
 })
 
+test('a provider pause still checks monitor sources first', async () => {
+  const f = fixture([
+    source(),
+    source({
+      sourceId: 'watch',
+      programId: 'example-program',
+      pageUrls: ['https://example.org/watch/'],
+      mode: 'monitor',
+    }),
+  ])
+  const store = createMemoryStore()
+
+  const result = await run(f, {
+    store,
+    router: fakeRouter({ fail: new ProvidersExhaustedError('no provider') }).router,
+  })
+
+  expect(result.summary.status).toBe('paused')
+  expect(store.get().pages[itemKey('watch', 'https://example.org/watch/')]).toBeDefined()
+})
+
 test('a monitor source records a change for review without extracting', async () => {
   const f = fixture([source({ mode: 'monitor' })])
   const store = createMemoryStore()
