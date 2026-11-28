@@ -96,6 +96,7 @@ export interface AiResponse {
   text: string
   providerId: ProviderId
   model: string
+  keyLabel?: string
 }
 
 export interface Router {
@@ -109,10 +110,16 @@ export interface Provider {
   complete(request: AiRequest, signal: AbortSignal): Promise<string>
 }
 
+export interface ProviderKeyConfig {
+  label: string
+  apiKey: string
+}
+
 export interface ProviderSettings {
   apiKey: string
   model: string
   accountId?: string
+  keys?: ProviderKeyConfig[]
 }
 
 export interface PipelineConfig {
@@ -160,10 +167,17 @@ export interface SourceHealth {
   nextEligibleAt: string | null
 }
 
+export interface KeyUsage {
+  callsByDay: Record<string, number>
+  cooldownUntil: string | null
+  lastError: string | null
+}
+
 export interface ProviderUsage {
   callsByDay: Record<string, number>
   cooldownUntil: string | null
   lastError: string | null
+  keys?: Record<string, KeyUsage>
 }
 
 export type DiscoveredVia =
@@ -260,7 +274,15 @@ export interface RunReport {
   candidates: number
   checked: number
   sources: Record<string, { fetched: number; published: number; failed: number }>
-  providers: Record<string, { calls: number; errors: number; cooldowns: number }>
+  providers: Record<
+    string,
+    {
+      calls: number
+      errors: number
+      cooldowns: number
+      keys?: Record<string, { calls: number; errors: number; cooling: boolean }>
+    }
+  >
   discovery: DiscoveryRunReport | null
 }
 

@@ -9,6 +9,7 @@ import { z } from "zod"
 import type {
   DiscoveryState,
   ItemCheckpoint,
+  KeyUsage,
   PipelineState,
   ProviderId,
   ProviderUsage,
@@ -66,11 +67,20 @@ const SourceHealthSchema = z
   })
   .strict()
 
+const KeyUsageSchema = z
+  .object({
+    callsByDay: z.record(z.string(), z.number().int().min(0)),
+    cooldownUntil: z.string().nullable(),
+    lastError: z.string().nullable(),
+  })
+  .strict()
+
 const ProviderUsageSchema = z
   .object({
     callsByDay: z.record(z.string(), z.number().int().min(0)),
     cooldownUntil: z.string().nullable(),
     lastError: z.string().nullable(),
+    keys: z.record(z.string(), KeyUsageSchema).optional(),
   })
   .strict()
 
@@ -269,8 +279,28 @@ export function recordProviderCall(
   state: PipelineState,
   providerId: ProviderId,
   day: string,
+  keyLabel?: string,
 ): PipelineState {
   const usage = providerUsage(state, providerId)
+  let keys = usage.keys
+  if (keyLabel) {
+    const keyData = keys?.[keyLabel] ?? {
+      callsByDay: {},
+      cooldownUntil: null,
+      lastError: null,
+    }
+    keys = {
+      ...keys,
+      [keyLabel]: {
+        ...keyData,
+        callsByDay: {
+          ...keyData.callsByDay,
+          [day]: (keyData.callsByDay[day] ?? 0) + 1,
+        },
+      },
+    }
+  }
+
   return {
     ...state,
     providers: {
@@ -281,6 +311,7 @@ export function recordProviderCall(
           ...usage.callsByDay,
           [day]: (usage.callsByDay[day] ?? 0) + 1,
         },
+        ...(keys ? { keys } : {}),
       },
     },
   }
@@ -306,12 +337,85 @@ export function setProviderCooldown(
   }
 }
 
+export function setKeyCooldown(
+  state: PipelineState,
+  providerId: ProviderId,
+  keyLabel: string,
+  until: string,
+  lastError?: string | null,
+): PipelineState {
+  const usage = providerUsage(state, providerId)
+  const existingKey = usage.keys?.[keyLabel] ?? {
+    callsByDay: {},
+    cooldownUntil: null,
+    lastError: null,
+  }
+
+  const updatedKey: KeyUsage = {
+    ...existingKey,
+    cooldownUntil: until,
+    lastError: lastError === undefined ? existingKey.lastError : lastError,
+  }
+
+  const keys = {
+    ...usage.keys,
+    [keyLabel]: updatedKey,
+  }
+
+  return {
+    ...state,
+    providers: {
+      ...state.providers,
+      [providerId]: {
+        ...usage,
+        lastError: lastError === undefined ? usage.lastError : lastError,
+        keys,
+      },
+    },
+  }
+}
+
+export function keyReady(
+  state: PipelineState,
+  providerId: ProviderId,
+  keyLabel: string,
+  now: Date,
+): boolean {
+  const keyUsage = state.providers[providerId]?.keys?.[keyLabel]
+  if (keyUsage && keyUsage.cooldownUntil !== null) {
+    const untilMs = Date.parse(keyUsage.cooldownUntil)
+    if (!Number.isNaN(untilMs) && untilMs > now.getTime()) {
+      return false
+    }
+  }
+
+  const providerUntil = state.providers[providerId]?.cooldownUntil
+  if (providerUntil !== null && providerUntil !== undefined) {
+    const providerUntilMs = Date.parse(providerUntil)
+    if (!Number.isNaN(providerUntilMs) && providerUntilMs > now.getTime()) {
+      return false
+    }
+  }
+
+  return true
+}
+
 export function providerReady(
   state: PipelineState,
   providerId: ProviderId,
   now: Date,
 ): boolean {
-  const until = state.providers[providerId]?.cooldownUntil
+  const usage = state.providers[providerId]
+  if (!usage) return true
+
+  if (usage.keys && Object.keys(usage.keys).length > 0) {
+    const hasReadyKey = Object.keys(usage.keys).some((label) =>
+      keyReady(state, providerId, label, now),
+    )
+    if (hasReadyKey) return true
+  }
+
+  const until = usage.cooldownUntil
   if (until === null || until === undefined) return true
 
   const untilMs = Date.parse(until)

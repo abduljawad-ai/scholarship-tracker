@@ -1,7 +1,13 @@
 // Pipeline configuration from the environment. Every path resolves against a
 // root so tests and dry runs never touch the real repository.
 import path from "node:path"
-import type { AiTask, PipelineConfig, ProviderId, ProviderSettings } from "./types"
+import type {
+  AiTask,
+  PipelineConfig,
+  ProviderId,
+  ProviderKeyConfig,
+  ProviderSettings,
+} from "./types"
 
 export const USER_AGENT =
   "ScholarshipTrackerBot/1.0 (+https://github.com/abduljawad-ai/scholarship-tracker)"
@@ -19,13 +25,37 @@ export function loadConfig(
     providers.gemini = {
       apiKey: env.GEMINI_API_KEY,
       model: env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
+      keys: [{ label: "gemini:1", apiKey: env.GEMINI_API_KEY }],
     }
   }
 
-  if (env.GROQ_API_KEY) {
+  const groqKeys: ProviderKeyConfig[] = []
+  const seenGroqKeys = new Set<string>()
+
+  // Check numbered keys GROQ_API_KEY_1..GROQ_API_KEY_16
+  for (let i = 1; i <= 16; i++) {
+    const key = env[`GROQ_API_KEY_${i}`]
+    if (key && !seenGroqKeys.has(key)) {
+      groqKeys.push({ label: `groq:${i}`, apiKey: key })
+      seenGroqKeys.add(key)
+    }
+  }
+
+  // Check legacy GROQ_API_KEY
+  if (env.GROQ_API_KEY && !seenGroqKeys.has(env.GROQ_API_KEY)) {
+    if (groqKeys.length === 0) {
+      groqKeys.push({ label: "groq:1", apiKey: env.GROQ_API_KEY })
+    } else {
+      groqKeys.unshift({ label: "groq:default", apiKey: env.GROQ_API_KEY })
+    }
+    seenGroqKeys.add(env.GROQ_API_KEY)
+  }
+
+  if (groqKeys.length > 0) {
     providers.groq = {
-      apiKey: env.GROQ_API_KEY,
+      apiKey: groqKeys[0]!.apiKey,
       model: env.GROQ_MODEL || DEFAULT_GROQ_MODEL,
+      keys: groqKeys,
     }
   }
 
@@ -36,6 +66,7 @@ export function loadConfig(
       apiKey: env.CLOUDFLARE_API_TOKEN,
       model: env.CLOUDFLARE_MODEL,
       accountId: env.CLOUDFLARE_ACCOUNT_ID,
+      keys: [{ label: "cloudflare:1", apiKey: env.CLOUDFLARE_API_TOKEN }],
     }
   }
 
@@ -43,6 +74,7 @@ export function loadConfig(
     providers.openrouter = {
       apiKey: env.OPENROUTER_API_KEY,
       model: env.OPENROUTER_MODEL,
+      keys: [{ label: "openrouter:1", apiKey: env.OPENROUTER_API_KEY }],
     }
   }
 

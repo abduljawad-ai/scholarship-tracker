@@ -211,3 +211,89 @@ test('a rate limit that outlasts the retries cools down and falls through', asyn
   expect(sleep).toHaveBeenCalledTimes(2)
   expect(getState().providers.groq?.cooldownUntil).toBe('2026-11-27T06:00:02.000Z')
 })
+
+test('multi-key pool rotates round-robin across requests', async () => {
+  const config = loadConfig(
+    {
+      GROQ_API_KEY_1: 'key-1',
+      GROQ_API_KEY_2: 'key-2',
+      GROQ_API_KEY_3: 'key-3',
+    },
+    '/srv/app',
+  )
+  const store = createMemoryStore(emptyState())
+  const usedKeys: string[] = []
+  const fetchImpl = vi.fn<FetchLike>(async (_url, init) => {
+    const auth = (init?.headers as Record<string, string>)?.authorization ?? ''
+    usedKeys.push(auth.replace('Bearer ', ''))
+    return groqAnswer('answer')
+  })
+
+  const router = createRouter({ config, store, fetchImpl, now: () => NOW })
+
+  const res1 = await router.complete(REQUEST)
+  const res2 = await router.complete(REQUEST)
+  const res3 = await router.complete(REQUEST)
+  const res4 = await router.complete(REQUEST)
+
+  expect(res1.keyLabel).toBe('groq:1')
+  expect(res2.keyLabel).toBe('groq:2')
+  expect(res3.keyLabel).toBe('groq:3')
+  expect(res4.keyLabel).toBe('groq:1')
+  expect(usedKeys).toEqual(['key-1', 'key-2', 'key-3', 'key-1'])
+})
+
+test('multi-key failover: when one key hits 429, the next key takes over immediately without sleeping', async () => {
+  const config = loadConfig(
+    {
+      GROQ_API_KEY_1: 'key-1',
+      GROQ_API_KEY_2: 'key-2',
+    },
+    '/srv/app',
+  )
+  const store = createMemoryStore(emptyState())
+  const sleep = vi.fn(async () => {})
+  const fetchImpl = vi.fn<FetchLike>(async (_url, init) => {
+    const auth = (init?.headers as Record<string, string>)?.authorization ?? ''
+    if (auth.includes('key-1')) {
+      return jsonResponse({ error: { message: 'rate limit 429' } }, 429, { 'retry-after': '60' })
+    }
+    return groqAnswer('answer from key 2')
+  })
+
+  const router = createRouter({ config, store, fetchImpl, now: () => NOW, sleep })
+
+  const response = await router.complete(REQUEST)
+
+  expect(response.keyLabel).toBe('groq:2')
+  expect(response.text).toBe('answer from key 2')
+  // No sleep needed because key-2 was ready right away!
+  expect(sleep).not.toHaveBeenCalled()
+  expect(store.get().providers.groq?.keys?.['groq:1']?.cooldownUntil).toBe('2026-11-27T06:01:00.000Z')
+  expect(store.get().providers.groq?.keys?.['groq:2']?.callsByDay[DAY]).toBe(1)
+})
+
+test('multi-key failover: invalid auth on one key cools it for 24h and moves to next key', async () => {
+  const config = loadConfig(
+    {
+      GROQ_API_KEY_1: 'bad-key',
+      GROQ_API_KEY_2: 'good-key',
+    },
+    '/srv/app',
+  )
+  const store = createMemoryStore(emptyState())
+  const fetchImpl = vi.fn<FetchLike>(async (_url, init) => {
+    const auth = (init?.headers as Record<string, string>)?.authorization ?? ''
+    if (auth.includes('bad-key')) {
+      return jsonResponse({ error: { message: 'invalid api key' } }, 401)
+    }
+    return groqAnswer('success')
+  })
+
+  const router = createRouter({ config, store, fetchImpl, now: () => NOW })
+
+  const response = await router.complete(REQUEST)
+
+  expect(response.keyLabel).toBe('groq:2')
+  expect(store.get().providers.groq?.keys?.['groq:1']?.cooldownUntil).toBe('2026-11-28T06:00:00.000Z')
+})

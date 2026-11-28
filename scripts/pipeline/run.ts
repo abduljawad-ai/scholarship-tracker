@@ -7,7 +7,7 @@ import { todayInPakistan } from "../../src/lib/cycle-status"
 import { loadProgramsFrom } from "../../src/lib/data"
 import type { Program } from "../../src/lib/schema"
 import { isPlausibleDate, isPlausibleDeadline, quoteSupportsDate } from "./dates"
-import { buildExtractRequest, parseExtraction, validateExtraction } from "./extract"
+import { extractScholarship, validateExtraction } from "./extract"
 import { clearRobotsCache, fetchText, robotsAllows, type FetchLike } from "./fetch"
 import { mergeExtraction, setRunStatusLive, writeProgramFile } from "./publish"
 import { ProvidersExhaustedError } from "./router"
@@ -312,11 +312,24 @@ function providerStats(
   const result: RunReport["providers"] = {}
 
   for (const [providerId, usage] of Object.entries(state.providers)) {
+    let keyStats: Record<string, { calls: number; errors: number; cooling: boolean }> | undefined
+    if (usage.keys && Object.keys(usage.keys).length > 0) {
+      keyStats = {}
+      for (const [label, k] of Object.entries(usage.keys)) {
+        keyStats[label] = {
+          calls: k.callsByDay[today] ?? 0,
+          errors: k.lastError === null ? 0 : 1,
+          cooling: k.cooldownUntil !== null && Date.parse(k.cooldownUntil) > now.getTime(),
+        }
+      }
+    }
+
     result[providerId] = {
       calls: usage.callsByDay[today] ?? 0,
       errors: usage.lastError === null ? 0 : 1,
       cooldowns:
         usage.cooldownUntil !== null && Date.parse(usage.cooldownUntil) > now.getTime() ? 1 : 0,
+      ...(keyStats ? { keys: keyStats } : {}),
     }
   }
 
@@ -527,11 +540,14 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
         let primaryProviderId: ProviderId
 
         try {
-          const response = await router.complete(
-            buildExtractRequest(source, snapshot, config.promptsDir),
-          )
-          primaryProviderId = response.providerId
-          extraction = parseExtraction(response.text)
+          const { extraction: extracted, providerId } = await extractScholarship({
+            source,
+            snapshot,
+            promptsDir: config.promptsDir,
+            router,
+          })
+          primaryProviderId = providerId
+          extraction = extracted
 
           const errors = validateExtraction(extraction, snapshot, source)
           if (errors.length > 0) {
