@@ -150,15 +150,42 @@ Expected results:
 ### Local check recorded on 2026-11-28
 
 - `npm run typecheck`: 0 errors, 0 warnings (99 files)
-- `npm test`: 26 files, 225 tests passed
+- `npm test`: 26 files, 230 tests passed
 - `npm run eval`: 4 golden fixtures passed
 - `npm run build`: 14 pages, sitemap created
-- `npm run test:e2e`: 67 tests passed, including design checks
-- `npm run design:shots`: 27 screenshots at 360/768/1440, 1024 px overflow checks, and dark mode
+- `npm run test:e2e`: 85 passed, 1 skipped (the banner test skips when data is fresh)
+- `npm run design:shots`: 45 checks — screenshots at 360/768/1440, 1024 px overflow,
+  dark mode, and a 44 px minimum on every standalone target
 - Local preview: home, listing, archive, about, My Applications, sitemap, and robots
-  returned 200; an unknown path returned 404; the demo-data banner was visible
-- Cloudflare deployment: **not performed here** — the owner completes the one-time
-  setup above
+  returned 200; an unknown path returned 404
+- Cloudflare deployment: **live** at `https://scholarships-pk.pages.dev`
+
+### First live run recorded on 2026-11-28
+
+The first scheduled run (`46123512632`) paused after three sources: Groq answered
+429 with a nine-second token-per-minute limit and no `Retry-After` header. The
+router cooled the only provider down for fifteen minutes, so the run stopped.
+The retry fix (`#8`) reads the wait from the provider message, retries short
+waits in place, and checks monitor sources before any AI work.
+
+The resumed run (`46124152331`) completed in 2m52s and committed `aa73a84`:
+
+- Checked 6, published 4 (`daad-epos`, `sindh-endowment-fund`,
+  `sindh-matric-scholarship`, `turkiye-burslari`), unchanged 2
+- Failed 0, paused 0, unhealthy 0, review 0
+- 3 discovery candidates queued in `pipeline/candidates.json`, none published
+- `run-status.json` moved to `mode: "live"` because the gate held: `checked > 0`,
+  zero failures, zero unhealthy sources, not a dry run
+
+What the live data still cannot show, and why:
+
+- No deadline renders as a date. Groq alone reads them, so they stay
+  `provisional` and the UI says "Not confirmed". A second provider
+  (`GEMINI_API_KEY` or `OPENROUTER_API_KEY` + `OPENROUTER_MODEL`) is required
+  before a deadline can be `verified`.
+- No Apply button anywhere, because no cycle has a verified apply URL.
+- Funding and eligibility stay behind the "not confirmed" panel until Plan 3
+  curation adds an official quote per program.
 
 ## Freshness and the demo banner
 
