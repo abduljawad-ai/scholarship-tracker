@@ -380,6 +380,9 @@ export function keyReady(
   providerId: ProviderId,
   keyLabel: string,
   now: Date,
+  // Pooled keys are cooled individually. A provider-wide cooldown left by an
+  // older single-key config must not lock out healthy keys in the pool.
+  ignoreProviderCooldown = false,
 ): boolean {
   const keyUsage = state.providers[providerId]?.keys?.[keyLabel]
   if (keyUsage && keyUsage.cooldownUntil !== null) {
@@ -388,6 +391,8 @@ export function keyReady(
       return false
     }
   }
+
+  if (ignoreProviderCooldown) return true
 
   const providerUntil = state.providers[providerId]?.cooldownUntil
   if (providerUntil !== null && providerUntil !== undefined) {
