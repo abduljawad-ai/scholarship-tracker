@@ -140,9 +140,9 @@
     },
     "daad": {
       "lastFetchedAt": "2026-11-28T10:11:53.933Z",
-      "failures": 1,
+      "failures": 0,
       "retired": false,
-      "nextEligibleAt": "2026-11-28T10:41:53.933Z"
+      "nextEligibleAt": null
     },
     "sindh-endowment": {
       "lastFetchedAt": "2026-11-28T10:19:07.770Z",
