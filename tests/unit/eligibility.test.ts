@@ -1,10 +1,10 @@
 import { expect, test } from 'vitest'
 import { evaluateEligibility, stagesForCurrentLevel } from '../../src/lib/eligibility'
-import { loadPrograms } from '../../src/lib/data'
+import { loadPrograms, nextCycle } from '../../src/lib/data'
 
 const programs = loadPrograms()
 const chevening = programs.find(p => p.programId === 'chevening-pakistan')!
-const cheveningCycle = chevening.cycles.find(c => c.status === 'open')!
+const cheveningCycle = nextCycle(chevening)!
 const turkiye = programs.find(p => p.programId === 'turkiye-burslari')!
 const turkiyeCycle = turkiye.cycles.find(c => c.status === 'upcoming')!
 

@@ -70,7 +70,7 @@
         "resultsDate": "2028-07-15",
         "studyStart": "2028-09-18"
       },
-      "status": "open",
+      "status": "upcoming",
       "apply": {
         "url": "https://www.chevening.org/scholarships/apply/",
         "portalName": "Chevening online application portal",
@@ -105,5 +105,5 @@
     }
   ],
   "firstSeen": "2026-11-18T00:00:00.000Z",
-  "lastUpdated": "2026-11-26T00:00:00.000Z"
+  "lastUpdated": "2026-11-27T00:00:00.000Z"
 }

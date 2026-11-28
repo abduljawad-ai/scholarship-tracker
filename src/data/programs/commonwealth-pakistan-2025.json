@@ -64,10 +64,10 @@
       "cycleId": "2027",
       "label": "2027 intake",
       "dates": {
-        "opens": "2027-05-04",
-        "deadline": "2027-06-30",
-        "resultsDate": "2027-11-15",
-        "studyStart": "2028-09-01"
+        "opens": "2026-05-04",
+        "deadline": "2026-06-30",
+        "resultsDate": "2026-11-15",
+        "studyStart": "2027-09-01"
       },
       "status": "closed",
       "apply": {
@@ -99,5 +99,5 @@
     }
   ],
   "firstSeen": "2026-11-16T00:00:00.000Z",
-  "lastUpdated": "2026-11-21T00:00:00.000Z"
+  "lastUpdated": "2026-11-27T00:00:00.000Z"
 }

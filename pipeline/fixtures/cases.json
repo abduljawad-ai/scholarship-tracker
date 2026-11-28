@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "chevening-program",
+      "kind": "extract",
+      "html": "chevening.html",
+      "output": "chevening.extraction.json",
+      "sourceId": "chevening",
+      "programId": "chevening-pakistan",
+      "today": "2026-11-27",
+      "verifiedFields": ["opens", "deadline", "resultsDate", "studyStart", "applyUrl"],
+      "expect": {
+        "cycles": 1,
+        "cycleId": "2027",
+        "status": "upcoming",
+        "deadline": "2027-11-03",
+        "deadlineVerification": "verified",
+        "applyUrl": "https://www.chevening.org/scholarships/apply/"
+      }
+    },
+    {
+      "id": "daad-provisional",
+      "kind": "extract",
+      "html": "daad.html",
+      "output": "daad.extraction.json",
+      "sourceId": "daad",
+      "url": "https://www.daad.de/en/study-and-research-in-germany/scholarships/",
+      "programId": "daad-epos",
+      "today": "2026-11-27",
+      "verifiedFields": ["opens", "applyUrl"],
+      "expect": {
+        "cycles": 1,
+        "cycleId": "2028",
+        "status": "upcoming",
+        "deadline": "2028-01-15",
+        "deadlineVerification": "provisional",
+        "applyUrl": "https://www.daad.de/en/study-and-research-in-germany/scholarships/"
+      }
+    },
+    {
+      "id": "unknown-news",
+      "kind": "extract",
+      "html": "unknown.html",
+      "output": "unknown.extraction.json",
+      "sourceId": "chevening",
+      "programId": "chevening-pakistan",
+      "today": "2026-11-27",
+      "verifiedFields": [],
+      "expect": { "invalid": true }
+    },
+    {
+      "id": "index-discovery",
+      "kind": "discover",
+      "html": "index.html",
+      "output": "index.discover.json",
+      "candidates": "index.candidates.json",
+      "sourceId": "example",
+      "expect": { "pages": 2, "scholarships": 1, "candidates": 1 }
+    }
+  ]
+}

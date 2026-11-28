@@ -17,9 +17,9 @@ const SOURCE_PROGRAMS_DIR = path.join(
 const ROOT_PROGRAMS_DIR = path.resolve(process.cwd(), "src/data/programs")
 const PROGRAMS_DIR = existsSync(ROOT_PROGRAMS_DIR) ? ROOT_PROGRAMS_DIR : SOURCE_PROGRAMS_DIR
 
-/** Reads, parses and validates every `src/data/programs/*.json` seed file. */
-export function loadPrograms(): Program[] {
-  const filenames = readdirSync(PROGRAMS_DIR)
+/** Reads, parses and validates every `*.json` program file in `dir`. */
+export function loadProgramsFrom(dir: string): Program[] {
+  const filenames = readdirSync(dir)
     .filter((name) => name.endsWith(".json"))
     .sort()
 
@@ -27,7 +27,7 @@ export function loadPrograms(): Program[] {
   const seen = new Map<string, string>() // programId -> filename
 
   for (const filename of filenames) {
-    const filePath = path.join(PROGRAMS_DIR, filename)
+    const filePath = path.join(dir, filename)
 
     let raw: unknown
     try {
@@ -56,6 +56,11 @@ export function loadPrograms(): Program[] {
   }
 
   return programs
+}
+
+/** Reads the published seed data from `src/data/programs`. */
+export function loadPrograms(): Program[] {
+  return loadProgramsFrom(PROGRAMS_DIR)
 }
 
 /** Looks up a program by its `programId` slug. */

@@ -1,0 +1,56 @@
+{
+  "pageKind": "program",
+  "cycles": [
+    {
+      "label": "2027/28 intake",
+      "dates": {
+        "opens": "2027-08-01",
+        "deadline": "2027-11-03",
+        "resultsDate": null,
+        "studyStart": null
+      },
+      "apply": {
+        "url": "https://www.chevening.org/scholarships/apply/",
+        "portalName": "Chevening online application portal",
+        "fee": "No application fee"
+      },
+      "evidence": [
+        {
+          "field": "opens",
+          "quote": "Applications open on 1 August 2027.",
+          "sourceUrl": "https://www.chevening.org/scholarships/"
+        },
+        {
+          "field": "deadline",
+          "quote": "Applications close on 3 November 2027.",
+          "sourceUrl": "https://www.chevening.org/scholarships/"
+        },
+        {
+          "field": "applyUrl",
+          "quote": "Apply at https://www.chevening.org/scholarships/apply/ before the deadline.",
+          "sourceUrl": "https://www.chevening.org/scholarships/"
+        },
+        {
+          "field": "guide.steps",
+          "quote": "Create an account on the Chevening portal.",
+          "sourceUrl": "https://www.chevening.org/scholarships/"
+        },
+        {
+          "field": "guide.documents",
+          "quote": "Two reference letters.",
+          "sourceUrl": "https://www.chevening.org/scholarships/"
+        }
+      ]
+    }
+  ],
+  "guide": {
+    "steps": [
+      "Create an account on the Chevening portal",
+      "Choose up to four UK master's courses",
+      "Answer the long-form questions and submit"
+    ],
+    "documents": ["Two reference letters"],
+    "tips": [],
+    "timeline": []
+  }
+}

@@ -174,6 +174,78 @@ Expected results:
 
 The banner is dismissible per browser session and appears on every page.
 
+## Daily data pipeline
+
+The robot runs on GitHub Actions, not on a laptop. It reads official pages,
+extracts cycles and guides, verifies them with a second model, and commits the
+result to `src/data/` and `pipeline/`. Git history is the audit log.
+
+- **Workflow:** `.github/workflows/pipeline.yml`
+- **Schedule:** `0 2 * * *` UTC, which is 07:00 in Pakistan
+- **Manual run:** GitHub → **Actions** → **Data pipeline** → **Run workflow**
+- **Job timeout:** 45 minutes; the loop runs up to 10 segments of 20 items
+- **Reports:** `pipeline/runs/` (uploaded as the `pipeline-reports` artifact)
+
+A manual dispatch always checks out `main`, so a feature branch can never
+publish data.
+
+### One-time setup (owner)
+
+1. Add the provider secrets you have: **Settings → Secrets and variables →
+   Actions → New repository secret**. Names: `GEMINI_API_KEY`, `GROQ_API_KEY`,
+   and optionally `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`,
+   `CLOUDFLARE_MODEL`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`. See
+   `.env.example`. With no secrets the run exits 0 and changes nothing.
+2. Set **Settings → Actions → General → Workflow permissions → Read and write**.
+   Without this the robot cannot push its data commit.
+3. Run the workflow once by hand and confirm it commits. Only then is the site
+   allowed to leave demo mode.
+
+GitHub emails the repository owner when a scheduled workflow fails, so no extra
+alert service is needed.
+
+### State values
+
+`pipeline/state.json` is the checkpoint. `state.run.status` is one of:
+
+| Value | Meaning |
+| --- | --- |
+| `running` | A run is in progress; the next segment resumes it |
+| `paused` | Stopped on purpose (for example a provider outage); resume by hand |
+| `complete` | Finished; the next run starts fresh |
+| `failed` | No item could be checked; the next run starts fresh |
+
+Per-item checkpoints live in `state.pages` and `state.sources`. A page whose
+content hash is unchanged is skipped, so a quiet day costs almost nothing.
+
+### Resume after a pause
+
+A paused run keeps its item checkpoints. Clear the pause by running the
+workflow again; it picks up where it stopped. Do not delete
+`pipeline/state.json` to "fix" a pause — that re-fetches and re-spends model
+calls.
+
+### Roll back a bad data commit
+
+1. Find the commit that changed `src/data/programs/`.
+2. `git revert <sha>` and push to `main`.
+3. Cloudflare rebuilds from the corrected data.
+
+Never hand-edit files in `src/data/`; the robot owns them.
+
+### Discovery queue
+
+New scholarships are never published automatically. Discovery writes
+`pipeline/candidates.json` with `status: "pending-review"`. A human reviews
+each candidate, adds it to `pipeline/sources.json` and `src/data/programs/`,
+and only then does it appear on the site.
+
+### When the site leaves demo mode
+
+`src/data/run-status.json` flips to `live` only when a real run checked at
+least one item, had zero failures, zero unhealthy sources, and was not a dry
+run. Until then the banner stays. Never set `mode: "live"` by hand.
+
 ## Troubleshooting
 
 | Symptom | Check |
@@ -185,3 +257,7 @@ The banner is dismissible per browser session and appears on every page.
 | e2e fails because port 4322 is busy | Stop the stale preview; the Playwright config always builds fresh and refuses to reuse a server. |
 | Cloudflare build uses the wrong Node version | Set `NODE_VERSION=24` in the Pages environment variables. |
 | Banner says demo data after automation is live | Confirm the robot committed `run-status.json` with `mode: "live"` and a fresh timestamp. |
+| Scheduled workflow fails with “push declined” | Workflow permissions are read-only; set **Settings → Actions → General → Workflow permissions → Read and write**. |
+| Workflow runs but changes nothing | No provider secrets are set, so the pipeline exits 0 by design. Add at least one key. |
+| A run is stuck on `running` | Re-run the workflow; it resumes from the checkpoint. Do not delete `pipeline/state.json`. |
+| The same page is checked every day | Its content hash changed, or extraction failed validation. Read `pipeline/runs/` for the reason. |
