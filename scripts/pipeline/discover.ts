@@ -418,7 +418,10 @@ const GAP_SYSTEM =
   "You propose short search phrases for scholarship discovery. Return JSON only."
 
 const PAGE_TEXT_LIMIT = 4_000
-const TOTAL_TEXT_LIMIT = 30_000
+// Groq's free tier allows 8,000 tokens per minute. A 30,000-character batch
+// was measured at 8,605 tokens, so keep discovery classification well below
+// that ceiling; smaller batches are classified separately with no data lost.
+const TOTAL_TEXT_LIMIT = 16_000
 
 function stripFences(text: string): string {
   return text.replace(/```(?:json)?/gi, "").trim()
