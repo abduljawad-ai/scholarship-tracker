@@ -15,6 +15,7 @@ export interface ProgramIndexEntry {
   nextDeadline: string | null
   deadlineVerified: boolean
   fundingType: FundingType
+  fundingVerified: boolean
   fundingScore: number
   status: "active" | "archived"
   firstSeen: string
@@ -62,6 +63,11 @@ export function toIndexEntry(program: Program): ProgramIndexEntry {
   }
 
   const fundingType = program.funding.type
+  const fundingVerified = cycle
+    ? cycle.evidence.some(
+        (item) => item.field === "funding" || item.field.startsWith("funding."),
+      )
+    : false
   const status: "active" | "archived" = isActive(program) ? "active" : "archived"
 
   let likelyEligibleFor: StudyLevel[] = []
@@ -88,6 +94,7 @@ export function toIndexEntry(program: Program): ProgramIndexEntry {
     nextDeadline,
     deadlineVerified,
     fundingType,
+    fundingVerified,
     fundingScore: FUNDING_SCORE[fundingType],
     status,
     firstSeen: program.firstSeen,
