@@ -99,6 +99,123 @@
       "discoveredVia": "index",
       "firstSeenAt": "2026-11-28T08:05:25.886Z",
       "discoveryScore": 51
+    },
+    {
+      "candidateId": "provision-of-higher-education-opportunities-for-the-students-2026",
+      "title": "- Provision of Higher Education Opportunities for the Students of Balochistan & Erstwhile FATA (Phase-III)",
+      "provider": "Higher Education Commission (HEC)",
+      "country": "Pakistan",
+      "officialUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/BF-III/Pages/default.aspx",
+      "deadline": "2026-12-14",
+      "applyUrl": null,
+      "evidence": [
+        {
+          "field": "title",
+          "quote": "- Provision of Higher Education Opportunities for the Students of Balochistan & Erstwhile FATA (Phase-III)",
+          "sourceUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/BF-III/Pages/default.aspx"
+        },
+        {
+          "field": "provider",
+          "quote": "The Higher Education Commission (HEC) invites applications",
+          "sourceUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/BF-III/Pages/default.aspx"
+        },
+        {
+          "field": "deadline",
+          "quote": "The deadline for submission of online applications is Monday, December 14, 2026.",
+          "sourceUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/BF-III/Pages/default.aspx"
+        }
+      ],
+      "sourceId": "hec",
+      "discoveredAt": "2026-11-28T09:54:21.454Z",
+      "status": "pending-review",
+      "foundByQuery": "UK Foreign, Commonwealth and Development Office scholarship",
+      "discoveredVia": "index",
+      "firstSeenAt": "2026-11-28T09:54:21.454Z",
+      "discoveryScore": 46
+    },
+    {
+      "candidateId": "study-in-china-for-six-months-2026",
+      "title": "Study in China for Six Months",
+      "provider": "Higher Education Commission of Pakistan",
+      "country": "China",
+      "officialUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/ACU/Pages/default.aspx",
+      "deadline": null,
+      "applyUrl": null,
+      "evidence": [
+        {
+          "field": "title",
+          "quote": "Study in China for Six Months",
+          "sourceUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/ACU/Pages/default.aspx"
+        },
+        {
+          "field": "provider",
+          "quote": "Higher Education Commission of Pakistan is offering a six-month research fellowship in China",
+          "sourceUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/ACU/Pages/default.aspx"
+        }
+      ],
+      "sourceId": "hec",
+      "discoveredAt": "2026-11-28T09:54:21.454Z",
+      "status": "pending-review",
+      "foundByQuery": "UK Foreign, Commonwealth and Development Office scholarship",
+      "discoveredVia": "index",
+      "firstSeenAt": "2026-11-28T09:54:21.454Z",
+      "discoveryScore": 46
+    },
+    {
+      "candidateId": "allama-muhammad-iqbal-scholarship-for-central-asia-friendly--2026",
+      "title": "Allama Muhammad Iqbal Scholarship for Central Asia & Friendly Countries",
+      "provider": "Higher Education Commission of Pakistan",
+      "country": "Pakistan",
+      "officialUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/CAFC/Pages/default.aspx",
+      "deadline": null,
+      "applyUrl": null,
+      "evidence": [
+        {
+          "field": "title",
+          "quote": "Allama Muhammad Iqbal Scholarship for Central Asia & Friendly Countries",
+          "sourceUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/CAFC/Pages/default.aspx"
+        },
+        {
+          "field": "provider",
+          "quote": "The Allama Muhammad Iqbal Scholarship Program is a prestigious initiative by the Higher Education Commission of Pakistan",
+          "sourceUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/CAFC/Pages/default.aspx"
+        }
+      ],
+      "sourceId": "hec",
+      "discoveredAt": "2026-11-28T09:54:21.454Z",
+      "status": "pending-review",
+      "foundByQuery": "UK Foreign, Commonwealth and Development Office scholarship",
+      "discoveredVia": "index",
+      "firstSeenAt": "2026-11-28T09:54:21.454Z",
+      "discoveryScore": 46
+    },
+    {
+      "candidateId": "allama-muhammad-iqbal-scholarships-for-afghan-students-phase-2026",
+      "title": "Allama Muhammad Iqbal Scholarships for Afghan Students (Phase-III)",
+      "provider": "Government of Pakistan",
+      "country": "Pakistan",
+      "officialUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/amisp/Pages/default.aspx",
+      "deadline": null,
+      "applyUrl": null,
+      "evidence": [
+        {
+          "field": "title",
+          "quote": "Allama Muhammad Iqbal Scholarships for Afghan Students (Phase-III)",
+          "sourceUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/amisp/Pages/default.aspx"
+        },
+        {
+          "field": "provider",
+          "quote": "Government of​ Pakistan is offering scholarships to Afghan youth",
+          "sourceUrl": "https://www.hec.gov.pk/english/scholarshipsgrants/amisp/Pages/default.aspx"
+        }
+      ],
+      "sourceId": "hec",
+      "discoveredAt": "2026-11-28T09:54:21.454Z",
+      "status": "pending-review",
+      "foundByQuery": "UK Foreign, Commonwealth and Development Office scholarship",
+      "discoveredVia": "index",
+      "firstSeenAt": "2026-11-28T09:54:21.454Z",
+      "discoveryScore": 46
     }
   ]
 }
