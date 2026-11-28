@@ -86,7 +86,7 @@ export function createRouter(deps: RouterDeps): Router {
     const pool = keyPools[id]
     if (!pool || pool.length === 0) return false
     const state = store.get()
-    const hasReadyKey = pool.some((k) => keyReady(state, id, k.label, date))
+    const hasReadyKey = pool.some((k) => keyReady(state, id, k.label, date, pool.length > 1))
     if (!hasReadyKey) return false
     return callsOn(state, todayInPakistan(date)) < config.dailyCallLimit
   }
@@ -184,7 +184,7 @@ export function createRouter(deps: RouterDeps): Router {
             const keyInst = pool[idx]!
             const state = store.get()
 
-            if (!keyReady(state, id, keyInst.label, date)) {
+            if (!keyReady(state, id, keyInst.label, date, true)) {
               const until = state.providers[id]?.keys?.[keyInst.label]?.cooldownUntil
               if (until) {
                 const untilMs = Date.parse(until)
@@ -253,10 +253,8 @@ export function createRouter(deps: RouterDeps): Router {
             continue
           }
 
-          if (earliestCooldownMs !== null) {
-            const until = new Date(currentTime().getTime() + earliestCooldownMs).toISOString()
-            store.set(setProviderCooldown(store.get(), id, until, lastError?.message))
-          }
+          // Never promote one key's cooldown to the whole provider: a bad key
+          // cooled for 24h would otherwise lock out every healthy key in the pool.
           break
         }
       }

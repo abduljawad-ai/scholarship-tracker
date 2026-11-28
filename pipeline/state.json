@@ -163,44 +163,7 @@
       "nextEligibleAt": null
     }
   },
-  "providers": {
-    "groq": {
-      "callsByDay": {
-        "2026-11-28": 2
-      },
-      "cooldownUntil": "2026-11-29T09:56:02.348Z",
-      "lastError": "Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.",
-      "keys": {
-        "groq:1": {
-          "callsByDay": {},
-          "cooldownUntil": "2026-11-29T09:56:00.994Z",
-          "lastError": "Invalid API Key"
-        },
-        "groq:2": {
-          "callsByDay": {},
-          "cooldownUntil": "2026-11-29T09:56:00.994Z",
-          "lastError": "Invalid API Key"
-        },
-        "groq:3": {
-          "callsByDay": {},
-          "cooldownUntil": "2026-11-29T09:56:00.994Z",
-          "lastError": "Invalid API Key"
-        },
-        "groq:4": {
-          "callsByDay": {},
-          "cooldownUntil": "2026-11-29T09:56:00.994Z",
-          "lastError": "Invalid API Key"
-        },
-        "groq:default": {
-          "callsByDay": {
-            "2026-11-28": 1
-          },
-          "cooldownUntil": "2026-11-28T09:56:10.509Z",
-          "lastError": "Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01kak7d02pf3ptjcaav76s83x9` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7273, Requested 882. Please try again in 1.1625s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing"
-        }
-      }
-    }
-  },
+  "providers": {},
   "discovery": {
     "seenUrls": {
       "https://www.daad.de/en/studying-in-germany/scholarships/daad-scholarships": {

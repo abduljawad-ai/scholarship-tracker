@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest'
 import { loadConfig } from '../../scripts/pipeline/config'
 import { ProvidersExhaustedError, createRouter } from '../../scripts/pipeline/router'
-import { emptyState, createMemoryStore, recordProviderCall, setProviderCooldown } from '../../scripts/pipeline/state'
+import { emptyState, createMemoryStore, recordProviderCall, setKeyCooldown, setProviderCooldown } from '../../scripts/pipeline/state'
 import type { FetchLike } from '../../scripts/pipeline/http'
 import { parseRetryHint } from '../../scripts/pipeline/http'
 import type { AiRequest, PipelineState } from '../../scripts/pipeline/types'
@@ -296,4 +296,64 @@ test('multi-key failover: invalid auth on one key cools it for 24h and moves to 
 
   expect(response.keyLabel).toBe('groq:2')
   expect(store.get().providers.groq?.keys?.['groq:1']?.cooldownUntil).toBe('2026-11-28T06:00:00.000Z')
+})
+
+test('a stale provider cooldown does not block a ready key in a multi-key pool', async () => {
+  const config = loadConfig(
+    { GROQ_API_KEY_1: 'key-1', GROQ_API_KEY_2: 'key-2' },
+    '/srv/app',
+  )
+  // State written by an older single-key config must not lock out a pool.
+  const state = setProviderCooldown(emptyState(), 'groq', '2026-11-28T06:00:00.000Z')
+  const router = createRouter({
+    config,
+    store: createMemoryStore(state),
+    fetchImpl: vi.fn<FetchLike>(async () => groqAnswer('answer')),
+    now: () => NOW,
+  })
+
+  const response = await router.complete(REQUEST)
+
+  expect(response.keyLabel).toBe('groq:1')
+})
+
+test('one bad key does not cool the whole pool after a transient generation failure', async () => {
+  const config = loadConfig(
+    { GROQ_API_KEY_1: 'bad-key', GROQ_API_KEY_2: 'good-key' },
+    '/srv/app',
+  )
+  // The bad key was already cooled by a 401 in an earlier call, as in the
+  // committed state after the live run.
+  const initial = setKeyCooldown(
+    emptyState(),
+    'groq',
+    'groq:1',
+    '2026-11-28T06:00:00.000Z',
+    'Invalid API Key',
+  )
+  const store = createMemoryStore(initial)
+  let goodAttempts = 0
+  const fetchImpl = vi.fn<FetchLike>(async (_url, init) => {
+    const auth = (init?.headers as Record<string, string>)?.authorization ?? ''
+    if (auth.includes('bad-key')) {
+      throw new Error('a cooled key must never be called')
+    }
+    goodAttempts += 1
+    if (goodAttempts === 1) {
+      return jsonResponse(
+        { error: { message: 'Failed to generate JSON.' } },
+        400,
+      )
+    }
+    return groqAnswer('answer')
+  })
+  const router = createRouter({ config, store, fetchImpl, now: () => NOW })
+
+  await expect(router.complete(REQUEST)).rejects.toBeInstanceOf(ProvidersExhaustedError)
+  expect(store.get().providers.groq?.cooldownUntil).toBeNull()
+
+  const response = await router.complete(REQUEST)
+
+  expect(response.keyLabel).toBe('groq:2')
+  expect(response.text).toBe('answer')
 })
