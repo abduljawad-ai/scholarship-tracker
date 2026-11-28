@@ -385,8 +385,11 @@ export async function runPipeline(options: RunOptions): Promise<RunResult> {
   const discoveryErrors: string[] = []
 
   const commit = (next: ReturnType<StateStore["get"]>): void => {
-    state = next
-    store.set(next)
+    // The router records each key's calls and cooldowns directly in the store.
+    // `next` was built from an older snapshot, so keep the fresh provider state
+    // or a checkpoint would silently erase every AI call made since then.
+    state = { ...next, providers: store.get().providers }
+    store.set(state)
   }
 
   const statFor = (id: string): RunReport["sources"][string] => {
