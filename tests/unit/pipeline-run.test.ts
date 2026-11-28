@@ -14,6 +14,7 @@ import {
   createMemoryStore,
   emptyState,
   itemKey,
+  recordProviderCall,
 } from '../../scripts/pipeline/state'
 import type {
   AiRequest,
@@ -342,6 +343,29 @@ test('a successful item publishes the program and goes live', async () => {
   expect(program.cycles[0]!.apply.url).toBe(APPLY_URL)
   expect(program.cycles[0]!.verification.applyUrl).toBe('verified')
   expect(readRunStatus(f).mode).toBe('live')
+})
+
+test('item checkpoints preserve per-key call records written by the router', async () => {
+  const f = fixture()
+  const store = createMemoryStore()
+  const fake = fakeRouter()
+  let calls = 0
+  const complete = vi.fn(async (request: AiRequest) => {
+    const response = await fake.router.complete(request)
+    calls += 1
+    // The real router records usage directly in the shared store.
+    store.set(recordProviderCall(store.get(), 'groq', '2026-11-27', 'groq:1'))
+    return response
+  })
+  const router: Router = {
+    available: () => ['gemini'],
+    complete: complete as unknown as Router['complete'],
+  }
+
+  await run(f, { store, router })
+
+  expect(calls).toBeGreaterThan(1)
+  expect(store.get().providers.groq?.keys?.['groq:1']?.callsByDay['2026-11-27']).toBe(calls)
 })
 
 test('an unchanged run skips extraction and refreshes lastSuccessfulRun', async () => {
