@@ -78,7 +78,7 @@
       "evidence": [
         {
           "field": "status",
-          "quote": "Applications for 2027-2028 Chevening Scholarships are now closed.",
+          "quote": "Applications are closed",
           "sourceUrl": "https://www.chevening.org/scholarship/pakistan/"
         }
       ],
@@ -86,5 +86,5 @@
     }
   ],
   "firstSeen": "2026-11-18T00:00:00.000Z",
-  "lastUpdated": "2026-11-28T03:36:12.478Z"
+  "lastUpdated": "2026-11-28T07:57:06.228Z"
 }

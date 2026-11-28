@@ -1,0 +1,39 @@
+{
+  "runId": "2026-11-28T07-57-06-228Z",
+  "startedAt": "2026-11-28T07:57:06.228Z",
+  "finishedAt": "2026-11-28T07:57:22.293Z",
+  "status": "paused",
+  "published": [
+    "chevening-pakistan",
+    "fulbright-pakistan"
+  ],
+  "unchanged": [],
+  "skipped": [],
+  "failed": [],
+  "paused": [
+    "daad::https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777"
+  ],
+  "unhealthy": [],
+  "review": [],
+  "candidates": 0,
+  "checked": 3,
+  "sources": {
+    "chevening": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "fulbright": {
+      "fetched": 1,
+      "published": 1,
+      "failed": 0
+    },
+    "daad": {
+      "fetched": 1,
+      "published": 0,
+      "failed": 0
+    }
+  },
+  "providers": {},
+  "discovery": null
+}

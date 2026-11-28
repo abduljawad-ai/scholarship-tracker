@@ -48,13 +48,10 @@
     ],
     "documents": [
       "Three reference letters",
-      "GRE score report",
-      "Scanned transcripts"
+      "GRE score report"
     ],
     "tips": [],
-    "timeline": [
-      "Results announced mid-September"
-    ]
+    "timeline": []
   },
   "cycles": [
     {
@@ -103,7 +100,7 @@
         },
         {
           "field": "guide.documents",
-          "quote": "Scanned transcripts",
+          "quote": "GRE score report",
           "sourceUrl": "https://www.usefp.org/scholarships/fulbright-degree.cfm"
         },
         {
@@ -116,5 +113,5 @@
     }
   ],
   "firstSeen": "2026-11-18T09:30:00.000Z",
-  "lastUpdated": "2026-11-28T03:41:07.385Z"
+  "lastUpdated": "2026-11-28T07:57:06.228Z"
 }

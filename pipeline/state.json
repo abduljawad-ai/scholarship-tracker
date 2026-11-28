@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "run": {
+    "runId": "2026-11-28T07-57-06-228Z",
+    "startedAt": "2026-11-28T07:57:06.228Z",
+    "status": "paused",
+    "items": {
+      "chevening::https://www.chevening.org/scholarship/pakistan/": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "1d24d2c14bed0eaba8011e76f43134f6e192d51e063b3190593da6ab6fd5a9db",
+        "lastError": null,
+        "updatedAt": "2026-11-28T07:57:06.228Z"
+      },
+      "fulbright::https://www.usefp.org/scholarships/fulbright-degree.cfm": {
+        "state": "published",
+        "attempts": 0,
+        "hash": "b10780d329bb38650d46f7ec081c4405935faed6a77823975db487d580e598b6",
+        "lastError": null,
+        "updatedAt": "2026-11-28T07:57:06.228Z"
+      },
+      "daad::https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/?detail=50076777": {
+        "state": "pending",
+        "attempts": 0,
+        "hash": null,
+        "lastError": "Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01kak7d02pf3ptjcaav76s83x9` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 5279, Requested 3944. Please try again in 9.1725s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing",
+        "updatedAt": "2026-11-28T07:57:06.228Z"
+      }
+    }
+  },
+  "pages": {
+    "chevening::https://www.chevening.org/scholarship/pakistan/": {
+      "hash": "1d24d2c14bed0eaba8011e76f43134f6e192d51e063b3190593da6ab6fd5a9db",
+      "textLength": 5471,
+      "lastFetchedAt": "2026-11-28T07:57:06.228Z",
+      "failures": 0
+    },
+    "fulbright::https://www.usefp.org/scholarships/fulbright-degree.cfm": {
+      "hash": "b10780d329bb38650d46f7ec081c4405935faed6a77823975db487d580e598b6",
+      "textLength": 7303,
+      "lastFetchedAt": "2026-11-28T07:57:06.228Z",
+      "failures": 0
+    }
+  },
+  "sources": {
+    "chevening": {
+      "lastFetchedAt": "2026-11-28T07:57:06.228Z",
+      "failures": 0,
+      "retired": false,
+      "nextEligibleAt": null
+    },
+    "fulbright": {
+      "lastFetchedAt": "2026-11-28T07:57:06.228Z",
+      "failures": 0,
+      "retired": false,
+      "nextEligibleAt": null
+    }
+  },
+  "providers": {},
+  "discovery": {
+    "seenUrls": {},
+    "queries": [],
+    "hostHealth": {}
+  },
+  "lastSuccessfulRun": null
+}
