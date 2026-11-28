@@ -17,6 +17,37 @@ const viewports = [
   { width: 1440, height: 900 },
 ]
 
+// Standalone touch targets must be at least 44x44 per the brief. Inline prose
+// links are exempt, so only buttons, nav links, and form controls are measured.
+const TARGET_SELECTOR =
+  'button, a[href], input:not([type="hidden"]), select, textarea, [role="button"], [role="tab"]'
+
+async function smallTargets(page: import('@playwright/test').Page): Promise<string[]> {
+  return page.evaluate((selector) => {
+    const problems: string[] = []
+    for (const element of document.querySelectorAll(selector)) {
+      if (!(element instanceof HTMLElement)) continue
+      const style = getComputedStyle(element)
+      if (style.display === 'none' || style.visibility === 'hidden') continue
+      if (element.closest('[hidden]')) continue
+
+      const box = element.getBoundingClientRect()
+      if (box.width === 0 || box.height === 0) continue
+      // Inline links inside a paragraph are exempt.
+      if (element.tagName === 'A' && element.closest('p, li')) continue
+
+      if (box.height < 43.5 || box.width < 43.5) {
+        problems.push(
+          `${element.tagName.toLowerCase()}${element.id ? `#${element.id}` : ''} ` +
+            `"${(element.textContent ?? '').trim().slice(0, 30)}" ` +
+            `${Math.round(box.width)}x${Math.round(box.height)}`,
+        )
+      }
+    }
+    return problems
+  }, TARGET_SELECTOR)
+}
+
 const outputDir = join(process.cwd(), 'test-results', 'design-review')
 
 test.beforeAll(() => {
@@ -36,6 +67,16 @@ for (const route of routes) {
         path: join(outputDir, `${route.name}-${viewport.width}.png`),
         fullPage: true,
       })
+    })
+
+    test(`standalone targets are at least 44px on ${route.name} at ${viewport.width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport)
+      await page.goto(route.path)
+
+      const problems = await smallTargets(page)
+      expect(problems, problems.join('\n')).toEqual([])
     })
   }
 

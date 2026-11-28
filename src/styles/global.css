@@ -923,39 +923,71 @@ a:hover {
   cursor: pointer;
 }
 
-.checkbox-label input {
+/* The checkbox keeps an 18px mark but owns a 44px hit area, so the control
+   meets the touch-target rule without a chunky box. */
+.checkbox-label input,
+.document-checklist input {
   flex: none;
   appearance: none;
-  display: grid;
-  place-content: center;
-  width: 1.125rem;
-  height: 1.125rem;
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
   margin: 0;
-  border: 1.5px solid var(--color-control-border);
-  border-radius: 2px;
-  background: var(--color-surface);
+  border: 0;
+  background: none;
   cursor: pointer;
 }
 
 .checkbox-label input::before,
 .document-checklist input::before {
   content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 1.5px solid var(--color-control-border);
+  border-radius: 2px;
+  background: var(--color-surface);
+}
+
+.checkbox-label input::after,
+.document-checklist input::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
   width: 0.55rem;
   height: 0.55rem;
-  transform: scale(0);
+  scale: 0;
   background: var(--color-accent-contrast);
   clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 }
 
-.checkbox-label input:checked,
-.document-checklist input:checked {
+.checkbox-label input:checked::before,
+.document-checklist input:checked::before {
   border-color: var(--color-accent);
   background: var(--color-accent);
 }
 
-.checkbox-label input:checked::before,
-.document-checklist input:checked::before {
-  transform: scale(1);
+.checkbox-label input:checked::after,
+.document-checklist input:checked::after {
+  scale: 1;
+}
+
+.checkbox-label input:focus-visible::before,
+.document-checklist input:focus-visible::before {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkbox-label input::after,
+  .document-checklist input::after {
+    transition: none;
+  }
 }
 
 .register-toolbar {
